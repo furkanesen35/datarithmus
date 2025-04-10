@@ -8,6 +8,8 @@
     "start": "npm run start --prefix packages/client & npm run start --prefix packages/server"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "concurrently": "^8.2.2",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
   }
 }

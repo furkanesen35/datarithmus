@@ -22,7 +22,7 @@ export default function Header() {
       </div>
 
       <nav className="flex justify-between items-center bg-black text-white h-[50px] px-4">
-        <div>Datarithmus</div>
+        <Link href="/">Datarithmus</Link>
 
         {/* Desktop Navigation */}
         <div className="hidden lg:flex justify-around w-[500px]">

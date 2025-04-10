@@ -1,0 +1,48 @@
+# Root-level Node.js dependencies
+/node_modules
+/package-lock.json  # If using npm; exclude unless you want to commit it
+/yarn.lock         # If using Yarn; exclude unless committing
+/pnpm-lock.yaml    # If using pnpm
+
+# Build outputs (root-level, if any)
+/dist
+/build
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Environment files
+.env
+.env.local
+.env.*.local
+.env.*  # Exclude all .env files unless you opt-in to commit specific ones
+
+# OS and editor files
+.DS_Store
+*.swp
+*.swo
+.vscode/
+.idea/
+
+# Monorepo package-specific ignores (adjust as needed)
+/packages/client/node_modules
+/packages/client/.next
+/packages/client/out
+/packages/client/build
+/packages/client/coverage
+/packages/client/*.tsbuildinfo
+/packages/client/next-env.d.ts
+/packages/client/.vercel
+
+/packages/server/node_modules
+/packages/server/dist
+/packages/server/build
+/packages/server/coverage
+
+# Misc
+*.pem  # Certificates or sensitive keys
+*.bak  # Backup files

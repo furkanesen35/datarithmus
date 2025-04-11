@@ -1,10 +1,12 @@
 "use client";
 import Link from 'next/link';
 import { useState } from 'react';
+import { useAuth } from '../context/AuthContext';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
   const [isCoursesDropdownOpen, setIsCoursesDropdownOpen] = useState<boolean>(false);
+  const { auth, logout } = useAuth(); // Access context
 
   const coursesLinks = (
     <>
@@ -22,9 +24,8 @@ export default function Header() {
       </div>
 
       <nav className="flex justify-between items-center bg-black text-white h-[50px] px-4">
-        <Link href="/">Datarithmus</Link>
+        <div>Datarithmus</div>
 
-        {/* Desktop Navigation */}
         <div className="hidden lg:flex justify-around w-[500px]">
           <div className="relative">
             <a
@@ -47,14 +48,12 @@ export default function Header() {
           <Link href="/blog" className="hover:text-gray-300">Blog</Link>
         </div>
 
-        {/* Mobile Toggle */}
         <div className="lg:hidden flex">
           <button className="mr-4 hover:text-gray-300" onClick={() => setIsMenuOpen(!isMenuOpen)}>
             {isMenuOpen ? '✕' : '☰'}
           </button>
         </div>
 
-        {/* Mobile Menu */}
         <div className={`lg:hidden absolute top-[50px] left-0 w-full bg-black transition-opacity duration-500 ${isMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'}`}>
           <div>
             <a
@@ -78,7 +77,18 @@ export default function Header() {
         </div>
 
         <div className="hidden lg:block">
-          <Link href="/auth" className="inline-block px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Login / Register</Link>
+          {auth.isLoggedIn ? (
+            <button
+              onClick={logout}
+              className="inline-block px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+            >
+              Logout
+            </button>
+          ) : (
+            <Link href="/auth" className="inline-block px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+              Login / Register
+            </Link>
+          )}
         </div>
       </nav>
     </header>

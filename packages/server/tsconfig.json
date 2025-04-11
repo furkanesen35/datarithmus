@@ -1,11 +1,12 @@
 {
-    "compilerOptions": {
-      "target": "ESNext",
-      "module": "CommonJS", // Use CommonJS to avoid ESM issues
-      "strict": true,
-      "esModuleInterop": true,
-      "skipLibCheck": true,
-      "outDir": "./dist"
-    },
-    "include": ["src/**/*"]
+  "compilerOptions": {
+    "target": "es6",
+    "module": "commonjs",
+    "strict": true,
+    "esModuleInterop": true,
+    "outDir": "dist",
+    "sourceMap": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules"]
 }

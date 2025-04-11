@@ -1,13 +1,12 @@
-import express from 'express';
+import express, { Express } from 'express';
+import authRoutes from './routes/auth';
 
-const app = express();
-const PORT = 3001;
+const app: Express = express();
+const PORT: number = 3001;
 
-app.use(express.json());
+app.use(express.json()); // Parse JSON bodies
 
-app.get('/api/hello', (req, res) => {
-  res.json({ message: 'Hello from BFF!' });
-});
+app.use('/api/auth', authRoutes); // Mount auth routes
 
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);

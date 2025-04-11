@@ -1,5 +1,6 @@
 import React, { FormEvent } from "react";
 import { useAuth } from "../../context/AuthContext";
+import { API_URL } from "../../config";
 
 export default function RegisterComponent() {
   const { login } = useAuth();
@@ -12,15 +13,16 @@ export default function RegisterComponent() {
     const password = formData.get("password") as string;
 
     try {
-      const response = await fetch("http://localhost:3001/api/auth/register", {
+      const response = await fetch(`${API_URL}/api/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, email, password }),
+        credentials: 'include', // Send cookies
       });
 
       const data = await response.json();
       if (response.ok) {
-        login(email, data.token); // Pass token to context
+        login(data.email); // Use email from response
         console.log("Register success:", data);
       } else {
         console.error("Register failed:", data.error);

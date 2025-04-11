@@ -4,40 +4,35 @@ import { createContext, useContext, useState, useEffect, ReactNode } from 'react
 interface AuthState {
   isLoggedIn: boolean;
   user: { email: string } | null;
-  token: string | null;
 }
 
 interface AuthContextType {
   auth: AuthState;
-  login: (email: string, token: string) => void;
+  login: (email: string) => void;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [auth, setAuth] = useState<AuthState>({ isLoggedIn: false, user: null, token: null });
+  const [auth, setAuth] = useState<AuthState>({ isLoggedIn: false, user: null });
 
-  // Sync with localStorage only on client-side mount
   useEffect(() => {
     const saved = localStorage.getItem('auth');
-    if (saved) {
-      setAuth(JSON.parse(saved));
-    }
-  }, []); // Empty dependency array: runs once on mount
+    if (saved) setAuth(JSON.parse(saved));
+  }, []);
 
-  // Save to localStorage on auth change
   useEffect(() => {
     localStorage.setItem('auth', JSON.stringify(auth));
   }, [auth]);
 
-  const login = (email: string, token: string) => {
-    setAuth({ isLoggedIn: true, user: { email }, token });
+  const login = (email: string) => {
+    setAuth({ isLoggedIn: true, user: { email } });
     console.log('Logged in as:', email);
   };
 
   const logout = () => {
-    setAuth({ isLoggedIn: false, user: null, token: null });
+    setAuth({ isLoggedIn: false, user: null });
     console.log('Logged out');
   };
 

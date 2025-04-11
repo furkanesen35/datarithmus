@@ -16,11 +16,17 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [auth, setAuth] = useState<AuthState>(() => {
-    const saved = localStorage.getItem('auth');
-    return saved ? JSON.parse(saved) : { isLoggedIn: false, user: null, token: null };
-  });
+  const [auth, setAuth] = useState<AuthState>({ isLoggedIn: false, user: null, token: null });
 
+  // Sync with localStorage only on client-side mount
+  useEffect(() => {
+    const saved = localStorage.getItem('auth');
+    if (saved) {
+      setAuth(JSON.parse(saved));
+    }
+  }, []); // Empty dependency array: runs once on mount
+
+  // Save to localStorage on auth change
   useEffect(() => {
     localStorage.setItem('auth', JSON.stringify(auth));
   }, [auth]);

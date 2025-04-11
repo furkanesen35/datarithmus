@@ -27,10 +27,10 @@ export default function LoginComponent() {
       if (response.ok) {
         login(data.email);
         console.log("Login success:", data);
-        setMessage("Login successful, redirecting to the home page");
+        setMessage("✔ Login successful, redirecting to the home page");
         setTimeout(() => {
-          router.push('/');
-        }, 2000); // Redirect after 2 seconds
+          router.push('/'); // Redirect to home
+        }, 2000);
       } else {
         console.error("Login failed:", data.error);
         alert(data.error);
@@ -44,8 +44,8 @@ export default function LoginComponent() {
   return (
     <div>
       {message && (
-        <div className="mb-4 p-4 bg-green-100 text-green-700 rounded-md text-center">
-          {message}
+        <div className="mb-4 p-4 bg-green-100 text-green-700 rounded-md text-center flex items-center justify-center">
+          <span>{message}</span>
         </div>
       )}
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -56,7 +56,7 @@ export default function LoginComponent() {
             id="email"
             name="email"
             required
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-black"
           />
         </div>
         <div>
@@ -66,7 +66,7 @@ export default function LoginComponent() {
             id="password"
             name="password"
             required
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-black"
           />
         </div>
         <button

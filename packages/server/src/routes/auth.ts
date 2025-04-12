@@ -4,8 +4,8 @@ import * as jwt from 'jsonwebtoken';
 import { OAuth2Client } from 'google-auth-library';
 
 const router = Router();
-const JWT_SECRET = 'your-secret-key';
-const GOOGLE_CLIENT_ID = '512313453952-p1kc0emice0hshj0kv3e976plkeffk7e.apps.googleusercontent.com';
+const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || '';
 
 const client = new OAuth2Client(GOOGLE_CLIENT_ID);
 
@@ -47,9 +47,8 @@ router.post('/google', async (req: Request, res: Response) => {
     const email = payload.email;
     let user = await userStore.findByEmail(email);
     if (!user) {
-      // Register new user
       const username = payload.name || email.split('@')[0];
-      user = await userStore.create(username, email, 'google-auth'); // No password for Google users
+      user = await userStore.create(username, email, 'google-auth');
     }
 
     const jwtToken = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '1h' });
@@ -59,6 +58,30 @@ router.post('/google', async (req: Request, res: Response) => {
     console.error('Google auth error:', error);
     res.status(500).json({ error: 'Google authentication failed' });
   }
+});
+
+router.get('/me', async (req: Request, res: Response) => {
+  const token = req.cookies.token;
+  if (!token) {
+    return res.status(401).json({ error: 'No token provided' });
+  }
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET) as { id: number; email: string };
+    const user = await userStore.findByEmail(decoded.email);
+    if (!user) {
+      return res.status(401).json({ error: 'User not found' });
+    }
+    res.status(200).json({ email: user.email });
+  } catch (error) {
+    console.error('Token verification failed:', error);
+    res.status(401).json({ error: 'Invalid token' });
+  }
+});
+
+router.post('/logout', (req: Request, res: Response) => {
+  res.clearCookie('token', { httpOnly: true, secure: false, sameSite: 'lax' });
+  res.status(200).json({ message: 'Logout successful' });
 });
 
 export default router;

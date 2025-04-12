@@ -6,7 +6,7 @@ import { useAuth } from '../context/AuthContext';
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
   const [isCoursesDropdownOpen, setIsCoursesDropdownOpen] = useState<boolean>(false);
-  const { auth, logout } = useAuth(); // Access context
+  const { auth, logout } = useAuth();
 
   const coursesLinks = (
     <>

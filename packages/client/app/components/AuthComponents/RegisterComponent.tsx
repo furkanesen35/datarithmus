@@ -5,7 +5,7 @@ import { useAuth } from "../../context/AuthContext";
 import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 import { API_URL } from "../../config";
 
-export default function RegisterComponent() {
+export default function RegisterComponent({ setActiveTab }: { setActiveTab: (tab: "login" | "register") => void }) {
   const { login } = useAuth();
   const router = useRouter();
   const [message, setMessage] = useState<string | null>(null);
@@ -31,7 +31,7 @@ export default function RegisterComponent() {
         console.log("Register success:", data);
         setMessage("✔ Registration successful, redirecting to login");
         setTimeout(() => {
-          router.push('/auth?tab=login');
+          window.location.href = '/auth?tab=login'; // Force full reload
         }, 2000);
       } else {
         console.error("Register failed:", data.error);
@@ -56,9 +56,9 @@ export default function RegisterComponent() {
       if (response.ok) {
         login(data.email);
         console.log("Google register success:", data);
-        setMessage("✔ Google registration successful, redirecting to login");
+        setMessage("✔ Google registration successful, redirecting to home page");
         setTimeout(() => {
-          router.push('/auth?tab=login');
+          router.push('/'); // Redirect to home
         }, 2000);
       } else {
         console.error("Google register failed:", data.error);
@@ -71,7 +71,7 @@ export default function RegisterComponent() {
   };
 
   return (
-    <GoogleOAuthProvider clientId="YOUR_GOOGLE_CLIENT_ID">
+    <GoogleOAuthProvider clientId="512313453952-p1kc0emice0hshj0kv3e976plkeffk7e.apps.googleusercontent.com">
       <div>
         {message && (
           <div className="mb-4 p-4 bg-green-100 text-green-700 rounded-md text-center flex items-center justify-center">

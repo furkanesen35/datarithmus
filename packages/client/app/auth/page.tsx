@@ -42,7 +42,7 @@ export default function Auth() {
           </button>
         </div>
         <div className="flex-1 min-h-[300px]">
-          {activeTab === "login" ? <LoginComponent /> : <RegisterComponent />}
+          {activeTab === "login" ? <LoginComponent /> : <RegisterComponent setActiveTab={setActiveTab} />}
         </div>
       </div>
     </div>

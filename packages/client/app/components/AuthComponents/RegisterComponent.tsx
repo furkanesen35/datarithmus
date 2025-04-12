@@ -31,7 +31,7 @@ export default function RegisterComponent({ setActiveTab }: { setActiveTab: (tab
         console.log("Register success:", data);
         setMessage("✔ Registration successful, redirecting to login");
         setTimeout(() => {
-          window.location.href = '/auth?tab=login'; // Force full reload
+          window.location.href = '/auth?tab=login';
         }, 2000);
       } else {
         console.error("Register failed:", data.error);
@@ -58,7 +58,7 @@ export default function RegisterComponent({ setActiveTab }: { setActiveTab: (tab
         console.log("Google register success:", data);
         setMessage("✔ Google registration successful, redirecting to home page");
         setTimeout(() => {
-          router.push('/'); // Redirect to home
+          router.push('/');
         }, 2000);
       } else {
         console.error("Google register failed:", data.error);
@@ -71,7 +71,7 @@ export default function RegisterComponent({ setActiveTab }: { setActiveTab: (tab
   };
 
   return (
-    <GoogleOAuthProvider clientId="512313453952-p1kc0emice0hshj0kv3e976plkeffk7e.apps.googleusercontent.com">
+    <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "512313453952-p1kc0emice0hshj0kv3e976plkeffk7e.apps.googleusercontent.com"}>
       <div>
         {message && (
           <div className="mb-4 p-4 bg-green-100 text-green-700 rounded-md text-center flex items-center justify-center">
@@ -109,7 +109,7 @@ export default function RegisterComponent({ setActiveTab }: { setActiveTab: (tab
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-black"
             />
           </div>
-          <div className="mt-4">
+          <div className="mt-4 flex justify-center">
             <GoogleLogin
               onSuccess={handleGoogleSuccess}
               onError={() => {
@@ -118,6 +118,8 @@ export default function RegisterComponent({ setActiveTab }: { setActiveTab: (tab
               }}
               text="signup_with"
               logo_alignment="center"
+              size="large"
+              shape="circle"
             />
           </div>
           <button

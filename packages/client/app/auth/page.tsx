@@ -1,12 +1,18 @@
 "use client";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import LoginComponent from "../components/AuthComponents/LoginComponent";
 import RegisterComponent from "../components/AuthComponents/RegisterComponent";
 
 export default function Auth() {
-  const [activeTab, setActiveTab] = useState<"login" | "register">("login");
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const initialTab = searchParams.get("tab") === "register" ? "register" : "login";
+  const [activeTab, setActiveTab] = useState<"login" | "register">(initialTab);
+
+  useEffect(() => {
+    setActiveTab(initialTab);
+  }, [initialTab]);
 
   const handleBack = () => {
     router.back();

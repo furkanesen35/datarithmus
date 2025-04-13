@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../context/AuthContext";
 import Link from "next/link";
@@ -7,11 +7,17 @@ import Link from "next/link";
 export default function DashboardPage() {
   const { auth, logout } = useAuth();
   const router = useRouter();
-  const [activeSection, setActiveSection] = useState("announcements");
+  const [activeSection, setActiveSection] = useState("overview");
 
-  // Redirect if not logged in
+  // Redirect if not logged in (client-side)
+  useEffect(() => {
+    if (!auth.isLoggedIn) {
+      router.push("/auth?tab=login");
+    }
+  }, [auth.isLoggedIn, router]);
+
+  // Prevent rendering until auth is checked
   if (!auth.isLoggedIn) {
-    router.push("/auth?tab=login");
     return null;
   }
 
@@ -29,11 +35,11 @@ export default function DashboardPage() {
           <li>
             <button
               className={`w-full text-left p-2 rounded ${
-                activeSection === "announcements" ? "bg-blue-500 text-white" : "hover:bg-gray-200"
+                activeSection === "overview" ? "bg-blue-500 text-white" : "hover:bg-gray-200"
               }`}
-              onClick={() => setActiveSection("announcements")}
+              onClick={() => setActiveSection("overview")}
             >
-              Announcements
+              Overview
             </button>
           </li>
           <li>
@@ -66,10 +72,10 @@ export default function DashboardPage() {
 
       {/* Middle - Content */}
       <div className="flex-1 p-8">
-        {activeSection === "announcements" && (
+        {activeSection === "overview" && (
           <div>
             <h1 className="text-2xl font-bold mb-4">Welcome, {auth.user?.email}!</h1>
-            <p>This is your dashboard announcements tab. Check your updates and news from this place.</p>
+            <p>This is your dashboard overview. Check your courses or progress from the sidebar.</p>
           </div>
         )}
         {activeSection === "courses" && (

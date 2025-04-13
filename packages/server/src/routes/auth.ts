@@ -5,7 +5,7 @@ import { OAuth2Client } from 'google-auth-library';
 import * as bcrypt from 'bcrypt';
 
 const router = Router();
-const JWT_SECRET = process.env.JWT_SECRET || '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';
+const JWT_SECRET = process.env.JWT_SECRET || 'fallback-secret'; // Ensure string
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 
 if (!GOOGLE_CLIENT_ID) {
@@ -57,7 +57,6 @@ router.post('/google', async (req: Request, res: Response) => {
     let user = await userStore.findByEmail(email);
     if (!user) {
       const username = payload.name || email.split('@')[0];
-      // Use a placeholder password for Google auth (never used for login)
       user = await userStore.create(username, email, 'google-auth-placeholder');
     }
 

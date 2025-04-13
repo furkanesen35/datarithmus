@@ -5,10 +5,15 @@ import { useAuth } from "../../context/AuthContext";
 import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
 import { API_URL } from "../../config";
 
-export default function LoginComponent() {
+interface LoginComponentProps {
+  setActiveTab: (tab: "login" | "register") => void;
+}
+
+export default function LoginComponent({ setActiveTab }: LoginComponentProps) {
   const { login } = useAuth();
   const router = useRouter();
   const [message, setMessage] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -17,69 +22,71 @@ export default function LoginComponent() {
     const password = formData.get("password") as string;
 
     try {
+      setError(null);
       const response = await fetch(`${API_URL}/api/auth/login`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
-        credentials: 'include',
+        credentials: "include",
       });
 
       const data = await response.json();
       if (response.ok) {
         login(data.email);
-        console.log("Login success:", data);
         setMessage("✔ Login successful, redirecting to the home page");
-        setTimeout(() => {
-          router.push('/');
-        }, 2000);
+        setTimeout(() => router.push("/"), 2000);
       } else {
-        console.error("Login failed:", data.error);
-        alert(data.error);
+        setError(data.error);
       }
     } catch (error) {
-      console.error("Error during login:", error);
-      alert("An error occurred. Please try again.");
+      setError("An error occurred. Please try again.");
     }
   };
 
   const handleGoogleSuccess = async (credentialResponse: any) => {
     try {
+      setError(null);
       const response = await fetch(`${API_URL}/api/auth/google`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ token: credentialResponse.credential }),
-        credentials: 'include',
+        credentials: "include",
       });
 
       const data = await response.json();
       if (response.ok) {
         login(data.email);
-        console.log("Google login success:", data);
         setMessage("✔ Google login successful, redirecting to home page");
-        setTimeout(() => {
-          router.push('/');
-        }, 2000);
+        setTimeout(() => router.push("/"), 2000);
       } else {
-        console.error("Google login failed:", data.error);
-        alert(data.error);
+        setError(data.error);
       }
     } catch (error) {
-      console.error("Error during Google login:", error);
-      alert("An error occurred. Please try again.");
+      setError("An error occurred. Please try again.");
     }
   };
 
   return (
-    <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || "512313453952-p1kc0emice0hshj0kv3e976plkeffk7e.apps.googleusercontent.com"}>
+    <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}>
       <div>
         {message && (
           <div className="mb-4 p-4 bg-green-100 text-green-700 rounded-md text-center flex items-center justify-center">
             <span>{message}</span>
           </div>
         )}
+        {error && (
+          <div className="mb-4 p-4 bg-red-100 text-red-700 rounded-md text-center">
+            <span>{error}</span>
+          </div>
+        )}
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Email
+            </label>
             <input
               type="email"
               id="email"
@@ -89,7 +96,12 @@ export default function LoginComponent() {
             />
           </div>
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Password
+            </label>
             <input
               type="password"
               id="password"
@@ -101,10 +113,7 @@ export default function LoginComponent() {
           <div className="mt-4 flex justify-center">
             <GoogleLogin
               onSuccess={handleGoogleSuccess}
-              onError={() => {
-                console.error("Google login failed");
-                alert("Google login failed. Please try again.");
-              }}
+              onError={() => setError("Google login failed. Please try again.")}
               text="signin_with"
               logo_alignment="center"
               size="large"
@@ -118,6 +127,14 @@ export default function LoginComponent() {
             Login
           </button>
         </form>
+        <div className="mt-4 text-center">
+          <button
+            onClick={() => setActiveTab("register")}
+            className="text-blue-500 hover:underline"
+          >
+            Don’t have an account? Register
+          </button>
+        </div>
       </div>
     </GoogleOAuthProvider>
   );

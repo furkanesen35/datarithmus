@@ -1,0 +1,99 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id          Int      @id @default(autoincrement())
+  email       String   @unique
+  isSuperuser Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
+
+model Announcement {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String
+  pinned    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model Video {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  filePath    String
+  createdAt   DateTime @default(now())
+}
+
+model Homework {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  dueDate     DateTime
+  filePath    String?
+  createdAt   DateTime @default(now())
+}
+
+model Resource {
+  id        Int      @id @default(autoincrement())
+  title     String
+  category  String
+  filePath  String?
+  link      String?
+  createdAt DateTime @default(now())
+}
+
+model Schedule {
+  id          Int      @id @default(autoincrement())
+  title       String
+  date        DateTime
+  time        String
+  description String
+  createdAt   DateTime @default(now())
+}
+
+model Quiz {
+  id            Int      @id @default(autoincrement())
+  question      String
+  options       String   // Store JSON array, e.g., ["opt1", "opt2"]
+  correctAnswer Int
+  createdAt     DateTime @default(now())
+}
+
+model StudentProgress {
+  id               Int      @id @default(autoincrement())
+  studentEmail     String
+  homeworkCompleted Int
+  quizScore        Int
+  notes            String
+  updatedAt        DateTime @default(now())
+}
+
+model Discussion {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String
+  author    String
+  pinned    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model Feedback {
+  id        Int      @id @default(autoincrement())
+  question  String
+  scale     Int
+  createdAt DateTime @default(now())
+}
+
+model Student {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  name      String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+}

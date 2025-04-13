@@ -34,8 +34,8 @@ export default function RegisterComponent({ setActiveTab }: RegisterComponentPro
       const data = await response.json();
       if (response.ok) {
         login(data.email);
-        setMessage("✔ Registration successful, redirecting to home page");
-        setTimeout(() => router.push("/"), 2000);
+        setMessage("✔ Registration successful, redirecting to dashboard");
+        setTimeout(() => router.push("/dashboard"), 2000);
       } else {
         setError(data.error);
       }
@@ -57,8 +57,8 @@ export default function RegisterComponent({ setActiveTab }: RegisterComponentPro
       const data = await response.json();
       if (response.ok) {
         login(data.email);
-        setMessage("✔ Google registration successful, redirecting to home page");
-        setTimeout(() => router.push("/"), 2000);
+        setMessage("✔ Google registration successful, redirecting to dashboard");
+        setTimeout(() => router.push("/dashboard"), 2000);
       } else {
         setError(data.error);
       }
@@ -82,10 +82,7 @@ export default function RegisterComponent({ setActiveTab }: RegisterComponentPro
         )}
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label
-              htmlFor="username"
-              className="block text-sm font-medium text-gray-700"
-            >
+            <label htmlFor="username" className="block text-sm font-medium text-gray-700">
               Username
             </label>
             <input
@@ -97,10 +94,7 @@ export default function RegisterComponent({ setActiveTab }: RegisterComponentPro
             />
           </div>
           <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-gray-700"
-            >
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
               Email
             </label>
             <input
@@ -112,10 +106,7 @@ export default function RegisterComponent({ setActiveTab }: RegisterComponentPro
             />
           </div>
           <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-700"
-            >
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
               Password
             </label>
             <input

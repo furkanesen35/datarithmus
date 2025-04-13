@@ -33,8 +33,8 @@ export default function LoginComponent({ setActiveTab }: LoginComponentProps) {
       const data = await response.json();
       if (response.ok) {
         login(data.email);
-        setMessage("✔ Login successful, redirecting to the home page");
-        setTimeout(() => router.push("/"), 2000);
+        setMessage("✔ Login successful, redirecting to dashboard");
+        setTimeout(() => router.push("/dashboard"), 2000);
       } else {
         setError(data.error);
       }
@@ -56,8 +56,8 @@ export default function LoginComponent({ setActiveTab }: LoginComponentProps) {
       const data = await response.json();
       if (response.ok) {
         login(data.email);
-        setMessage("✔ Google login successful, redirecting to home page");
-        setTimeout(() => router.push("/"), 2000);
+        setMessage("✔ Google login successful, redirecting to dashboard");
+        setTimeout(() => router.push("/dashboard"), 2000);
       } else {
         setError(data.error);
       }
@@ -81,10 +81,7 @@ export default function LoginComponent({ setActiveTab }: LoginComponentProps) {
         )}
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-gray-700"
-            >
+            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
               Email
             </label>
             <input
@@ -96,10 +93,7 @@ export default function LoginComponent({ setActiveTab }: LoginComponentProps) {
             />
           </div>
           <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-700"
-            >
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
               Password
             </label>
             <input

@@ -1,12 +1,13 @@
 import Header from "./components/Header";
-import Home from "./pages/Home";
+import FirstContainer from "./components/HomeComponents/FirstContainer";
+import ThirdContainer from "./components/HomeComponents/ThirdContainer";
 
 // packages/client/app/page.tsx
-export default function Page() {
+export default function Home() {
   return (
-    <main>
-      <Header />
-      <Home/>
-    </main>
+    <div className="w-full h-[100vh] bg-[#301934]">
+      <FirstContainer/>
+      <ThirdContainer/>
+    </div>
   );
 }

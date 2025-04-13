@@ -2,10 +2,15 @@ import { Router, Request, Response } from 'express';
 import { userStore } from '../context/users';
 import * as jwt from 'jsonwebtoken';
 import { OAuth2Client } from 'google-auth-library';
+import * as bcrypt from 'bcrypt';
 
 const router = Router();
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
-const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || '';
+const JWT_SECRET = process.env.JWT_SECRET || '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';
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+
+if (!GOOGLE_CLIENT_ID) {
+  throw new Error('GOOGLE_CLIENT_ID is not defined');
+}
 
 const client = new OAuth2Client(GOOGLE_CLIENT_ID);
 
@@ -13,7 +18,9 @@ router.post('/login', async (req: Request, res: Response) => {
   const { email, password } = req.body;
   if (!email || !password) return res.status(400).json({ error: 'Email and password are required' });
   const user = await userStore.findByEmail(email);
-  if (!user || user.password !== password) return res.status(401).json({ error: 'Invalid email or password' });
+  if (!user || !(await bcrypt.compare(password, user.password))) {
+    return res.status(401).json({ error: 'Invalid email or password' });
+  }
 
   const token = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '1h' });
   res.cookie('token', token, { httpOnly: true, secure: false, sameSite: 'lax' });
@@ -34,6 +41,8 @@ router.post('/register', async (req: Request, res: Response) => {
 
 router.post('/google', async (req: Request, res: Response) => {
   const { token } = req.body;
+  if (!token) return res.status(400).json({ error: 'No token provided' });
+
   try {
     const ticket = await client.verifyIdToken({
       idToken: token,
@@ -48,7 +57,8 @@ router.post('/google', async (req: Request, res: Response) => {
     let user = await userStore.findByEmail(email);
     if (!user) {
       const username = payload.name || email.split('@')[0];
-      user = await userStore.create(username, email, 'google-auth');
+      // Use a placeholder password for Google auth (never used for login)
+      user = await userStore.create(username, email, 'google-auth-placeholder');
     }
 
     const jwtToken = jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, { expiresIn: '1h' });
@@ -62,16 +72,12 @@ router.post('/google', async (req: Request, res: Response) => {
 
 router.get('/me', async (req: Request, res: Response) => {
   const token = req.cookies.token;
-  if (!token) {
-    return res.status(401).json({ error: 'No token provided' });
-  }
+  if (!token) return res.status(401).json({ error: 'No token provided' });
 
   try {
     const decoded = jwt.verify(token, JWT_SECRET) as { id: number; email: string };
     const user = await userStore.findByEmail(decoded.email);
-    if (!user) {
-      return res.status(401).json({ error: 'User not found' });
-    }
+    if (!user) return res.status(401).json({ error: 'User not found' });
     res.status(200).json({ email: user.email });
   } catch (error) {
     console.error('Token verification failed:', error);

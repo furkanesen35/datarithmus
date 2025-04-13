@@ -6,8 +6,12 @@ import VideoManager from "../components/AdminComponents/VideoManager";
 import HomeworkManager from "../components/AdminComponents/HomeworkManager";
 import ScheduleManager from "../components/AdminComponents/ScheduleManager";
 import QuizManager from "../components/AdminComponents/QuizManager";
-import AnnouncementsManager from "app/components/AdminComponents/AnnouncementMananer";
+import StudentProgressManager from "../components/AdminComponents/StudentProgressManager";
+import DiscussionManager from "../components/AdminComponents/DiscussionManager";
+import FeedbackManager from "../components/AdminComponents/FeedbackManager";
+import StudentManager from "../components/AdminComponents/StudentManager";
 import ResourceManager from "app/components/AdminComponents/ResourceManagement";
+import AnnouncementsManager from "app/components/AdminComponents/AnnouncementMananer";
 
 export default function AdminPage() {
   const { auth, logout } = useAuth();
@@ -145,6 +149,70 @@ export default function AdminPage() {
           {activeSection === "quizzes" && (
             <div className="p-6 bg-white rounded-lg shadow-md">
               <QuizManager onMessage={setMessage} onError={setError} />
+            </div>
+          )}
+
+          {/* Student Progress Section */}
+          <button
+            onClick={() => toggleSection("progress")}
+            className="w-full flex justify-between items-center p-4 bg-white rounded-lg shadow-md hover:bg-blue-50 transition-colors"
+          >
+            <span className="text-lg font-semibold">Manage Student Progress</span>
+            <span className="text-xl">
+              {activeSection === "progress" ? "−" : "+"}
+            </span>
+          </button>
+          {activeSection === "progress" && (
+            <div className="p-6 bg-white rounded-lg shadow-md">
+              <StudentProgressManager onMessage={setMessage} onError={setError} />
+            </div>
+          )}
+
+          {/* Discussion Section */}
+          <button
+            onClick={() => toggleSection("discussion")}
+            className="w-full flex justify-between items-center p-4 bg-white rounded-lg shadow-md hover:bg-blue-50 transition-colors"
+          >
+            <span className="text-lg font-semibold">Manage Discussion</span>
+            <span className="text-xl">
+              {activeSection === "discussion" ? "−" : "+"}
+            </span>
+          </button>
+          {activeSection === "discussion" && (
+            <div className="p-6 bg-white rounded-lg shadow-md">
+              <DiscussionManager onMessage={setMessage} onError={setError} />
+            </div>
+          )}
+
+          {/* Feedback Section */}
+          <button
+            onClick={() => toggleSection("feedback")}
+            className="w-full flex justify-between items-center p-4 bg-white rounded-lg shadow-md hover:bg-blue-50 transition-colors"
+          >
+            <span className="text-lg font-semibold">Manage Feedback</span>
+            <span className="text-xl">
+              {activeSection === "feedback" ? "−" : "+"}
+            </span>
+          </button>
+          {activeSection === "feedback" && (
+            <div className="p-6 bg-white rounded-lg shadow-md">
+              <FeedbackManager onMessage={setMessage} onError={setError} />
+            </div>
+          )}
+
+          {/* Student Management Section */}
+          <button
+            onClick={() => toggleSection("students")}
+            className="w-full flex justify-between items-center p-4 bg-white rounded-lg shadow-md hover:bg-blue-50 transition-colors"
+          >
+            <span className="text-lg font-semibold">Manage Students</span>
+            <span className="text-xl">
+              {activeSection === "students" ? "−" : "+"}
+            </span>
+          </button>
+          {activeSection === "students" && (
+            <div className="p-6 bg-white rounded-lg shadow-md">
+              <StudentManager onMessage={setMessage} onError={setError} />
             </div>
           )}
         </div>

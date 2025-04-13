@@ -33,9 +33,9 @@ export default function RegisterComponent({ setActiveTab }: RegisterComponentPro
 
       const data = await response.json();
       if (response.ok) {
-        login(data.email);
-        setMessage("✔ Registration successful, redirecting to dashboard");
-        setTimeout(() => router.push("/dashboard"), 2000);
+        login(data.email, data.isSuperuser);
+        setMessage("✔ Registration successful, redirecting...");
+        setTimeout(() => router.push(data.isSuperuser ? "/admin" : "/dashboard"), 2000);
       } else {
         setError(data.error);
       }
@@ -56,9 +56,9 @@ export default function RegisterComponent({ setActiveTab }: RegisterComponentPro
 
       const data = await response.json();
       if (response.ok) {
-        login(data.email);
-        setMessage("✔ Google registration successful, redirecting to dashboard");
-        setTimeout(() => router.push("/dashboard"), 2000);
+        login(data.email, data.isSuperuser);
+        setMessage("✔ Google registration successful, redirecting...");
+        setTimeout(() => router.push(data.isSuperuser ? "/admin" : "/dashboard"), 2000);
       } else {
         setError(data.error);
       }

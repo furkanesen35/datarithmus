@@ -4,7 +4,8 @@ interface User {
   id: number;
   username: string;
   email: string;
-  password: string; // Now stores hashed password
+  password: string;
+  isSuperuser: boolean;
 }
 
 class UserStore {
@@ -15,10 +16,14 @@ class UserStore {
     return this.users.find(user => user.email === email);
   }
 
-  async create(username: string, email: string, password: string): Promise<User> {
-    const hashedPassword = await bcrypt.hash(password, 10); // 10 is the salt rounds
-    const user: User = { id: this.idCounter++, username, email, password: hashedPassword };
+  async create(username: string, email: string, password: string, isSuperuser: boolean = false): Promise<User> {
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const user: User = { id: this.idCounter++, username, email, password: hashedPassword, isSuperuser };
     this.users.push(user);
+    // Temporary: Make specific user superuser
+    if (email === 'furkanesen35@gmail.com') {
+      user.isSuperuser = true;
+    }
     return user;
   }
 }

@@ -32,9 +32,9 @@ export default function LoginComponent({ setActiveTab }: LoginComponentProps) {
 
       const data = await response.json();
       if (response.ok) {
-        login(data.email);
-        setMessage("✔ Login successful, redirecting to dashboard");
-        setTimeout(() => router.push("/dashboard"), 2000);
+        login(data.email, data.isSuperuser);
+        setMessage("✔ Login successful, redirecting...");
+        setTimeout(() => router.push(data.isSuperuser ? "/admin" : "/dashboard"), 2000);
       } else {
         setError(data.error);
       }
@@ -55,9 +55,9 @@ export default function LoginComponent({ setActiveTab }: LoginComponentProps) {
 
       const data = await response.json();
       if (response.ok) {
-        login(data.email);
-        setMessage("✔ Google login successful, redirecting to dashboard");
-        setTimeout(() => router.push("/dashboard"), 2000);
+        login(data.email, data.isSuperuser);
+        setMessage("✔ Google login successful, redirecting...");
+        setTimeout(() => router.push(data.isSuperuser ? "/admin" : "/dashboard"), 2000);
       } else {
         setError(data.error);
       }

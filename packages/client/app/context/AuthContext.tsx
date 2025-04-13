@@ -4,19 +4,18 @@ import { API_URL } from '../config';
 
 interface AuthState {
   isLoggedIn: boolean;
-  user: { email: string } | null;
+  user: { email: string; isSuperuser: boolean } | null;
 }
 
 interface AuthContextType {
   auth: AuthState;
-  login: (email: string) => void;
+  login: (email: string, isSuperuser: boolean) => void;
   logout: () => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  // Initialize from localStorage synchronously
   const initialAuth = (() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('auth');
@@ -36,7 +35,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const [auth, setAuth] = useState<AuthState>(initialAuth);
 
-  // Verify session with backend
   useEffect(() => {
     const verifySession = async () => {
       try {
@@ -47,7 +45,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const data = await response.json();
         if (response.ok) {
           console.log('Session verified:', data);
-          setAuth({ isLoggedIn: true, user: { email: data.email } });
+          setAuth({ isLoggedIn: true, user: { email: data.email, isSuperuser: data.isSuperuser } });
         } else {
           console.log('No valid session:', data.error);
           setAuth({ isLoggedIn: false, user: null });
@@ -63,16 +61,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     verifySession();
   }, []);
 
-  // Save to localStorage on auth change
   useEffect(() => {
     console.log('Saving auth to localStorage:', auth);
     localStorage.setItem('auth', JSON.stringify(auth));
   }, [auth]);
 
-  const login = (email: string) => {
-    const newAuth = { isLoggedIn: true, user: { email } };
+  const login = (email: string, isSuperuser: boolean) => {
+    const newAuth = { isLoggedIn: true, user: { email, isSuperuser } };
     setAuth(newAuth);
-    console.log('Logged in as:', email);
+    console.log('Logged in as:', email, 'Superuser:', isSuperuser);
   };
 
   const logout = async () => {

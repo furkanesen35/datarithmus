@@ -1,154 +1,143 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface Announcement {
   id: number;
   title: string;
   content: string;
+  pinned: boolean;
   createdAt: string;
 }
 
-interface AnnouncementsManagerProps {
-  onMessage: (msg: string) => void;
-  onError: (err: string) => void;
-}
-
-export default function AnnouncementsManager({ onMessage, onError }: AnnouncementsManagerProps) {
-  const [announcementTitle, setAnnouncementTitle] = useState("");
-  const [announcementContent, setAnnouncementContent] = useState("");
+export default function AnnouncementsManager() {
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
+  const [pinned, setPinned] = useState(false);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [editingId, setEditingId] = useState<number | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    fetchAnnouncements();
+  }, []);
+
+  const fetchAnnouncements = async () => {
+    const res = await fetch("/api/announcements", {
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+    });
+    if (res.ok) {
+      setAnnouncements(await res.json());
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!announcementTitle || !announcementContent) {
-      onError("Title and content are required");
-      return;
-    }
+    if (!title || !content) return;
 
-    if (editingId) {
-      // Edit existing announcement
-      setAnnouncements(
-        announcements.map((ann) =>
-          ann.id === editingId
-            ? { ...ann, title: announcementTitle, content: announcementContent }
-            : ann
-        )
-      );
-      onMessage("Announcement updated successfully");
+    const body = {
+      title,
+      content,
+      pinned,
+      ...(editingId && { id: editingId }),
+    };
+
+    const res = await fetch("/api/announcements", {
+      method: editingId ? "PUT" : "POST",
+      body: JSON.stringify(body),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+
+    if (res.ok) {
+      fetchAnnouncements();
+      setTitle("");
+      setContent("");
+      setPinned(false);
       setEditingId(null);
-    } else {
-      // Create new announcement
-      const newAnnouncement: Announcement = {
-        id: Date.now(),
-        title: announcementTitle,
-        content: announcementContent,
-        createdAt: new Date().toISOString(),
-      };
-      setAnnouncements([newAnnouncement, ...announcements]);
-      onMessage("Announcement created successfully");
     }
-
-    setAnnouncementTitle("");
-    setAnnouncementContent("");
   };
 
-  const handleEdit = (ann: Announcement) => {
-    setEditingId(ann.id);
-    setAnnouncementTitle(ann.title);
-    setAnnouncementContent(ann.content);
+  const handleEdit = (announcement: Announcement) => {
+    setEditingId(announcement.id);
+    setTitle(announcement.title);
+    setContent(announcement.content);
+    setPinned(announcement.pinned);
   };
 
-  const handleDelete = (id: number) => {
-    setAnnouncements(announcements.filter((ann) => ann.id !== id));
-    onMessage("Announcement deleted successfully");
+  const handleDelete = async (id: number) => {
+    const res = await fetch("/api/announcements", {
+      method: "DELETE",
+      body: JSON.stringify({ id }),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+    if (res.ok) fetchAnnouncements();
   };
 
   return (
     <div className="mb-8">
-      <h2 className="text-xl font-semibold mb-4">
-        {editingId ? "Edit Announcement" : "Create Announcement"}
-      </h2>
+      <h2 className="text-xl font-semibold mb-4">{editingId ? "Edit Announcement" : "Create Announcement"}</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="announcementTitle" className="block text-sm font-medium">
-            Announcement Title
-          </label>
+          <label htmlFor="title" className="block text-sm font-medium">Title</label>
           <input
+            id="title"
             type="text"
-            id="announcementTitle"
-            value={announcementTitle}
-            onChange={(e) => setAnnouncementTitle(e.target.value)}
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md text-black"
           />
         </div>
         <div>
-          <label htmlFor="announcementContent" className="block text-sm font-medium">
-            Content
-          </label>
+          <label htmlFor="content" className="block text-sm font-medium">Content</label>
           <textarea
-            id="announcementContent"
-            value={announcementContent}
-            onChange={(e) => setAnnouncementContent(e.target.value)}
+            id="content"
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md text-black"
-            rows={5}
+            rows={4}
           />
         </div>
-        <div className="flex space-x-4">
-          <button
-            type="submit"
-            className="py-2 px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600"
-          >
-            {editingId ? "Update Announcement" : "Create Announcement"}
-          </button>
-          {editingId && (
-            <button
-              type="button"
-              className="py-2 px-4 bg-gray-500 text-white rounded-md hover:bg-gray-600"
-              onClick={() => {
-                setEditingId(null);
-                setAnnouncementTitle("");
-                setAnnouncementContent("");
-              }}
-            >
-              Cancel
-            </button>
-          )}
+        <div>
+          <label htmlFor="pinned" className="flex items-center">
+            <input
+              id="pinned"
+              type="checkbox"
+              checked={pinned}
+              onChange={(e) => setPinned(e.target.checked)}
+              className="mr-2"
+            />
+            Pin Announcement
+          </label>
         </div>
+        <button
+          type="submit"
+          className="py-2 px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+        >
+          {editingId ? "Update Announcement" : "Create Announcement"}
+        </button>
       </form>
-
-      {/* Announcements List */}
       <div className="mt-6">
         <h3 className="text-lg font-semibold mb-2">Announcements</h3>
-        {announcements.length === 0 ? (
-          <p>No announcements yet.</p>
-        ) : (
-          <ul className="space-y-4">
-            {announcements.map((ann) => (
-              <li key={ann.id} className="p-4 bg-white border border-gray-300 rounded-md">
-                <h4 className="text-md font-medium">{ann.title}</h4>
-                <p className="text-sm">{ann.content}</p>
-                <p className="text-xs text-gray-500 mt-1">
-                  Posted: {new Date(ann.createdAt).toLocaleDateString()}
-                </p>
-                <div className="mt-2 flex space-x-2">
-                  <button
-                    onClick={() => handleEdit(ann)}
-                    className="text-blue-500 hover:underline text-sm"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(ann.id)}
-                    className="text-red-500 hover:underline text-sm"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
+        {announcements.map((announcement) => (
+          <div key={announcement.id} className="p-4 bg-white border border-gray-300 rounded-md mb-2">
+            <h4 className="text-md font-medium">
+              {announcement.title} {announcement.pinned && <span className="text-blue-500">[Pinned]</span>}
+            </h4>
+            <p className="text-sm">{announcement.content}</p>
+            <div className="mt-2 flex space-x-2">
+              <button onClick={() => handleEdit(announcement)} className="text-blue-500 hover:underline">
+                Edit
+              </button>
+              <button onClick={() => handleDelete(announcement.id)} className="text-red-500 hover:underline">
+                Delete
+              </button>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

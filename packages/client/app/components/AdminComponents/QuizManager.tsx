@@ -1,191 +1,149 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface Quiz {
   id: number;
   question: string;
-  options: string[];
+  options: string;
   correctAnswer: number;
   createdAt: string;
 }
 
-interface QuizManagerProps {
-  onMessage: (msg: string) => void;
-  onError: (err: string) => void;
-}
-
-export default function QuizManager({ onMessage, onError }: QuizManagerProps) {
+export default function QuizManager() {
   const [question, setQuestion] = useState("");
   const [options, setOptions] = useState<string[]>(["", "", "", ""]);
-  const [correctAnswer, setCorrectAnswer] = useState(0);
+  const [correctAnswer, setCorrectAnswer] = useState("");
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [editingId, setEditingId] = useState<number | null>(null);
 
-  const handleOptionChange = (index: number, value: string) => {
-    const newOptions = [...options];
-    newOptions[index] = value;
-    setOptions(newOptions);
+  useEffect(() => {
+    fetchQuizzes();
+  }, []);
+
+  const fetchQuizzes = async () => {
+    const res = await fetch("/api/quizzes", {
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+    });
+    if (res.ok) {
+      const data = await res.json();
+      setQuizzes(data);
+    }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!question || options.some((opt) => !opt)) {
-      onError("Question and all options are required");
-      return;
-    }
+    if (!question || options.some((opt) => !opt) || !correctAnswer) return;
 
-    if (editingId) {
-      // Edit existing quiz
-      setQuizzes(
-        quizzes.map((qz) =>
-          qz.id === editingId
-            ? { ...qz, question, options: [...options], correctAnswer }
-            : qz
-        )
-      );
-      onMessage("Quiz updated successfully");
+    const body = {
+      question,
+      options,
+      correctAnswer,
+      ...(editingId && { id: editingId }),
+    };
+
+    const res = await fetch("/api/quizzes", {
+      method: editingId ? "PUT" : "POST",
+      body: JSON.stringify(body),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+
+    if (res.ok) {
+      fetchQuizzes();
+      setQuestion("");
+      setOptions(["", "", "", ""]);
+      setCorrectAnswer("");
       setEditingId(null);
-    } else {
-      // Create new quiz
-      const newQuiz: Quiz = {
-        id: Date.now(),
-        question,
-        options: [...options],
-        correctAnswer,
-        createdAt: new Date().toISOString(),
-      };
-      setQuizzes([newQuiz, ...quizzes]);
-      onMessage("Quiz created successfully");
     }
-
-    setQuestion("");
-    setOptions(["", "", "", ""]);
-    setCorrectAnswer(0);
   };
 
-  const handleEdit = (qz: Quiz) => {
-    setEditingId(qz.id);
-    setQuestion(qz.question);
-    setOptions([...qz.options]);
-    setCorrectAnswer(qz.correctAnswer);
+  const handleEdit = (quiz: Quiz) => {
+    setEditingId(quiz.id);
+    setQuestion(quiz.question);
+    setOptions(JSON.parse(quiz.options));
+    setCorrectAnswer(quiz.correctAnswer.toString());
   };
 
-  const handleDelete = (id: number) => {
-    setQuizzes(quizzes.filter((qz) => qz.id !== id));
-    onMessage("Quiz deleted successfully");
+  const handleDelete = async (id: number) => {
+    const res = await fetch("/api/quizzes", {
+      method: "DELETE",
+      body: JSON.stringify({ id }),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+    if (res.ok) fetchQuizzes();
   };
 
   return (
     <div className="mb-8">
-      <h2 className="text-xl font-semibold mb-4">
-        {editingId ? "Edit Quiz" : "Create Quiz"}
-      </h2>
+      <h2 className="text-xl font-semibold mb-4">{editingId ? "Edit Quiz" : "Create Quiz"}</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="question" className="block text-sm font-medium">
-            Question
-          </label>
+          <label htmlFor="question" className="block text-sm font-medium">Question</label>
           <input
-            type="text"
             id="question"
+            type="text"
             value={question}
             onChange={(e) => setQuestion(e.target.value)}
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md text-black"
           />
         </div>
-        {options.map((opt, index) => (
-          <div key={index}>
-            <label htmlFor={`option${index}`} className="block text-sm font-medium">
-              Option {index + 1}
-            </label>
+        {options.map((opt, i) => (
+          <div key={i}>
+            <label htmlFor={`option-${i}`} className="block text-sm font-medium">Option {i + 1}</label>
             <input
+              id={`option-${i}`}
               type="text"
-              id={`option${index}`}
               value={opt}
-              onChange={(e) => handleOptionChange(index, e.target.value)}
+              onChange={(e) => {
+                const newOptions = [...options];
+                newOptions[i] = e.target.value;
+                setOptions(newOptions);
+              }}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md text-black"
             />
           </div>
         ))}
         <div>
-          <label htmlFor="correctAnswer" className="block text-sm font-medium">
-            Correct Answer
-          </label>
-          <select
+          <label htmlFor="correctAnswer" className="block text-sm font-medium">Correct Answer (0-3)</label>
+          <input
             id="correctAnswer"
+            type="number"
+            min="0"
+            max="3"
             value={correctAnswer}
-            onChange={(e) => setCorrectAnswer(Number(e.target.value))}
+            onChange={(e) => setCorrectAnswer(e.target.value)}
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md text-black"
-          >
-            {options.map((_, index) => (
-              <option key={index} value={index}>
-                Option {index + 1}
-              </option>
-            ))}
-          </select>
+          />
         </div>
-        <div className="flex space-x-4">
-          <button
-            type="submit"
-            className="py-2 px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600"
-          >
-            {editingId ? "Update Quiz" : "Create Quiz"}
-          </button>
-          {editingId && (
-            <button
-              type="button"
-              className="py-2 px-4 bg-gray-500 text-white rounded-md hover:bg-gray-600"
-              onClick={() => {
-                setEditingId(null);
-                setQuestion("");
-                setOptions(["", "", "", ""]);
-                setCorrectAnswer(0);
-              }}
-            >
-              Cancel
-            </button>
-          )}
-        </div>
+        <button
+          type="submit"
+          className="py-2 px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+        >
+          {editingId ? "Update Quiz" : "Create Quiz"}
+        </button>
       </form>
-
-      {/* Quizzes List */}
       <div className="mt-6">
         <h3 className="text-lg font-semibold mb-2">Quizzes</h3>
-        {quizzes.length === 0 ? (
-          <p>No quizzes created yet.</p>
-        ) : (
-          <ul className="space-y-4">
-            {quizzes.map((qz) => (
-              <li key={qz.id} className="p-4 bg-white border border-gray-300 rounded-md">
-                <h4 className="text-md font-medium">{qz.question}</h4>
-                <ul className="text-sm list-disc pl-5">
-                  {qz.options.map((opt, idx) => (
-                    <li key={idx} className={idx === qz.correctAnswer ? "text-green-600" : ""}>
-                      {opt} {idx === qz.correctAnswer ? "(Correct)" : ""}
-                    </li>
-                  ))}
-                </ul>
-                <p className="text-xs text-gray-500 mt-1">
-                  Created: {new Date(qz.createdAt).toLocaleDateString()}
-                </p>
-                <div className="mt-2 flex space-x-2">
-                  <button
-                    onClick={() => handleEdit(qz)}
-                    className="text-blue-500 hover:underline text-sm"
-                  >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(qz.id)}
-                    className="text-red-500 hover:underline text-sm"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
+        {quizzes.map((quiz) => (
+          <div key={quiz.id} className="p-4 bg-white border border-gray-300 rounded-md mb-2">
+            <h4 className="text-md font-medium">{quiz.question}</h4>
+            <p className="text-sm">Options: {JSON.parse(quiz.options).join(", ")}</p>
+            <p className="text-sm">Correct: {quiz.correctAnswer}</p>
+            <div className="mt-2 flex space-x-2">
+              <button onClick={() => handleEdit(quiz)} className="text-blue-500 hover:underline">
+                Edit
+              </button>
+              <button onClick={() => handleDelete(quiz.id)} className="text-red-500 hover:underline">
+                Delete
+              </button>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

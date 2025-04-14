@@ -8,18 +8,11 @@ datasource db {
 }
 
 model User {
-  id          Int      @id @default(autoincrement())
-  email       String   @unique
-  isSuperuser Boolean  @default(false)
-  createdAt   DateTime @default(now())
-}
-
-model Announcement {
-  id        Int      @id @default(autoincrement())
-  title     String
-  content   String
-  pinned    Boolean  @default(false)
-  createdAt DateTime @default(now())
+  id         Int      @id @default(autoincrement())
+  email      String   @unique
+  password   String
+  isSuperuser Boolean @default(false)
+  createdAt  DateTime @default(now())
 }
 
 model Video {
@@ -28,6 +21,22 @@ model Video {
   description String
   filePath    String
   createdAt   DateTime @default(now())
+}
+
+model Quiz {
+  id            Int      @id @default(autoincrement())
+  question      String
+  options       String // JSON string, e.g., ["opt1", "opt2"]
+  correctAnswer Int
+  createdAt     DateTime @default(now())
+}
+
+model Announcement {
+  id        Int      @id @default(autoincrement())
+  title     String
+  content   String
+  pinned    Boolean  @default(false)
+  createdAt DateTime @default(now())
 }
 
 model Homework {
@@ -40,12 +49,12 @@ model Homework {
 }
 
 model Resource {
-  id        Int      @id @default(autoincrement())
-  title     String
-  category  String
-  filePath  String?
-  link      String?
-  createdAt DateTime @default(now())
+  id          Int      @id @default(autoincrement())
+  title       String
+  category    String
+  filePath    String?
+  link        String?
+  createdAt   DateTime @default(now())
 }
 
 model Schedule {
@@ -53,25 +62,17 @@ model Schedule {
   title       String
   date        DateTime
   time        String
-  description String
+  description String?
   createdAt   DateTime @default(now())
-}
-
-model Quiz {
-  id            Int      @id @default(autoincrement())
-  question      String
-  options       String   // Store JSON array, e.g., ["opt1", "opt2"]
-  correctAnswer Int
-  createdAt     DateTime @default(now())
 }
 
 model StudentProgress {
   id               Int      @id @default(autoincrement())
   studentEmail     String
-  homeworkCompleted Int
-  quizScore        Int
-  notes            String
-  updatedAt        DateTime @default(now())
+  homeworkCompleted Int      @default(0)
+  quizScore        Int      @default(0)
+  notes            String?
+  createdAt        DateTime @default(now())
 }
 
 model Discussion {

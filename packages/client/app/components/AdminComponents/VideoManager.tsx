@@ -1,74 +1,109 @@
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface Video {
   id: number;
   title: string;
-  fileName: string;
-  uploadedAt: string;
+  description: string;
+  filePath: string;
+  createdAt: string;
 }
 
-interface VideoManagerProps {
-  onMessage: (msg: string) => void;
-  onError: (err: string) => void;
-}
-
-export default function VideoManager({ onMessage, onError }: VideoManagerProps) {
-  const [videoTitle, setVideoTitle] = useState("");
-  const [videoFile, setVideoFile] = useState<File | null>(null);
+export default function VideoManager() {
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [file, setFile] = useState<File | null>(null);
   const [videos, setVideos] = useState<Video[]>([]);
+  const [editingId, setEditingId] = useState<number | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!videoTitle || !videoFile) {
-      onError("Title and file are required");
-      return;
+  useEffect(() => {
+    fetchVideos();
+  }, []);
+
+  const fetchVideos = async () => {
+    const res = await fetch("/api/videos", {
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+    });
+    if (res.ok) {
+      setVideos(await res.json());
     }
-
-    // Simulate video upload
-    const newVideo: Video = {
-      id: Date.now(),
-      title: videoTitle,
-      fileName: videoFile.name,
-      uploadedAt: new Date().toISOString(),
-    };
-    setVideos([newVideo, ...videos]);
-    onMessage("Video uploaded successfully");
-
-    setVideoTitle("");
-    setVideoFile(null);
   };
 
-  const handleDelete = (id: number) => {
-    setVideos(videos.filter((vid) => vid.id !== id));
-    onMessage("Video deleted successfully");
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!title || !description || (!editingId && !file)) return;
+
+    const formData = new FormData();
+    formData.append("title", title);
+    formData.append("description", description);
+    if (file) formData.append("file", file);
+    if (editingId) formData.append("id", editingId.toString());
+
+    const res = await fetch("/api/videos", {
+      method: editingId ? "PUT" : "POST",
+      body: formData,
+      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+    });
+
+    if (res.ok) {
+      fetchVideos();
+      setTitle("");
+      setDescription("");
+      setFile(null);
+      setEditingId(null);
+    }
+  };
+
+  const handleEdit = (video: Video) => {
+    setEditingId(video.id);
+    setTitle(video.title);
+    setDescription(video.description);
+    setFile(null);
+  };
+
+  const handleDelete = async (id: number) => {
+    const res = await fetch("/api/videos", {
+      method: "DELETE",
+      body: JSON.stringify({ id }),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+    });
+    if (res.ok) fetchVideos();
   };
 
   return (
     <div className="mb-8">
-      <h2 className="text-xl font-semibold mb-4">Upload Session Video</h2>
+      <h2 className="text-xl font-semibold mb-4">{editingId ? "Edit Video" : "Upload Video"}</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="videoTitle" className="block text-sm font-medium">
-            Video Title
-          </label>
+          <label htmlFor="title" className="block text-sm font-medium">Title</label>
           <input
+            id="title"
             type="text"
-            id="videoTitle"
-            value={videoTitle}
-            onChange={(e) => setVideoTitle(e.target.value)}
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md text-black"
           />
         </div>
         <div>
-          <label htmlFor="videoFile" className="block text-sm font-medium">
-            Video File
-          </label>
+          <label htmlFor="description" className="block text-sm font-medium">Description</label>
+          <textarea
+            id="description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md text-black"
+            rows={4}
+          />
+        </div>
+        <div>
+          <label htmlFor="file" className="block text-sm font-medium">Video File</label>
           <input
+            id="file"
             type="file"
-            id="videoFile"
             accept="video/*"
-            onChange={(e) => setVideoFile(e.target.files?.[0] || null)}
+            onChange={(e) => setFile(e.target.files?.[0] || null)}
             className="mt-1 block w-full"
           />
         </div>
@@ -76,36 +111,26 @@ export default function VideoManager({ onMessage, onError }: VideoManagerProps) 
           type="submit"
           className="py-2 px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600"
         >
-          Upload Video
+          {editingId ? "Update Video" : "Upload Video"}
         </button>
       </form>
-
-      {/* Videos List */}
       <div className="mt-6">
-        <h3 className="text-lg font-semibold mb-2">Uploaded Videos</h3>
-        {videos.length === 0 ? (
-          <p>No videos uploaded yet.</p>
-        ) : (
-          <ul className="space-y-4">
-            {videos.map((vid) => (
-              <li key={vid.id} className="p-4 bg-white border border-gray-300 rounded-md">
-                <h4 className="text-md font-medium">{vid.title}</h4>
-                <p className="text-sm">File: {vid.fileName}</p>
-                <p className="text-xs text-gray-500 mt-1">
-                  Uploaded: {new Date(vid.uploadedAt).toLocaleDateString()}
-                </p>
-                <div className="mt-2">
-                  <button
-                    onClick={() => handleDelete(vid.id)}
-                    className="text-red-500 hover:underline text-sm"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
+        <h3 className="text-lg font-semibold mb-2">Videos</h3>
+        {videos.map((video) => (
+          <div key={video.id} className="p-4 bg-white border border-gray-300 rounded-md mb-2">
+            <h4 className="text-md font-medium">{video.title}</h4>
+            <p className="text-sm">{video.description}</p>
+            <video src={video.filePath} controls className="mt-2 w-full max-w-xs" />
+            <div className="mt-2 flex space-x-2">
+              <button onClick={() => handleEdit(video)} className="text-blue-500 hover:underline">
+                Edit
+              </button>
+              <button onClick={() => handleDelete(video.id)} className="text-red-500 hover:underline">
+                Delete
+              </button>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

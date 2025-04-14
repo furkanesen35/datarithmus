@@ -122,22 +122,26 @@ export default function AnnouncementsManager() {
       </form>
       <div className="mt-6">
         <h3 className="text-lg font-semibold mb-2">Announcements</h3>
-        {announcements.map((announcement) => (
-          <div key={announcement.id} className="p-4 bg-white border border-gray-300 rounded-md mb-2">
-            <h4 className="text-md font-medium">
-              {announcement.title} {announcement.pinned && <span className="text-blue-500">[Pinned]</span>}
-            </h4>
-            <p className="text-sm">{announcement.content}</p>
-            <div className="mt-2 flex space-x-2">
-              <button onClick={() => handleEdit(announcement)} className="text-blue-500 hover:underline">
-                Edit
-              </button>
-              <button onClick={() => handleDelete(announcement.id)} className="text-red-500 hover:underline">
-                Delete
-              </button>
+        {announcements.length === 0 ? (
+          <p>No announcements yet.</p>
+        ) : (
+          announcements.map((announcement) => (
+            <div key={announcement.id} className="p-4 bg-white border border-gray-300 rounded-md mb-2">
+              <h4 className="text-md font-medium">
+                {announcement.title} {announcement.pinned && <span className="text-blue-500">[Pinned]</span>}
+              </h4>
+              <p className="text-sm">{announcement.content}</p>
+              <div className="mt-2 flex space-x-2">
+                <button onClick={() => handleEdit(announcement)} className="text-blue-500 hover:underline">
+                  Edit
+                </button>
+                <button onClick={() => handleDelete(announcement.id)} className="text-red-500 hover:underline">
+                  Delete
+                </button>
+              </div>
             </div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
     </div>
   );

@@ -15,17 +15,52 @@ export default function AnnouncementsManager() {
   const [pinned, setPinned] = useState(false);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
-    fetchAnnouncements();
+    const token = localStorage.getItem("token");
+    if (token) {
+      setIsLoggedIn(true);
+      fetchAnnouncements(token);
+    }
   }, []);
 
-  const fetchAnnouncements = async () => {
-    const res = await fetch("/api/announcements", {
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-    });
-    if (res.ok) {
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      const res = await fetch("http://localhost:5000/api/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
+      if (!res.ok) {
+        throw new Error("Login failed");
+      }
+      const { token } = await res.json();
+      localStorage.setItem("token", token);
+      setIsLoggedIn(true);
+      setError(null);
+      fetchAnnouncements(token);
+    } catch (err: any) {
+      setError(err.message || "Login failed");
+    }
+  };
+
+  const fetchAnnouncements = async (token: string) => {
+    try {
+      const res = await fetch("http://localhost:5000/api/announcements", {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) {
+        throw new Error(`HTTP error ${res.status}`);
+      }
       setAnnouncements(await res.json());
+      setError(null);
+    } catch (err: any) {
+      setError(err.message || "Failed to fetch announcements");
     }
   };
 
@@ -33,28 +68,37 @@ export default function AnnouncementsManager() {
     e.preventDefault();
     if (!title || !content) return;
 
-    const body = {
-      title,
-      content,
-      pinned,
-      ...(editingId && { id: editingId }),
-    };
-
-    const res = await fetch("/api/announcements", {
-      method: editingId ? "PUT" : "POST",
-      body: JSON.stringify(body),
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    });
-
-    if (res.ok) {
-      fetchAnnouncements();
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setError("Please log in");
+        return;
+      }
+      const body = {
+        title,
+        content,
+        pinned,
+        ...(editingId && { id: editingId }),
+      };
+      const res = await fetch("http://localhost:5000/api/announcements", {
+        method: editingId ? "PUT" : "POST",
+        body: JSON.stringify(body),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!res.ok) {
+        throw new Error(`HTTP error ${res.status}`);
+      }
+      fetchAnnouncements(token);
       setTitle("");
       setContent("");
       setPinned(false);
       setEditingId(null);
+      setError(null);
+    } catch (err: any) {
+      setError(err.message || "Failed to save announcement");
     }
   };
 
@@ -66,19 +110,70 @@ export default function AnnouncementsManager() {
   };
 
   const handleDelete = async (id: number) => {
-    const res = await fetch("/api/announcements", {
-      method: "DELETE",
-      body: JSON.stringify({ id }),
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
-      },
-    });
-    if (res.ok) fetchAnnouncements();
+    try {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        setError("Please log in");
+        return;
+      }
+      const res = await fetch("http://localhost:5000/api/announcements", {
+        method: "DELETE",
+        body: JSON.stringify({ id }),
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      if (!res.ok) {
+        throw new Error(`HTTP error ${res.status}`);
+      }
+      fetchAnnouncements(token);
+      setError(null);
+    } catch (err: any) {
+      setError(err.message || "Failed to delete announcement");
+    }
   };
+
+  if (!isLoggedIn) {
+    return (
+      <div className="min-h-screen bg-gray-100 p-8">
+        <h1 className="text-2xl font-bold mb-8">Login</h1>
+        {error && <p className="text-red-500 mb-4">{error}</p>}
+        <form onSubmit={handleLogin} className="space-y-4 max-w-md">
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium">Email</label>
+            <input
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md text-black"
+            />
+          </div>
+          <div>
+            <label htmlFor="password" className="block text-sm font-medium">Password</label>
+            <input
+              id="password"
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md text-black"
+            />
+          </div>
+          <button
+            type="submit"
+            className="py-2 px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600"
+          >
+            Log In
+          </button>
+        </form>
+      </div>
+    );
+  }
 
   return (
     <div className="mb-8">
+      {error && <p className="text-red-500 mb-4">{error}</p>}
       <h2 className="text-xl font-semibold mb-4">{editingId ? "Edit Announcement" : "Create Announcement"}</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>

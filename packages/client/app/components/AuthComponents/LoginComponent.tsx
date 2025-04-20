@@ -1,8 +1,10 @@
+// packages/client/app/components/AuthComponents/LoginComponent.tsx
 'use client';
 import React, { FormEvent, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
+import { authFetch } from '../../../lib/fetch'; // Import custom fetch
 
 interface LoginComponentProps {
   setActiveTab: (tab: 'login' | 'register') => void;
@@ -22,15 +24,14 @@ export default function LoginComponent({ setActiveTab }: LoginComponentProps) {
 
     try {
       setError(null);
-      const response = await fetch('/api/login', {
+      const response = await authFetch('/api/login', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
 
       const data = await response.json();
       if (response.ok) {
-        localStorage.setItem('token', data.token); // Store JWT
+        localStorage.setItem('token', data.token);
         login(data.email, data.isSuperuser);
         setMessage('✔ Login successful, redirecting...');
         setTimeout(() => router.push(data.isSuperuser ? '/admin' : '/dashboard'), 2000);
@@ -45,15 +46,14 @@ export default function LoginComponent({ setActiveTab }: LoginComponentProps) {
   const handleGoogleSuccess = async (credentialResponse: any) => {
     try {
       setError(null);
-      const response = await fetch('/api/auth/google', {
+      const response = await authFetch('/api/auth/google', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token: credentialResponse.credential }),
       });
 
       const data = await response.json();
       if (response.ok) {
-        localStorage.setItem('token', data.token); // Store JWT
+        localStorage.setItem('token', data.token);
         login(data.email, data.isSuperuser);
         setMessage('✔ Google login successful, redirecting...');
         setTimeout(() => router.push(data.isSuperuser ? '/admin' : '/dashboard'), 2000);

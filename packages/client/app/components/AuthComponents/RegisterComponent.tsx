@@ -1,8 +1,10 @@
+// packages/client/app/components/AuthComponents/RegisterComponent.tsx
 'use client';
 import React, { FormEvent, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
+import { authFetch } from '../../../lib/fetch'; // Import custom fetch
 
 interface RegisterComponentProps {
   setActiveTab: (tab: 'login' | 'register') => void;
@@ -23,15 +25,14 @@ export default function RegisterComponent({ setActiveTab }: RegisterComponentPro
 
     try {
       setError(null);
-      const response = await fetch('/api/register', {
+      const response = await authFetch('/api/register', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, email, password }),
       });
 
       const data = await response.json();
       if (response.ok) {
-        localStorage.setItem('token', data.token); // Store JWT
+        localStorage.setItem('token', data.token);
         login(data.email, data.isSuperuser);
         setMessage('✔ Registration successful, redirecting...');
         setTimeout(() => router.push(data.isSuperuser ? '/admin' : '/dashboard'), 2000);
@@ -46,15 +47,14 @@ export default function RegisterComponent({ setActiveTab }: RegisterComponentPro
   const handleGoogleSuccess = async (credentialResponse: any) => {
     try {
       setError(null);
-      const response = await fetch('/api/auth/google', {
+      const response = await authFetch('/api/auth/google', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token: credentialResponse.credential }),
       });
 
       const data = await response.json();
       if (response.ok) {
-        localStorage.setItem('token', data.token); // Store JWT
+        localStorage.setItem('token', data.token);
         login(data.email, data.isSuperuser);
         setMessage('✔ Google registration successful, redirecting...');
         setTimeout(() => router.push(data.isSuperuser ? '/admin' : '/dashboard'), 2000);
@@ -81,7 +81,7 @@ export default function RegisterComponent({ setActiveTab }: RegisterComponentPro
         )}
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label htmlFor="username" className="block subway text-sm font-medium text-gray-700">
+            <label htmlFor="username" className="block text-sm font-medium text-gray-700">
               Username
             </label>
             <input

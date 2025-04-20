@@ -8,9 +8,7 @@ const googleClient = new OAuth2Client(process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID);
 
 export async function POST(req: NextRequest) {
   try {
-    const { token } = await req.json(); // Google ID token from client
-
-    // Verify Google token
+    const { token } = await req.json();
     const ticket = await googleClient.verifyIdToken({
       idToken: token,
       audience: process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID,
@@ -21,29 +19,34 @@ export async function POST(req: NextRequest) {
     }
 
     const { email, sub: googleId } = payload;
-
-    // Check if user exists
     let user = await prisma.user.findUnique({ where: { email } });
 
     if (!user) {
-      // Register new user
       user = await prisma.user.create({
         data: {
           email,
-          password: '', // No password for Google users
-          isSuperuser: false, // Default to non-superuser
+          password: '',
+          isSuperuser: false,
         },
       });
     }
 
-    // Generate JWT
     const jwtToken = jwt.sign(
       { email: user.email, isSuperuser: user.isSuperuser },
       process.env.JWT_SECRET!,
       { expiresIn: '1h' }
     );
 
-    return NextResponse.json({ token: jwtToken, email: user.email, isSuperuser: user.isSuperuser });
+    const response = NextResponse.json({ email: user.email, isSuperuser: user.isSuperuser });
+    response.cookies.set('token', jwtToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 3600,
+      path: '/',
+    });
+
+    return response;
   } catch (error) {
     console.error('Google auth error:', error);
     return NextResponse.json({ error: 'Server error' }, { status: 500 });

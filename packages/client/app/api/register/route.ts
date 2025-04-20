@@ -18,8 +18,9 @@ export async function POST(req: NextRequest) {
     const user = await prisma.user.create({
       data: {
         email,
+        username,
         password: hashedPassword,
-        isSuperuser: false, // Default to non-superuser
+        isSuperuser: false,
       },
     });
 
@@ -29,7 +30,16 @@ export async function POST(req: NextRequest) {
       { expiresIn: '1h' }
     );
 
-    return NextResponse.json({ token, email: user.email, isSuperuser: user.isSuperuser });
+    const response = NextResponse.json({ email: user.email, isSuperuser: user.isSuperuser });
+    response.cookies.set('token', token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'strict',
+      maxAge: 3600,
+      path: '/',
+    });
+
+    return response;
   } catch (error) {
     return NextResponse.json({ error: 'Server error' }, { status: 500 });
   }

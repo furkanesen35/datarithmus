@@ -38,11 +38,6 @@ pnpm-debug.log*
 /packages/client/next-env.d.ts
 /packages/client/.vercel
 
-/packages/server/node_modules
-/packages/server/dist
-/packages/server/build
-/packages/server/coverage
-
 # Misc
 *.pem  # Certificates or sensitive keys
 *.bak  # Backup files

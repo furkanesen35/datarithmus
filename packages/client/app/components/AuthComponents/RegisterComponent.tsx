@@ -31,6 +31,7 @@ export default function RegisterComponent({ setActiveTab }: RegisterComponentPro
 
       const data = await response.json();
       if (response.ok) {
+        localStorage.setItem('token', data.token); // Store JWT
         login(data.email, data.isSuperuser);
         setMessage('✔ Registration successful, redirecting...');
         setTimeout(() => router.push(data.isSuperuser ? '/admin' : '/dashboard'), 2000);
@@ -43,8 +44,26 @@ export default function RegisterComponent({ setActiveTab }: RegisterComponentPro
   };
 
   const handleGoogleSuccess = async (credentialResponse: any) => {
-    // TODO: Implement Google registration with frontend API
-    setError('Google registration not implemented yet');
+    try {
+      setError(null);
+      const response = await fetch('/api/auth/google', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: credentialResponse.credential }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        localStorage.setItem('token', data.token); // Store JWT
+        login(data.email, data.isSuperuser);
+        setMessage('✔ Google registration successful, redirecting...');
+        setTimeout(() => router.push(data.isSuperuser ? '/admin' : '/dashboard'), 2000);
+      } else {
+        setError(data.error);
+      }
+    } catch (error) {
+      setError('Google registration failed. Please try again.');
+    }
   };
 
   return (
@@ -62,7 +81,7 @@ export default function RegisterComponent({ setActiveTab }: RegisterComponentPro
         )}
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+            <label htmlFor="username" className="block subway text-sm font-medium text-gray-700">
               Username
             </label>
             <input

@@ -30,6 +30,7 @@ export default function LoginComponent({ setActiveTab }: LoginComponentProps) {
 
       const data = await response.json();
       if (response.ok) {
+        localStorage.setItem('token', data.token); // Store JWT
         login(data.email, data.isSuperuser);
         setMessage('✔ Login successful, redirecting...');
         setTimeout(() => router.push(data.isSuperuser ? '/admin' : '/dashboard'), 2000);
@@ -42,8 +43,26 @@ export default function LoginComponent({ setActiveTab }: LoginComponentProps) {
   };
 
   const handleGoogleSuccess = async (credentialResponse: any) => {
-    // TODO: Implement Google login with frontend API
-    setError('Google login not implemented yet');
+    try {
+      setError(null);
+      const response = await fetch('/api/auth/google', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: credentialResponse.credential }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        localStorage.setItem('token', data.token); // Store JWT
+        login(data.email, data.isSuperuser);
+        setMessage('✔ Google login successful, redirecting...');
+        setTimeout(() => router.push(data.isSuperuser ? '/admin' : '/dashboard'), 2000);
+      } else {
+        setError(data.error);
+      }
+    } catch (error) {
+      setError('Google login failed. Please try again.');
+    }
   };
 
   return (

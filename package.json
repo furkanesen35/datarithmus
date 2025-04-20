@@ -3,19 +3,17 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "concurrently \"npm run dev --prefix packages/client\" \"npm run dev --prefix packages/server\"",
-    "build": "npm run build --prefix packages/client && npm run build --prefix packages/server",
-    "start": "npm run start --prefix packages/client & npm run start --prefix packages/server"
+    "dev": "npm run dev --prefix packages/client",
+    "build": "npm run build --prefix packages/client",
+    "start": "npm run start --prefix packages/client"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.21",
-    "concurrently": "^8.2.2",
     "postcss": "^8.5.3",
     "tailwindcss": "^4.1.3",
-    "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   },
-  "dependencies": {
-    "jsonwebtoken": "^9.0.2"
-  }
+  "workspaces": [
+    "packages/client"
+  ]
 }

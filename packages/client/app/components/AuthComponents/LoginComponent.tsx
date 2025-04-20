@@ -1,12 +1,11 @@
-"use client";
-import React, { FormEvent, useState } from "react";
-import { useRouter } from "next/navigation";
-import { useAuth } from "../../context/AuthContext";
-import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
-import { API_URL } from "../../config";
+'use client';
+import React, { FormEvent, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '../../context/AuthContext';
+import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 
 interface LoginComponentProps {
-  setActiveTab: (tab: "login" | "register") => void;
+  setActiveTab: (tab: 'login' | 'register') => void;
 }
 
 export default function LoginComponent({ setActiveTab }: LoginComponentProps) {
@@ -18,52 +17,33 @@ export default function LoginComponent({ setActiveTab }: LoginComponentProps) {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget as HTMLFormElement);
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
 
     try {
       setError(null);
-      const response = await fetch(`${API_URL}/api/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
-        credentials: "include",
       });
 
       const data = await response.json();
       if (response.ok) {
         login(data.email, data.isSuperuser);
-        setMessage("✔ Login successful, redirecting...");
-        setTimeout(() => router.push(data.isSuperuser ? "/admin" : "/dashboard"), 2000);
+        setMessage('✔ Login successful, redirecting...');
+        setTimeout(() => router.push(data.isSuperuser ? '/admin' : '/dashboard'), 2000);
       } else {
         setError(data.error);
       }
     } catch (error) {
-      setError("An error occurred. Please try again.");
+      setError('An error occurred. Please try again.');
     }
   };
 
   const handleGoogleSuccess = async (credentialResponse: any) => {
-    try {
-      setError(null);
-      const response = await fetch(`${API_URL}/api/auth/google`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token: credentialResponse.credential }),
-        credentials: "include",
-      });
-
-      const data = await response.json();
-      if (response.ok) {
-        login(data.email, data.isSuperuser);
-        setMessage("✔ Google login successful, redirecting...");
-        setTimeout(() => router.push(data.isSuperuser ? "/admin" : "/dashboard"), 2000);
-      } else {
-        setError(data.error);
-      }
-    } catch (error) {
-      setError("An error occurred. Please try again.");
-    }
+    // TODO: Implement Google login with frontend API
+    setError('Google login not implemented yet');
   };
 
   return (
@@ -107,7 +87,7 @@ export default function LoginComponent({ setActiveTab }: LoginComponentProps) {
           <div className="mt-4 flex justify-center">
             <GoogleLogin
               onSuccess={handleGoogleSuccess}
-              onError={() => setError("Google login failed. Please try again.")}
+              onError={() => setError('Google login failed. Please try again.')}
               text="signin_with"
               logo_alignment="center"
               size="large"
@@ -123,7 +103,7 @@ export default function LoginComponent({ setActiveTab }: LoginComponentProps) {
         </form>
         <div className="mt-4 text-center">
           <button
-            onClick={() => setActiveTab("register")}
+            onClick={() => setActiveTab('register')}
             className="text-blue-500 hover:underline"
           >
             Don’t have an account? Register

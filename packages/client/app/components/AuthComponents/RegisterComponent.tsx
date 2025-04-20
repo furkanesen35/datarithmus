@@ -1,12 +1,11 @@
-"use client";
-import React, { FormEvent, useState } from "react";
-import { useRouter } from "next/navigation";
-import { useAuth } from "../../context/AuthContext";
-import { GoogleOAuthProvider, GoogleLogin } from "@react-oauth/google";
-import { API_URL } from "../../config";
+'use client';
+import React, { FormEvent, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '../../context/AuthContext';
+import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 
 interface RegisterComponentProps {
-  setActiveTab: (tab: "login" | "register") => void;
+  setActiveTab: (tab: 'login' | 'register') => void;
 }
 
 export default function RegisterComponent({ setActiveTab }: RegisterComponentProps) {
@@ -18,53 +17,34 @@ export default function RegisterComponent({ setActiveTab }: RegisterComponentPro
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget as HTMLFormElement);
-    const username = formData.get("username") as string;
-    const email = formData.get("email") as string;
-    const password = formData.get("password") as string;
+    const username = formData.get('username') as string;
+    const email = formData.get('email') as string;
+    const password = formData.get('password') as string;
 
     try {
       setError(null);
-      const response = await fetch(`${API_URL}/api/auth/register`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetch('/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, email, password }),
-        credentials: "include",
       });
 
       const data = await response.json();
       if (response.ok) {
         login(data.email, data.isSuperuser);
-        setMessage("✔ Registration successful, redirecting...");
-        setTimeout(() => router.push(data.isSuperuser ? "/admin" : "/dashboard"), 2000);
+        setMessage('✔ Registration successful, redirecting...');
+        setTimeout(() => router.push(data.isSuperuser ? '/admin' : '/dashboard'), 2000);
       } else {
         setError(data.error);
       }
     } catch (error) {
-      setError("An error occurred. Please try again.");
+      setError('An error occurred. Please try again.');
     }
   };
 
   const handleGoogleSuccess = async (credentialResponse: any) => {
-    try {
-      setError(null);
-      const response = await fetch(`${API_URL}/api/auth/google`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token: credentialResponse.credential }),
-        credentials: "include",
-      });
-
-      const data = await response.json();
-      if (response.ok) {
-        login(data.email, data.isSuperuser);
-        setMessage("✔ Google registration successful, redirecting...");
-        setTimeout(() => router.push(data.isSuperuser ? "/admin" : "/dashboard"), 2000);
-      } else {
-        setError(data.error);
-      }
-    } catch (error) {
-      setError("An error occurred. Please try again.");
-    }
+    // TODO: Implement Google registration with frontend API
+    setError('Google registration not implemented yet');
   };
 
   return (
@@ -120,7 +100,7 @@ export default function RegisterComponent({ setActiveTab }: RegisterComponentPro
           <div className="mt-4 flex justify-center">
             <GoogleLogin
               onSuccess={handleGoogleSuccess}
-              onError={() => setError("Google registration failed. Please try again.")}
+              onError={() => setError('Google registration failed. Please try again.')}
               text="signup_with"
               logo_alignment="center"
               size="large"
@@ -136,7 +116,7 @@ export default function RegisterComponent({ setActiveTab }: RegisterComponentPro
         </form>
         <div className="mt-4 text-center">
           <button
-            onClick={() => setActiveTab("login")}
+            onClick={() => setActiveTab('login')}
             className="text-blue-500 hover:underline"
           >
             Already have an account? Login

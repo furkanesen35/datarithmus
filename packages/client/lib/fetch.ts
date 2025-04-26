@@ -1,14 +1,11 @@
 // packages/client/lib/fetch.ts
-export async function authFetch(url: string, options: RequestInit = {}): Promise<Response> {
-  const token = localStorage.getItem('token');
-  const headers = {
-    ...options.headers,
-    'Content-Type': 'application/json',
-    ...(token ? { Authorization: `Bearer ${token}` } : {}),
-  };
-
+export async function authFetch(url: string, options: RequestInit = {}) {
   return fetch(url, {
     ...options,
-    headers,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+    credentials: 'include', // Include cookies
   });
 }

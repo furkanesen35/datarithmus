@@ -4,7 +4,7 @@ import React, { FormEvent, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
-import { authFetch } from '../../../lib/fetch'; // Import custom fetch
+import { authFetch } from '../../../lib/fetch';
 import Link from 'next/link';
 
 export default function LoginComponent() {
@@ -28,7 +28,6 @@ export default function LoginComponent() {
 
       const data = await response.json();
       if (response.ok) {
-        localStorage.setItem('token', data.token);
         login(data.email, data.isSuperuser);
         setMessage('✔ Login successful, redirecting...');
         setTimeout(() => router.push(data.isSuperuser ? '/admin' : '/dashboard'), 2000);
@@ -50,7 +49,6 @@ export default function LoginComponent() {
 
       const data = await response.json();
       if (response.ok) {
-        localStorage.setItem('token', data.token);
         login(data.email, data.isSuperuser);
         setMessage('✔ Google login successful, redirecting...');
         setTimeout(() => router.push(data.isSuperuser ? '/admin' : '/dashboard'), 2000);
@@ -118,9 +116,7 @@ export default function LoginComponent() {
           </button>
         </form>
         <div className="mt-4 text-center">
-          <Link href='/auth/register'
-            className="text-blue-500 hover:underline"
-          >
+          <Link href='/auth/register' className="text-blue-500 hover:underline">
             Don’t have an account? Register
           </Link>
         </div>

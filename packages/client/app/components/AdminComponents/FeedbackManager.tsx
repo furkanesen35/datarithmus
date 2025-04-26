@@ -1,3 +1,4 @@
+// packages/client/app/components/AdminComponents/FeedbackManager.tsx
 "use client";
 import { useState } from "react";
 

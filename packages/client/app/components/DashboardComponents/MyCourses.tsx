@@ -1,3 +1,4 @@
+// packages/client/app/components/DashboardComponents/MyCourses.tsx
 export default function MyCourses() {
     return (
       <div>

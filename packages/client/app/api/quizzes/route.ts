@@ -1,3 +1,4 @@
+// packages/client/app/api/quizzes/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { requireSuperuser } from "../../../lib/authMiddleware";

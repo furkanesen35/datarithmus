@@ -1,3 +1,4 @@
+// packages/client/app/components/HomeComponents/FirstContainer.tsx
 import '../../globals.css';
 
 function FirstContainer() {

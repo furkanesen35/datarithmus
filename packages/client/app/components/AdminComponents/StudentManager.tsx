@@ -1,3 +1,4 @@
+// packages/client/app/components/AdminComponents/StudentManager.tsx
 "use client";
 import { useState } from "react";
 

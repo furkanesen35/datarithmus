@@ -1,5 +1,5 @@
+// packages/client/app/auth/register/page.tsx
 "use client"
-
 import RegisterComponent from "app/components/AuthComponents/RegisterComponent";
 
 export default function Page() {

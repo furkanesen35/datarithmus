@@ -1,3 +1,4 @@
+// packages/client/app/api/student-progress/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import { requireSuperuser } from "../../../lib/authMiddleware";

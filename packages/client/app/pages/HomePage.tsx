@@ -1,3 +1,4 @@
+// packages/client/app/pages/HomePage.tsx
 import Header from "app/components/Header";
 import FirstContainer from "../components/HomeComponents/FirstContainer";
 import ThirdContainer from "../components/HomeComponents/ThirdContainer";

@@ -1,3 +1,4 @@
+// packages/client/app/components/DashboardComponents/Recordings.tsx
 export default function Recordings() {
     return (
       <div>

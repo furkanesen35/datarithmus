@@ -1,3 +1,4 @@
+// packages/client/app/components/AdminComponents/ResourceManager.tsx
 "use client";
 import { useState } from "react";
 

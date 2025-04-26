@@ -1,3 +1,4 @@
+// packages/client/app/layout.tsx
 import './globals.css';
 import { ReactNode } from 'react';
 import { AuthProvider } from './context/AuthContext';

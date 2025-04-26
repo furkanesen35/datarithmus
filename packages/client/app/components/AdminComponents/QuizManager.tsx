@@ -1,3 +1,4 @@
+// packages/client/app/components/AdminComponents/QuizManager.tsx
 "use client";
 import { useState, useEffect } from "react";
 

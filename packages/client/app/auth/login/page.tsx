@@ -1,3 +1,4 @@
+// packages/client/app/auth/login/page.tsx
 "use client"
 import LoginComponent from "app/components/AuthComponents/LoginComponent";
 

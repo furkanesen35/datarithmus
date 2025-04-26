@@ -1,3 +1,4 @@
+// packages/client/app/pages/CoursesPage.tsx
 export default function CoursesPage() {
     return (
       <div className="w-full p-8 bg-[#301934] text-white">

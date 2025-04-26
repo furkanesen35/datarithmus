@@ -1,3 +1,4 @@
+// packages/client/app/components/DashboardComponents/Schedule.tsx
 export default function Schedule() {
     return (
       <div>

@@ -1,3 +1,4 @@
+// packages/client/app/components/AdminComponents/StudentProgressManager.tsx
 "use client";
 import { useState } from "react";
 

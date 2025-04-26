@@ -1,3 +1,4 @@
+// packages/client/app/components/DashboardComponents/MyProgress.tsx
 export default function MyProgress() {
     return (
       <div>

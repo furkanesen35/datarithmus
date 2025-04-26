@@ -1,3 +1,4 @@
+// packages/client/app/components/AdminComponents/AnnouncementManager.tsx
 "use client";
 import { useState, useEffect } from "react";
 

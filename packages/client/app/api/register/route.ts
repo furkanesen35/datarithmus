@@ -1,3 +1,4 @@
+// packages/client/app/api/register/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';

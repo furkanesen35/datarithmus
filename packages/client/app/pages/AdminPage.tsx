@@ -26,7 +26,7 @@ export default function AdminPage() {
     if (typeof window !== "undefined") {
       setIsLoading(false);
       if (!auth.isLoggedIn || !auth.user?.isSuperuser) {
-        router.push("/auth?tab=login");
+        router.push("/auth/login");
       }
     }
   }, [auth.isLoggedIn, auth.user?.isSuperuser, router]);
@@ -37,7 +37,7 @@ export default function AdminPage() {
 
   const handleLogout = async () => {
     await logout();
-    router.push("/auth?tab=login");
+    router.push("/auth/login");
   };
 
   // Render loading placeholder during SSR or auth check

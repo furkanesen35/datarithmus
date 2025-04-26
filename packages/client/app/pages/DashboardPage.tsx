@@ -18,7 +18,7 @@ export default function DashboardPage() {
   // Redirect if not logged in (client-side)
   useEffect(() => {
     if (!auth.isLoggedIn) {
-      router.push("/auth?tab=login");
+      router.push("/auth/login");
     }
   }, [auth.isLoggedIn, router]);
 
@@ -29,7 +29,7 @@ export default function DashboardPage() {
 
   const handleLogout = async () => {
     await logout();
-    router.push("/auth?tab=login");
+    router.push("/auth/login");
   };
 
   return (

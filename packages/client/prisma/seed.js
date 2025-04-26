@@ -5,13 +5,14 @@ const prisma = new PrismaClient();
 
 async function main() {
   const email = "furkanesen35@gmail.com";
-  const password = await bcrypt.hash("Thereisspoon35.", 10); // Password: admin123
+  const password = await bcrypt.hash("Thereisspoon35.", 10);
   await prisma.user.upsert({
     where: { email },
     update: {},
     create: {
       email,
       password,
+      username: "furkanesen", // Required field
       isSuperuser: true,
       createdAt: new Date(),
     },

@@ -5,12 +5,9 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import { authFetch } from '../../../lib/fetch'; // Import custom fetch
+import Link from 'next/link';
 
-interface RegisterComponentProps {
-  setActiveTab: (tab: 'login' | 'register') => void;
-}
-
-export default function RegisterComponent({ setActiveTab }: RegisterComponentProps) {
+export default function RegisterComponent() {
   const { login } = useAuth();
   const router = useRouter();
   const [message, setMessage] = useState<string | null>(null);
@@ -25,7 +22,7 @@ export default function RegisterComponent({ setActiveTab }: RegisterComponentPro
 
     try {
       setError(null);
-      const response = await authFetch('/api/register', {
+      const response = await fetch('/api/register', {
         method: 'POST',
         body: JSON.stringify({ username, email, password }),
       });
@@ -37,7 +34,7 @@ export default function RegisterComponent({ setActiveTab }: RegisterComponentPro
         setMessage('✔ Registration successful, redirecting...');
         setTimeout(() => router.push(data.isSuperuser ? '/admin' : '/dashboard'), 2000);
       } else {
-        setError(data.error);
+        setError(error);
       }
     } catch (error) {
       setError('An error occurred. Please try again.');
@@ -47,7 +44,7 @@ export default function RegisterComponent({ setActiveTab }: RegisterComponentPro
   const handleGoogleSuccess = async (credentialResponse: any) => {
     try {
       setError(null);
-      const response = await authFetch('/api/auth/google', {
+      const response = await fetch('/api/auth/google', {
         method: 'POST',
         body: JSON.stringify({ token: credentialResponse.credential }),
       });
@@ -134,12 +131,11 @@ export default function RegisterComponent({ setActiveTab }: RegisterComponentPro
           </button>
         </form>
         <div className="mt-4 text-center">
-          <button
-            onClick={() => setActiveTab('login')}
+          <Link href='/auth/login'
             className="text-blue-500 hover:underline"
           >
             Already have an account? Login
-          </button>
+          </Link>
         </div>
       </div>
     </GoogleOAuthProvider>

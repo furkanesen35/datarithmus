@@ -10,6 +10,8 @@ export async function POST(req: NextRequest) {
     const { username, email, password } = await req.json();
     const existingUser = await prisma.user.findUnique({ where: { email } });
 
+    console.log(username, email, password);    
+
     if (existingUser) {
       return NextResponse.json({ error: 'User already exists' }, { status: 400 });
     }
@@ -24,6 +26,8 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    console.log(user);
+
     const token = jwt.sign(
       { email: user.email, isSuperuser: user.isSuperuser },
       process.env.JWT_SECRET!,
@@ -33,7 +37,6 @@ export async function POST(req: NextRequest) {
     const response = NextResponse.json({ email: user.email, isSuperuser: user.isSuperuser });
     response.cookies.set('token', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict',
       maxAge: 3600,
       path: '/',
@@ -41,6 +44,6 @@ export async function POST(req: NextRequest) {
 
     return response;
   } catch (error) {
-    return NextResponse.json({ error: 'Server error' }, { status: 500 });
+    return NextResponse.json({ error: error }, { status: 500 });
   }
 }

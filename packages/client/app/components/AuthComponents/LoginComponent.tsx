@@ -5,12 +5,9 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
 import { authFetch } from '../../../lib/fetch'; // Import custom fetch
+import Link from 'next/link';
 
-interface LoginComponentProps {
-  setActiveTab: (tab: 'login' | 'register') => void;
-}
-
-export default function LoginComponent({ setActiveTab }: LoginComponentProps) {
+export default function LoginComponent() {
   const { login } = useAuth();
   const router = useRouter();
   const [message, setMessage] = useState<string | null>(null);
@@ -121,12 +118,11 @@ export default function LoginComponent({ setActiveTab }: LoginComponentProps) {
           </button>
         </form>
         <div className="mt-4 text-center">
-          <button
-            onClick={() => setActiveTab('register')}
+          <Link href='/auth/register'
             className="text-blue-500 hover:underline"
           >
             Don’t have an account? Register
-          </button>
+          </Link>
         </div>
       </div>
     </GoogleOAuthProvider>

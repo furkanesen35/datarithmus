@@ -85,7 +85,7 @@ export default function Header() {
               Logout
             </button>
           ) : (
-            <Link href="/auth" className="inline-block px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
+            <Link href="/auth/login" className="inline-block px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">
               Login / Register
             </Link>
           )}

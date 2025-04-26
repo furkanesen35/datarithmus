@@ -11,7 +11,7 @@ import StudentProgressManager from "../components/AdminComponents/StudentProgres
 import DiscussionManager from "../components/AdminComponents/DiscussionManager";
 import FeedbackManager from "../components/AdminComponents/FeedbackManager";
 import StudentManager from "../components/AdminComponents/StudentManager";
-import AnnouncementsManager from "app/components/AdminComponents/AnnouncementMananer";
+import AnnouncementsManager from "app/components/AdminComponents/AnnouncementManager";
 import ResourceManager from "app/components/AdminComponents/ResourceManagement";
 
 export default function AdminPage() {

@@ -1,4 +1,4 @@
-// packages/client/app/api/admin/route.ts (example)
+// packages/client/app/api/admin/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import jwt from 'jsonwebtoken';
 

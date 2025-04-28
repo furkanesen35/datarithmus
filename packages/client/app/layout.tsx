@@ -10,6 +10,9 @@ interface RootLayoutProps {
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
     <html lang="en">
+      <head>
+        <link rel="stylesheet" href="/output.css" />
+      </head>
       <body>
         <AuthProvider>
           {children}

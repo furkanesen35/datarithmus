@@ -1,5 +1,6 @@
 // packages/client/middleware.ts
 import { NextRequest, NextResponse } from 'next/server';
+import jwt from 'jsonwebtoken';
 
 export function middleware(req: NextRequest) {
   const token = req.headers.get('authorization')?.split(' ')[1] || req.cookies.get('token')?.value;
@@ -17,6 +18,19 @@ export function middleware(req: NextRequest) {
 
   // Redirect to /auth/login if no token for protected routes
   if (!token) {
+    return NextResponse.redirect(new URL('/auth/login', req.url));
+  }
+
+  try {
+    // Decode the token to check for superuser access
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!);
+
+    // Redirect non-superusers from admin routes
+    if (pathname.startsWith('/admin') && !(decoded as any).isSuperUser) {
+      return NextResponse.redirect(new URL('/dashboard', req.url));
+    }
+  } catch (error) {
+    // Redirect to login if token verification fails
     return NextResponse.redirect(new URL('/auth/login', req.url));
   }
 

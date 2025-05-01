@@ -14,6 +14,7 @@ model User {
   username   String
   isSuperuser Boolean @default(false)
   createdAt  DateTime @default(now())
+  quizResults QuizResult[]
 }
 
 model Video {
@@ -29,6 +30,7 @@ model Quiz {
   title     String
   createdAt DateTime       @default(now())
   questions QuizQuestion[]
+  quizResults QuizResult[]
 }
 
 model QuizQuestion {
@@ -39,6 +41,7 @@ model QuizQuestion {
   quiz          Quiz     @relation(fields: [quizId], references: [id])
   quizId        Int
   createdAt     DateTime @default(now())
+  quizResults QuizResult[]
 }
 
 model Announcement {
@@ -107,4 +110,18 @@ model Student {
   name      String
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
+}
+
+model QuizResult {
+  id         Int      @id @default(autoincrement())
+  userId    Int
+  quizId    Int
+  questionId Int
+  answer    Int      // 0-based index of selected answer
+  isCorrect Boolean
+  createdAt DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [id])
+  quiz      Quiz     @relation(fields: [quizId], references: [id])
+  question  QuizQuestion @relation(fields: [questionId], references: [id])
 }

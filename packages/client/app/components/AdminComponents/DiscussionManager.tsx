@@ -1,6 +1,6 @@
 // packages/client/app/components/AdminComponents/DiscussionManager.tsx
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface Post {
   id: number;
@@ -22,42 +22,61 @@ export default function DiscussionManager({ onMessage, onError }: DiscussionMana
   const [isPinned, setIsPinned] = useState(false);
   const [posts, setPosts] = useState<Post[]>([]);
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    fetchPosts();
+  }, []);
+
+  const fetchPosts = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/discussion", { credentials: "include" });
+      if (!res.ok) throw new Error("Failed to fetch posts");
+      setPosts(await res.json());
+    } catch (err: any) {
+      onError(err.message || "Failed to fetch posts");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!postTitle || !postContent) {
       onError("Title and content are required");
       return;
     }
-
-    if (editingId) {
-      // Edit existing post
-      setPosts(
-        posts.map((post) =>
-          post.id === editingId
-            ? { ...post, title: postTitle, content: postContent, pinned: isPinned }
-            : post
-        )
-      );
-      onMessage("Post updated successfully");
+    setLoading(true);
+    try {
+      let res;
+      if (editingId) {
+        res = await fetch("/api/discussion", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ id: editingId, title: postTitle, content: postContent, author: "Teacher", pinned: isPinned }),
+        });
+      } else {
+        res = await fetch("/api/discussion", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ title: postTitle, content: postContent, author: "Teacher", pinned: isPinned }),
+        });
+      }
+      if (!res.ok) throw new Error("Failed to save post");
+      await fetchPosts();
+      onMessage(editingId ? "Post updated successfully" : "Post created successfully");
       setEditingId(null);
-    } else {
-      // Create new post
-      const newPost: Post = {
-        id: Date.now(),
-        title: postTitle,
-        content: postContent,
-        author: "Teacher",
-        pinned: isPinned,
-        createdAt: new Date().toISOString(),
-      };
-      setPosts([newPost, ...posts]);
-      onMessage("Post created successfully");
+      setPostTitle("");
+      setPostContent("");
+      setIsPinned(false);
+    } catch (err: any) {
+      onError(err.message || "Failed to save post");
+    } finally {
+      setLoading(false);
     }
-
-    setPostTitle("");
-    setPostContent("");
-    setIsPinned(false);
   };
 
   const handleEdit = (post: Post) => {
@@ -67,18 +86,44 @@ export default function DiscussionManager({ onMessage, onError }: DiscussionMana
     setIsPinned(post.pinned);
   };
 
-  const handleDelete = (id: number) => {
-    setPosts(posts.filter((post) => post.id !== id));
-    onMessage("Post deleted successfully");
+  const handleDelete = async (id: number) => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/discussion", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ id }),
+      });
+      if (!res.ok) throw new Error("Failed to delete post");
+      await fetchPosts();
+      onMessage("Post deleted successfully");
+    } catch (err: any) {
+      onError(err.message || "Failed to delete post");
+    } finally {
+      setLoading(false);
+    }
   };
 
-  const togglePin = (id: number) => {
-    setPosts(
-      posts.map((post) =>
-        post.id === id ? { ...post, pinned: !post.pinned } : post
-      )
-    );
-    onMessage("Post pin toggled");
+  const togglePin = async (id: number, pinned: boolean) => {
+    setLoading(true);
+    try {
+      const post = posts.find((p) => p.id === id);
+      if (!post) return;
+      const res = await fetch("/api/discussion", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ id, title: post.title, content: post.content, author: post.author, pinned: !pinned }),
+      });
+      if (!res.ok) throw new Error("Failed to toggle pin");
+      await fetchPosts();
+      onMessage("Post pin toggled");
+    } catch (err: any) {
+      onError(err.message || "Failed to toggle pin");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -149,7 +194,9 @@ export default function DiscussionManager({ onMessage, onError }: DiscussionMana
       {/* Posts List */}
       <div className="mt-6">
         <h3 className="text-lg font-semibold mb-2">Discussion Posts</h3>
-        {posts.length === 0 ? (
+        {loading ? (
+          <p>Loading...</p>
+        ) : posts.length === 0 ? (
           <p>No posts yet.</p>
         ) : (
           <ul className="space-y-4">
@@ -177,7 +224,7 @@ export default function DiscussionManager({ onMessage, onError }: DiscussionMana
                     Delete
                   </button>
                   <button
-                    onClick={() => togglePin(post.id)}
+                    onClick={() => togglePin(post.id, post.pinned)}
                     className="text-gray-500 hover:underline text-sm"
                   >
                     {post.pinned ? "Unpin" : "Pin"}

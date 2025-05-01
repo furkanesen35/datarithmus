@@ -1,6 +1,6 @@
 // packages/client/app/components/AdminComponents/FeedbackManager.tsx
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface Survey {
   id: number;
@@ -19,37 +19,60 @@ export default function FeedbackManager({ onMessage, onError }: FeedbackManagerP
   const [scale, setScale] = useState(5);
   const [surveys, setSurveys] = useState<Survey[]>([]);
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    fetchSurveys();
+  }, []);
+
+  const fetchSurveys = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/feedback", { credentials: "include" });
+      if (!res.ok) throw new Error("Failed to fetch feedback");
+      setSurveys(await res.json());
+    } catch (err: any) {
+      onError(err.message || "Failed to fetch feedback");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!question) {
       onError("Question is required");
       return;
     }
-
-    if (editingId) {
-      // Edit existing survey
-      setSurveys(
-        surveys.map((sv) =>
-          sv.id === editingId ? { ...sv, question, scale } : sv
-        )
-      );
-      onMessage("Survey updated successfully");
+    setLoading(true);
+    try {
+      let res;
+      if (editingId) {
+        res = await fetch("/api/feedback", {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ id: editingId, question, scale }),
+        });
+      } else {
+        res = await fetch("/api/feedback", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ question, scale }),
+        });
+      }
+      if (!res.ok) throw new Error("Failed to save feedback");
+      await fetchSurveys();
+      onMessage(editingId ? "Survey updated successfully" : "Survey created successfully");
       setEditingId(null);
-    } else {
-      // Create new survey
-      const newSurvey: Survey = {
-        id: Date.now(),
-        question,
-        scale,
-        createdAt: new Date().toISOString(),
-      };
-      setSurveys([newSurvey, ...surveys]);
-      onMessage("Survey created successfully");
+      setQuestion("");
+      setScale(5);
+    } catch (err: any) {
+      onError(err.message || "Failed to save feedback");
+    } finally {
+      setLoading(false);
     }
-
-    setQuestion("");
-    setScale(5);
   };
 
   const handleEdit = (sv: Survey) => {
@@ -58,9 +81,23 @@ export default function FeedbackManager({ onMessage, onError }: FeedbackManagerP
     setScale(sv.scale);
   };
 
-  const handleDelete = (id: number) => {
-    setSurveys(surveys.filter((sv) => sv.id !== id));
-    onMessage("Survey deleted successfully");
+  const handleDelete = async (id: number) => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/feedback", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ id }),
+      });
+      if (!res.ok) throw new Error("Failed to delete feedback");
+      await fetchSurveys();
+      onMessage("Survey deleted successfully");
+    } catch (err: any) {
+      onError(err.message || "Failed to delete feedback");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -121,7 +158,9 @@ export default function FeedbackManager({ onMessage, onError }: FeedbackManagerP
       {/* Surveys List */}
       <div className="mt-6">
         <h3 className="text-lg font-semibold mb-2">Feedback Surveys</h3>
-        {surveys.length === 0 ? (
+        {loading ? (
+          <p>Loading...</p>
+        ) : surveys.length === 0 ? (
           <p>No surveys created yet.</p>
         ) : (
           <ul className="space-y-4">

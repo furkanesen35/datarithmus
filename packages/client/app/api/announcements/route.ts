@@ -11,7 +11,7 @@ interface JwtPayload {
 }
 
 async function requireSuperuser(req: NextRequest): Promise<NextResponse | null> {
-  const token = req.headers.get('authorization')?.split(' ')[1];
+  const token = req.cookies.get('token')?.value;
   if (!token) {
     return NextResponse.json({ error: 'No token provided' }, { status: 401 });
   }

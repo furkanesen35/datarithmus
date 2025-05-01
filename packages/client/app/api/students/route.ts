@@ -1,49 +1,55 @@
-// packages/client/app/api/students/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
-import { requireSuperuser } from "../../../lib/authMiddleware";
+import jwt from "jsonwebtoken";
 
 const prisma = new PrismaClient();
+
+interface JwtPayload {
+  email: string;
+  isSuperuser: boolean;
+}
+
+async function requireSuperuser(req: NextRequest): Promise<NextResponse | null> {
+  const token = req.cookies.get('token')?.value;
+  if (!token) {
+    return NextResponse.json({ error: 'No token provided' }, { status: 401 });
+  }
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret') as JwtPayload;
+    if (!decoded.isSuperuser) {
+      return NextResponse.json({ error: 'Superuser access required' }, { status: 403 });
+    }
+    return null;
+  } catch (error) {
+    return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
+  }
+}
 
 export async function GET(req: NextRequest) {
   const authCheck = await requireSuperuser(req);
   if (authCheck) return authCheck;
 
-  const students = await prisma.student.findMany({ orderBy: { createdAt: "desc" } });
+  const students = await prisma.user.findMany({
+    where: { isSuperuser: false },
+    orderBy: { createdAt: "desc" },
+    select: { id: true, email: true, username: true, isSuperuser: true, createdAt: true, isActive: true },
+  });
   return NextResponse.json(students);
 }
 
-export async function POST(req: NextRequest) {
+export async function PATCH(req: NextRequest) {
   const authCheck = await requireSuperuser(req);
   if (authCheck) return authCheck;
 
-  const { email, name, isActive } = await req.json();
-  if (!email || !name) {
+  const { id, isActive } = await req.json();
+  if (!id || typeof isActive !== "boolean") {
     return NextResponse.json({ error: "Missing fields" }, { status: 400 });
   }
-
-  const student = await prisma.student.create({
-    data: { email, name, isActive: isActive !== undefined ? isActive : true },
-  });
-
-  return NextResponse.json({ message: "Student created", student }, { status: 201 });
-}
-
-export async function PUT(req: NextRequest) {
-  const authCheck = await requireSuperuser(req);
-  if (authCheck) return authCheck;
-
-  const { id, email, name, isActive } = await req.json();
-  if (!id || !email || !name) {
-    return NextResponse.json({ error: "Missing fields" }, { status: 400 });
-  }
-
-  const student = await prisma.student.update({
+  const user = await prisma.user.update({
     where: { id: Number(id) },
-    data: { email, name, isActive },
+    data: { isActive },
   });
-
-  return NextResponse.json({ message: "Student updated", student });
+  return NextResponse.json({ message: "Status updated", user });
 }
 
 export async function DELETE(req: NextRequest) {
@@ -54,7 +60,6 @@ export async function DELETE(req: NextRequest) {
   if (!id) {
     return NextResponse.json({ error: "ID required" }, { status: 400 });
   }
-
-  await prisma.student.delete({ where: { id: Number(id) } });
-  return NextResponse.json({ message: "Student deleted" });
+  await prisma.user.delete({ where: { id: Number(id) } });
+  return NextResponse.json({ message: "User deleted" });
 }

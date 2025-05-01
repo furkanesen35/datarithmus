@@ -22,9 +22,7 @@ export default function QuizManager() {
   }, []);
 
   const fetchQuizzes = async () => {
-    const res = await fetch("/api/quizzes", {
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-    });
+    const res = await fetch("/api/quizzes", { credentials: "include" });
     if (res.ok) {
       const data = await res.json();
       setQuizzes(data);
@@ -38,7 +36,7 @@ export default function QuizManager() {
     const body = {
       question,
       options,
-      correctAnswer,
+      correctAnswer: Number(correctAnswer),
       ...(editingId && { id: editingId }),
     };
 
@@ -47,8 +45,8 @@ export default function QuizManager() {
       body: JSON.stringify(body),
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
+      credentials: "include"
     });
 
     if (res.ok) {
@@ -73,8 +71,8 @@ export default function QuizManager() {
       body: JSON.stringify({ id }),
       headers: {
         "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
       },
+      credentials: "include"
     });
     if (res.ok) fetchQuizzes();
   };

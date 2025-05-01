@@ -115,6 +115,9 @@ export default function LoginComponent() {
             Login
           </button>
         </form>
+        <a href="/auth/request-password-reset" className="text-blue-500 hover:underline text-sm">
+          Forgot Password?
+        </a>
         <div className="mt-4 text-center">
           <Link href='/auth/register' className="text-blue-500 hover:underline">
             Don’t have an account? Register

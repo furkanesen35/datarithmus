@@ -1,11 +1,32 @@
 // packages/client/app/api/homework/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
-import { requireSuperuser } from "../../../lib/authMiddleware";
+import jwt from "jsonwebtoken";
 import path from "path";
 import fs from "fs/promises";
 
 const prisma = new PrismaClient();
+
+interface JwtPayload {
+  email: string;
+  isSuperuser: boolean;
+}
+
+async function requireSuperuser(req: NextRequest): Promise<NextResponse | null> {
+  const token = req.cookies.get('token')?.value;
+  if (!token) {
+    return NextResponse.json({ error: 'No token provided' }, { status: 401 });
+  }
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret') as JwtPayload;
+    if (!decoded.isSuperuser) {
+      return NextResponse.json({ error: 'Superuser access required' }, { status: 403 });
+    }
+    return null;
+  } catch (error) {
+    return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
+  }
+}
 
 export async function GET(req: NextRequest) {
   const authCheck = await requireSuperuser(req);

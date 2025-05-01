@@ -1,6 +1,6 @@
 // packages/client/app/components/AdminComponents/HomeworkManager.tsx
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface Homework {
   id: number;
@@ -8,6 +8,7 @@ interface Homework {
   description: string;
   dueDate: string;
   fileName?: string;
+  filePath?: string;
   createdAt: string;
 }
 
@@ -23,49 +24,57 @@ export default function HomeworkManager({ onMessage, onError }: HomeworkManagerP
   const [homeworkFile, setHomeworkFile] = useState<File | null>(null);
   const [homeworks, setHomeworks] = useState<Homework[]>([]);
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    fetchHomeworks();
+  }, []);
+
+  const fetchHomeworks = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/homework", { credentials: "include" });
+      if (!res.ok) throw new Error("Failed to fetch homework");
+      setHomeworks(await res.json());
+    } catch (err: any) {
+      onError(err.message || "Failed to fetch homework");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!homeworkTitle || !homeworkDescription || !dueDate) {
       onError("Title, description, and due date are required");
       return;
     }
-
-    if (editingId) {
-      // Edit existing homework
-      setHomeworks(
-        homeworks.map((hw) =>
-          hw.id === editingId
-            ? {
-                ...hw,
-                title: homeworkTitle,
-                description: homeworkDescription,
-                dueDate,
-                fileName: homeworkFile ? homeworkFile.name : hw.fileName,
-              }
-            : hw
-        )
-      );
-      onMessage("Homework updated successfully");
+    setLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append("title", homeworkTitle);
+      formData.append("description", homeworkDescription);
+      formData.append("dueDate", dueDate);
+      if (homeworkFile) formData.append("file", homeworkFile);
+      if (editingId) formData.append("id", editingId.toString());
+      const res = await fetch("/api/homework", {
+        method: editingId ? "PUT" : "POST",
+        body: formData,
+        credentials: "include"
+      });
+      if (!res.ok) throw new Error("Failed to save homework");
+      await fetchHomeworks();
+      onMessage(editingId ? "Homework updated successfully" : "Homework created successfully");
       setEditingId(null);
-    } else {
-      // Create new homework
-      const newHomework: Homework = {
-        id: Date.now(),
-        title: homeworkTitle,
-        description: homeworkDescription,
-        dueDate,
-        fileName: homeworkFile ? homeworkFile.name : undefined,
-        createdAt: new Date().toISOString(),
-      };
-      setHomeworks([newHomework, ...homeworks]);
-      onMessage("Homework created successfully");
+      setHomeworkTitle("");
+      setHomeworkDescription("");
+      setDueDate("");
+      setHomeworkFile(null);
+    } catch (err: any) {
+      onError(err.message || "Failed to save homework");
+    } finally {
+      setLoading(false);
     }
-
-    setHomeworkTitle("");
-    setHomeworkDescription("");
-    setDueDate("");
-    setHomeworkFile(null);
   };
 
   const handleEdit = (hw: Homework) => {
@@ -76,9 +85,23 @@ export default function HomeworkManager({ onMessage, onError }: HomeworkManagerP
     setHomeworkFile(null); // File reset on edit
   };
 
-  const handleDelete = (id: number) => {
-    setHomeworks(homeworks.filter((hw) => hw.id !== id));
-    onMessage("Homework deleted successfully");
+  const handleDelete = async (id: number) => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/homework", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ id }),
+      });
+      if (!res.ok) throw new Error("Failed to delete homework");
+      await fetchHomeworks();
+      onMessage("Homework deleted successfully");
+    } catch (err: any) {
+      onError(err.message || "Failed to delete homework");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -163,7 +186,9 @@ export default function HomeworkManager({ onMessage, onError }: HomeworkManagerP
       {/* Homework List */}
       <div className="mt-6">
         <h3 className="text-lg font-semibold mb-2">Homework Assignments</h3>
-        {homeworks.length === 0 ? (
+        {loading ? (
+          <p>Loading...</p>
+        ) : homeworks.length === 0 ? (
           <p>No homework assigned yet.</p>
         ) : (
           <ul className="space-y-4">
@@ -172,7 +197,11 @@ export default function HomeworkManager({ onMessage, onError }: HomeworkManagerP
                 <h4 className="text-md font-medium">{hw.title}</h4>
                 <p className="text-sm">{hw.description}</p>
                 <p className="text-sm">Due: {new Date(hw.dueDate).toLocaleDateString()}</p>
-                {hw.fileName && <p className="text-sm">File: {hw.fileName}</p>}
+                {hw.filePath && (
+                  <p className="text-sm">
+                    File: <a href={hw.filePath} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">Download</a>
+                  </p>
+                )}
                 <p className="text-xs text-gray-500 mt-1">
                   Created: {new Date(hw.createdAt).toLocaleDateString()}
                 </p>

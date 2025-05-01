@@ -1,6 +1,6 @@
 // packages/client/app/components/AdminComponents/ResourceManager.tsx
 "use client";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 interface Resource {
   id: number;
@@ -23,51 +23,59 @@ export default function ResourceManager({ onMessage, onError }: ResourceManagerP
   const [resourceLink, setResourceLink] = useState("");
   const [resources, setResources] = useState<Resource[]>([]);
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [loading, setLoading] = useState(false);
 
   const categories = ["Cheat Sheet", "Tutorial", "Article", "Code Sample"];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  useEffect(() => {
+    fetchResources();
+  }, []);
+
+  const fetchResources = async () => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/resources", { credentials: "include" });
+      if (!res.ok) throw new Error("Failed to fetch resources");
+      setResources(await res.json());
+    } catch (err: any) {
+      onError(err.message || "Failed to fetch resources");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!resourceTitle || (!resourceFile && !resourceLink)) {
       onError("Title and either a file or link are required");
       return;
     }
-
-    if (editingId) {
-      // Edit existing resource
-      setResources(
-        resources.map((res) =>
-          res.id === editingId
-            ? {
-                ...res,
-                title: resourceTitle,
-                category,
-                fileName: resourceFile ? resourceFile.name : res.fileName,
-                link: resourceLink || res.link,
-              }
-            : res
-        )
-      );
-      onMessage("Resource updated successfully");
+    setLoading(true);
+    try {
+      const formData = new FormData();
+      formData.append("title", resourceTitle);
+      formData.append("category", category);
+      if (resourceFile) formData.append("file", resourceFile);
+      if (resourceLink) formData.append("link", resourceLink);
+      if (editingId) formData.append("id", editingId.toString());
+      const res = await fetch("/api/resources", {
+        method: editingId ? "PUT" : "POST",
+        body: formData,
+        credentials: "include"
+      });
+      if (!res.ok) throw new Error("Failed to save resource");
+      await fetchResources();
+      onMessage(editingId ? "Resource updated successfully" : "Resource created successfully");
       setEditingId(null);
-    } else {
-      // Create new resource
-      const newResource: Resource = {
-        id: Date.now(),
-        title: resourceTitle,
-        category,
-        fileName: resourceFile ? resourceFile.name : undefined,
-        link: resourceLink || undefined,
-        createdAt: new Date().toISOString(),
-      };
-      setResources([newResource, ...resources]);
-      onMessage("Resource created successfully");
+      setResourceTitle("");
+      setCategory("Cheat Sheet");
+      setResourceFile(null);
+      setResourceLink("");
+    } catch (err: any) {
+      onError(err.message || "Failed to save resource");
+    } finally {
+      setLoading(false);
     }
-
-    setResourceTitle("");
-    setCategory("Cheat Sheet");
-    setResourceFile(null);
-    setResourceLink("");
   };
 
   const handleEdit = (res: Resource) => {
@@ -78,9 +86,23 @@ export default function ResourceManager({ onMessage, onError }: ResourceManagerP
     setResourceLink(res.link || "");
   };
 
-  const handleDelete = (id: number) => {
-    setResources(resources.filter((res) => res.id !== id));
-    onMessage("Resource deleted successfully");
+  const handleDelete = async (id: number) => {
+    setLoading(true);
+    try {
+      const res = await fetch("/api/resources", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ id }),
+      });
+      if (!res.ok) throw new Error("Failed to delete resource");
+      await fetchResources();
+      onMessage("Resource deleted successfully");
+    } catch (err: any) {
+      onError(err.message || "Failed to delete resource");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -171,7 +193,9 @@ export default function ResourceManager({ onMessage, onError }: ResourceManagerP
       {/* Resources List */}
       <div className="mt-6">
         <h3 className="text-lg font-semibold mb-2">Resources</h3>
-        {resources.length === 0 ? (
+        {loading ? (
+          <p>Loading...</p>
+        ) : resources.length === 0 ? (
           <p>No resources added yet.</p>
         ) : (
           <ul className="space-y-4">
@@ -179,7 +203,11 @@ export default function ResourceManager({ onMessage, onError }: ResourceManagerP
               <li key={res.id} className="p-4 bg-white border border-gray-300 rounded-md">
                 <h4 className="text-md font-medium">{res.title}</h4>
                 <p className="text-sm">Category: {res.category}</p>
-                {res.fileName && <p className="text-sm">File: {res.fileName}</p>}
+                {res.filePath && (
+                  <p className="text-sm">
+                    File: <a href={res.filePath} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">Download</a>
+                  </p>
+                )}
                 {res.link && (
                   <p className="text-sm">
                     Link: <a href={res.link} className="text-blue-500 hover:underline" target="_blank" rel="noopener noreferrer">{res.link}</a>

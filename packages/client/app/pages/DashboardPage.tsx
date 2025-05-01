@@ -12,18 +12,19 @@ import Schedule from "app/components/DashboardComponents/Schedule";
 import ImportantLinks from "app/components/DashboardComponents/ImportantLinks";
 
 export default function DashboardPage() {
-  const { auth, logout } = useAuth();
+  const { auth, logout, isAuthLoading } = useAuth();
   const router = useRouter();
   const [activeSection, setActiveSection] = useState("overview");
 
-  // Redirect if not logged in (client-side)
   useEffect(() => {
-    if (!auth.isLoggedIn) {
+    if (!isAuthLoading && !auth.isLoggedIn) {
       router.push("/auth/login");
     }
-  }, [auth.isLoggedIn, router]);
+  }, [auth.isLoggedIn, isAuthLoading, router]);
 
-  // Prevent rendering until auth is checked
+  if (isAuthLoading) {
+    return null; // or a loading spinner if you prefer
+  }
   if (!auth.isLoggedIn) {
     return null;
   }

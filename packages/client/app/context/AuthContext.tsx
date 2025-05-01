@@ -1,7 +1,6 @@
 // packages/client/app/context/AuthContext.tsx
 'use client';
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import jwt from 'jsonwebtoken';
 
 interface AuthState {
   isLoggedIn: boolean;
@@ -12,43 +11,47 @@ interface AuthContextType {
   auth: AuthState;
   login: (email: string, isSuperuser: boolean) => void;
   logout: () => void;
+  isAuthLoading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [auth, setAuth] = useState<AuthState>({ isLoggedIn: false, user: null });
+  const [isAuthLoading, setIsAuthLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    if (token) {
+    // Check authentication by calling /api/me (server verifies cookie)
+    async function checkAuth() {
       try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret') as {
-          email: string;
-          isSuperuser: boolean;
-        };
-        setAuth({ isLoggedIn: true, user: { email: decoded.email, isSuperuser: decoded.isSuperuser } });
+        const res = await fetch('/api/me', { credentials: 'include' });
+        if (res.ok) {
+          const data = await res.json();
+          setAuth({ isLoggedIn: true, user: { email: data.email, isSuperuser: data.isSuperuser } });
+        } else {
+          setAuth({ isLoggedIn: false, user: null });
+        }
       } catch (error) {
-        console.error('Invalid token:', error);
-        localStorage.removeItem('token');
         setAuth({ isLoggedIn: false, user: null });
+      } finally {
+        setIsAuthLoading(false);
       }
     }
+    checkAuth();
   }, []);
 
   const login = (email: string, isSuperuser: boolean) => {
-    const newAuth = { isLoggedIn: true, user: { email, isSuperuser } };
-    setAuth(newAuth);
-    console.log('Logged in as:', email, 'Superuser:', isSuperuser);
+    setAuth({ isLoggedIn: true, user: { email, isSuperuser } });
   };
 
   const logout = () => {
     setAuth({ isLoggedIn: false, user: null });
-    localStorage.removeItem('token');
+    // Optionally, call /api/auth/logout to clear cookie
+    fetch('/api/auth/logout', { method: 'POST' });
   };
 
   return (
-    <AuthContext.Provider value={{ auth, login, logout }}>
+    <AuthContext.Provider value={{ auth, login, logout, isAuthLoading }}>
       {children}
     </AuthContext.Provider>
   );

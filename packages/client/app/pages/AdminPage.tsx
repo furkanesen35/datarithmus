@@ -15,22 +15,19 @@ import AnnouncementsManager from "app/components/AdminComponents/AnnouncementMan
 import ResourceManager from "app/components/AdminComponents/ResourceManagement";
 
 export default function AdminPage() {
-  const { auth, logout } = useAuth();
+  const { auth, logout, isAuthLoading } = useAuth();
   const router = useRouter();
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [activeSection, setActiveSection] = useState<string | null>(null);
-  const [isLoading, setIsLoading] = useState(true); // New loading state
 
   useEffect(() => {
-    // Delay auth check until client-side to avoid SSR mismatch
-    if (typeof window !== "undefined") {
-      setIsLoading(false);
+    if (!isAuthLoading && (typeof window !== "undefined")) {
       if (!auth.isLoggedIn || !auth.user?.isSuperuser) {
         router.push("/auth/login");
       }
     }
-  }, [auth.isLoggedIn, auth.user?.isSuperuser, router]);
+  }, [auth.isLoggedIn, auth.user?.isSuperuser, isAuthLoading, router]);
 
   const toggleSection = (section: string) => {
     setActiveSection(activeSection === section ? null : section);
@@ -41,8 +38,7 @@ export default function AdminPage() {
     router.push("/auth/login");
   };
 
-  // Render loading placeholder during SSR or auth check
-  if (isLoading || !auth.isLoggedIn || !auth.user?.isSuperuser) {
+  if (isAuthLoading) {
     return (
       <div className="min-h-screen bg-[#f7f7f7] text-black p-8">
         <div className="max-w-4xl mx-auto">
@@ -51,6 +47,9 @@ export default function AdminPage() {
         </div>
       </div>
     );
+  }
+  if (!auth.isLoggedIn || !auth.user?.isSuperuser) {
+    return null;
   }
 
   return (

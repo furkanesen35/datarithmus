@@ -25,10 +25,19 @@ model Video {
 }
 
 model Quiz {
+  id        Int            @id @default(autoincrement())
+  title     String
+  createdAt DateTime       @default(now())
+  questions QuizQuestion[]
+}
+
+model QuizQuestion {
   id            Int      @id @default(autoincrement())
   question      String
-  options       String // JSON string, e.g., ["opt1", "opt2"]
-  correctAnswer Int
+  options       String   // JSON string, e.g., ["opt1", "opt2", ...]
+  correctAnswer Int      // 0-based index
+  quiz          Quiz     @relation(fields: [quizId], references: [id])
+  quizId        Int
   createdAt     DateTime @default(now())
 }
 

@@ -30,7 +30,10 @@ export async function GET(req: NextRequest) {
   const authCheck = await requireSuperuser(req);
   if (authCheck) return authCheck;
 
-  const quizzes = await prisma.quiz.findMany({ orderBy: { createdAt: "desc" } });
+  const quizzes = await prisma.quiz.findMany({
+    orderBy: { createdAt: "desc" },
+    include: { questions: true },
+  });
   return NextResponse.json(quizzes);
 }
 
@@ -38,17 +41,23 @@ export async function POST(req: NextRequest) {
   const authCheck = await requireSuperuser(req);
   if (authCheck) return authCheck;
 
-  const { question, options, correctAnswer } = await req.json();
-  if (!question || !options || correctAnswer === undefined) {
-    return NextResponse.json({ error: "Missing fields" }, { status: 400 });
+  const { title, questions } = await req.json();
+  if (!title || !Array.isArray(questions) || questions.length === 0) {
+    return NextResponse.json({ error: "Missing title or questions" }, { status: 400 });
   }
 
   const quiz = await prisma.quiz.create({
     data: {
-      question,
-      options: JSON.stringify(options),
-      correctAnswer: Number(correctAnswer),
+      title,
+      questions: {
+        create: questions.map((q: any) => ({
+          question: q.question,
+          options: JSON.stringify(q.options),
+          correctAnswer: q.correctAnswer - 1, // store as 0-based
+        })),
+      },
     },
+    include: { questions: true },
   });
 
   return NextResponse.json({ message: "Quiz created", quiz }, { status: 201 });

@@ -29,7 +29,16 @@ export async function POST(req: NextRequest) {
       await sendMail({
         to: email,
         subject: 'Verify your email',
-        html: `<p>Welcome! Please verify your email by clicking the link below:</p><p><a href="${verifyUrl}">${verifyUrl}</a></p>`
+        html: `
+          <div style="font-family: Arial, sans-serif; color: #222; background: #f9f9f9; padding: 24px; border-radius: 8px; max-width: 480px; margin: auto;">
+            <h2 style="color: #2563eb;">Welcome to Datarithmus!</h2>
+            <p>Thank you for registering. Please verify your email by clicking the button below:</p>
+            <a href="${verifyUrl}" style="display: inline-block; margin: 16px 0; padding: 12px 24px; background: #2563eb; color: #fff; border-radius: 4px; text-decoration: none; font-weight: bold;">Verify Email</a>
+            <p>If you did not create an account, you can ignore this email.</p>
+            <hr style="margin: 24px 0; border: none; border-top: 1px solid #eee;" />
+            <small style="color: #888;">&copy; ${new Date().getFullYear()} Datarithmus</small>
+          </div>
+        `
       });
       // Only create the user and token if email send succeeds
       user = await prisma.user.create({

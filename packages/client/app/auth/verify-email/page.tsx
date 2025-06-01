@@ -24,7 +24,7 @@ export default function VerifyEmailPage() {
         const data = await res.json();
         if (res.ok) {
           setMessage("✔ Email verified! You can now log in.");
-          setTimeout(() => router.push("/auth/login"), 2000);
+          setTimeout(() => router.push("/auth/login"), 5000); // 5 seconds for better UX
         } else {
           setMessage(data.error || "Verification failed.");
         }

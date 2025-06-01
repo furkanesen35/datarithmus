@@ -52,7 +52,7 @@ export default function RegisterComponent() {
         localStorage.setItem('token', data.token);
         login(data.email, data.isSuperuser);
         setMessage('✔ Google registration successful, redirecting...');
-        setTimeout(() => router.push(data.isSuperuser ? '/admin' : '/dashboard'), 2000);
+        setTimeout(() => router.push(data.isSuperuser ? '/admin' : '/dashboard'), 5000); // 5 seconds for better UX
       } else {
         setError(data.error);
       }
@@ -72,6 +72,34 @@ export default function RegisterComponent() {
         {error && (
           <div className="mb-4 p-4 bg-red-100 text-red-700 rounded-md text-center">
             <span>{error}</span>
+            {error && error.includes('verification email') && (
+              <button
+                className="ml-2 underline text-blue-600 hover:text-blue-800"
+                onClick={async () => {
+                  setError(null);
+                  setMessage('Resending verification email...');
+                  const email = (document.getElementById('email') as HTMLInputElement)?.value;
+                  if (!email) {
+                    setError('Please enter your email above.');
+                    setMessage(null);
+                    return;
+                  }
+                  const res = await fetch('/api/auth/resend-verification', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email }),
+                  });
+                  const data = await res.json();
+                  if (res.ok) {
+                    setMessage('Verification email resent! Please check your inbox.');
+                  } else {
+                    setError(data.error || 'Could not resend verification email.');
+                  }
+                }}
+              >
+                Resend Verification Email
+              </button>
+            )}
           </div>
         )}
         <form onSubmit={handleSubmit} className="space-y-6">

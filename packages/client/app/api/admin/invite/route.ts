@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import bcrypt from "bcrypt";
 import crypto from "crypto";
-import { sendMail } from "../../../lib/mail";
+import { sendMail } from "../../../../lib/mail";
 
 const prisma = new PrismaClient();
 
@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
   const tempPassword = crypto.randomBytes(8).toString("hex");
   const hashedPassword = await bcrypt.hash(tempPassword, 10);
   const token = crypto.randomBytes(32).toString("hex");
-  const expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24); // 24 hours
+  const expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24);
 
   // Create user (inactive until verified)
   const user = await prisma.user.create({

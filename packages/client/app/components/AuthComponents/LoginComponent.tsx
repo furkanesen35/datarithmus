@@ -29,8 +29,8 @@ export default function LoginComponent() {
       const data = await response.json();
       if (response.ok) {
         login(data.email, data.isSuperuser);
-        setMessage('✔ Login successful, redirecting...');
-        setTimeout(() => router.push(data.isSuperuser ? '/admin' : '/dashboard'), 2000);
+        setMessage('✔ Login successful! Redirecting to dashboard...');
+        setTimeout(() => router.push('/dashboard'), 3500); // Increased to 5 seconds
       } else {
         setError(data.error);
       }

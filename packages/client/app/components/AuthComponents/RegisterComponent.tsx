@@ -29,12 +29,10 @@ export default function RegisterComponent() {
 
       const data = await response.json();
       if (response.ok) {
-        localStorage.setItem('token', data.token);
-        login(data.email, data.isSuperuser);
-        setMessage('✔ Registration successful, redirecting...');
-        setTimeout(() => router.push(data.isSuperuser ? '/admin' : '/dashboard'), 2000);
+        setMessage('✔ Registration successful! Please check your email to verify your account.');
+        setTimeout(() => router.push('/auth/login'), 3500);
       } else {
-        setError(error);
+        setError(data.error);
       }
     } catch (error) {
       setError('An error occurred. Please try again.');

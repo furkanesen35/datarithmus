@@ -14,6 +14,9 @@ export async function POST(req: NextRequest) {
     if (!user || !(await bcrypt.compare(password, user.password))) {
       return NextResponse.json({ error: 'Invalid credentials' }, { status: 401 });
     }
+    if (!user.isActive) {
+      return NextResponse.json({ error: 'Account not verified. Please check your email.' }, { status: 403 });
+    }
 
     const token = jwt.sign(
       { email: user.email, isSuperuser: user.isSuperuser },

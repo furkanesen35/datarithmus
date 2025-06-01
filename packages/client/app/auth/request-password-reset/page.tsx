@@ -21,7 +21,7 @@ export default function RequestPasswordResetPage() {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-12 p-6 bg-white rounded shadow">
+    <div className="max-w-md mx-auto mt-12 p-6">
       <h2 className="text-xl font-semibold mb-4">Reset your password</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <input

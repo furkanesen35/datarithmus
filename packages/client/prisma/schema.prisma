@@ -124,7 +124,7 @@ model QuizResult {
   isCorrect Boolean
   createdAt DateTime @default(now())
 
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   quiz      Quiz     @relation(fields: [quizId], references: [id])
   question  QuizQuestion @relation(fields: [questionId], references: [id])
 }
@@ -135,7 +135,7 @@ model PasswordResetToken {
   token     String   @unique
   expiresAt DateTime
   used      Boolean  @default(false)
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model EmailVerificationToken {
@@ -144,5 +144,5 @@ model EmailVerificationToken {
   token     String   @unique
   expiresAt DateTime
   used      Boolean  @default(false)
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

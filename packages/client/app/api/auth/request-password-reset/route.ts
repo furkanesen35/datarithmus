@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
 import crypto from "crypto";
+import { sendMail } from "../../../../lib/mail";
 
 const prisma = new PrismaClient();
 
@@ -15,7 +16,12 @@ export async function POST(req: NextRequest) {
   await prisma.passwordResetToken.create({
     data: { userId: user.id, token, expiresAt },
   });
-  // In production, send email. For now, log the reset link:
-  console.log(`Password reset link: http://localhost:3000/auth/reset-password?token=${token}`);
-  return NextResponse.json({ message: "Password reset link sent (check server log)" });
+  const resetUrl = `http://localhost:3000/auth/reset-password?token=${token}`;
+  // Send password reset email
+  await sendMail({
+    to: user.email,
+    subject: "Password Reset",
+    html: `<p>Click the link below to reset your password:</p><p><a href="${resetUrl}">${resetUrl}</a></p>`,
+  });
+  return NextResponse.json({ message: "Password reset link sent to your email." });
 }

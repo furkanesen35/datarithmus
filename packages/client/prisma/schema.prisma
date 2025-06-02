@@ -24,7 +24,7 @@ model Video {
   id          Int      @id @default(autoincrement())
   title       String
   description String
-  filePath    String
+  videoUrl    String   // changed from filePath
   createdAt   DateTime @default(now())
 }
 

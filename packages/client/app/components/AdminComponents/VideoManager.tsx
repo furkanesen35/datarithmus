@@ -6,14 +6,14 @@ interface Video {
   id: number;
   title: string;
   description: string;
-  filePath: string;
+  videoUrl: string; // changed from filePath
   createdAt: string;
 }
 
 export default function VideoManager() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [file, setFile] = useState<File | null>(null);
+  const [videoUrl, setVideoUrl] = useState("");
   const [videos, setVideos] = useState<Video[]>([]);
   const [editingId, setEditingId] = useState<number | null>(null);
 
@@ -32,25 +32,26 @@ export default function VideoManager() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!title || !description || (!editingId && !file)) return;
-
-    const formData = new FormData();
-    formData.append("title", title);
-    formData.append("description", description);
-    if (file) formData.append("file", file);
-    if (editingId) formData.append("id", editingId.toString());
-
+    if (!title || !description || !videoUrl) return;
+    const body = JSON.stringify({
+      id: editingId,
+      title,
+      description,
+      videoUrl,
+    });
     const res = await fetch("/api/videos", {
       method: editingId ? "PUT" : "POST",
-      body: formData,
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${localStorage.getItem("token")}`,
+      },
+      body,
     });
-
     if (res.ok) {
       fetchVideos();
       setTitle("");
       setDescription("");
-      setFile(null);
+      setVideoUrl("");
       setEditingId(null);
     }
   };
@@ -59,7 +60,7 @@ export default function VideoManager() {
     setEditingId(video.id);
     setTitle(video.title);
     setDescription(video.description);
-    setFile(null);
+    setVideoUrl(video.videoUrl);
   };
 
   const handleDelete = async (id: number) => {
@@ -76,7 +77,7 @@ export default function VideoManager() {
 
   return (
     <div className="mb-8">
-      <h2 className="text-xl font-semibold mb-4">{editingId ? "Edit Video" : "Upload Video"}</h2>
+      <h2 className="text-xl font-semibold mb-4">{editingId ? "Edit Video" : "Add Video"}</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label htmlFor="title" className="block text-sm font-medium">Title</label>
@@ -99,20 +100,21 @@ export default function VideoManager() {
           />
         </div>
         <div>
-          <label htmlFor="file" className="block text-sm font-medium">Video File</label>
+          <label htmlFor="videoUrl" className="block text-sm font-medium">YouTube Link</label>
           <input
-            id="file"
-            type="file"
-            accept="video/*"
-            onChange={(e) => setFile(e.target.files?.[0] || null)}
-            className="mt-1 block w-full"
+            id="videoUrl"
+            type="url"
+            value={videoUrl}
+            onChange={(e) => setVideoUrl(e.target.value)}
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md text-black"
+            placeholder="https://www.youtube.com/watch?v=..."
           />
         </div>
         <button
           type="submit"
           className="py-2 px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600"
         >
-          {editingId ? "Update Video" : "Upload Video"}
+          {editingId ? "Update Video" : "Add Video"}
         </button>
       </form>
       <div className="mt-6">
@@ -121,7 +123,20 @@ export default function VideoManager() {
           <div key={video.id} className="p-4 bg-white border border-gray-300 rounded-md mb-2">
             <h4 className="text-md font-medium">{video.title}</h4>
             <p className="text-sm">{video.description}</p>
-            <video src={video.filePath} controls className="mt-2 w-full max-w-xs" />
+            {video.videoUrl && (
+              <div className="mt-2">
+                <iframe
+                  width="320"
+                  height="180"
+                  src={`https://www.youtube.com/embed/${getYouTubeId(video.videoUrl)}`}
+                  title={video.title}
+                  frameBorder="0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  className="w-full max-w-xs"
+                />
+              </div>
+            )}
             <div className="mt-2 flex space-x-2">
               <button onClick={() => handleEdit(video)} className="text-blue-500 hover:underline">
                 Edit
@@ -135,4 +150,9 @@ export default function VideoManager() {
       </div>
     </div>
   );
+}
+
+function getYouTubeId(url: string): string | undefined {
+  const match = url.match(/(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?|shorts)\/|.*[?&]v=)|youtu\.be\/)([\w-]{11})/);
+  return match ? match[1] : undefined;
 }

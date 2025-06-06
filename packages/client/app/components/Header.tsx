@@ -75,6 +75,7 @@ export default function Header() {
           <Link href="/events" className="block py-2 px-4 hover:bg-gray-700">Events</Link>
           <Link href="/about" className="block py-2 px-4 hover:bg-gray-700">About Us</Link>
           <Link href="/blog" className="block py-2 px-4 hover:bg-gray-700">Blog</Link>
+          <Link href="/auth/login" className="block py-2 px-4 bg-blue-700 hover:bg-red-700 ">Login/Register</Link>
         </div>
 
         <div className="hidden lg:block">

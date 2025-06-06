@@ -1,6 +1,6 @@
 // packages/client/app/components/AdminComponents/StudentProgressManager.tsx
-"use client";
-import { useEffect, useState } from "react";
+'use client';
+import { useEffect, useState } from 'react';
 
 interface Student {
   id: number;
@@ -28,7 +28,9 @@ interface StudentQuizResults {
 export default function StudentProgressManager() {
   const [students, setStudents] = useState<Student[]>([]);
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
-  const [results, setResults] = useState<{ [userId: number]: StudentQuizResults }>({});
+  const [results, setResults] = useState<{
+    [userId: number]: StudentQuizResults;
+  }>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -37,7 +39,9 @@ export default function StudentProgressManager() {
 
   async function fetchData() {
     setLoading(true);
-    const res = await fetch("/api/student-progress", { credentials: "include" });
+    const res = await fetch('/api/student-progress', {
+      credentials: 'include',
+    });
     if (res.ok) {
       const data = await res.json();
       setStudents(data.students);
@@ -61,31 +65,44 @@ export default function StudentProgressManager() {
                 {quizzes.flatMap((quiz) =>
                   quiz.questions.map((q) => (
                     <th key={q.id} className="border px-2 py-1">
-                      {quiz.title} <br />Q: {q.question}
+                      {quiz.title} <br />
+                      Q: {q.question}
                     </th>
-                  ))
+                  )),
                 )}
               </tr>
             </thead>
             <tbody>
               {students.map((student) => (
                 <tr key={student.id}>
-                  <td className="border px-2 py-1">{student.username} <br /><span className="text-xs text-gray-500">{student.email}</span></td>
+                  <td className="border px-2 py-1">
+                    {student.username} <br />
+                    <span className="text-xs text-gray-500">
+                      {student.email}
+                    </span>
+                  </td>
                   {quizzes.flatMap((quiz) =>
                     quiz.questions.map((q) => {
                       const result = results[student.id]?.[q.id];
                       return (
                         <td key={q.id} className="border px-2 py-1 text-center">
                           {result ? (
-                            <span className={result.isCorrect ? "text-green-600 font-bold" : "text-red-600 font-bold"}>
-                              {result.isCorrect ? "✔" : "✗"} (Ans: {result.answer + 1})
+                            <span
+                              className={
+                                result.isCorrect
+                                  ? 'text-green-600 font-bold'
+                                  : 'text-red-600 font-bold'
+                              }
+                            >
+                              {result.isCorrect ? '✔' : '✗'} (Ans:{' '}
+                              {result.answer + 1})
                             </span>
                           ) : (
                             <span className="text-gray-400">—</span>
                           )}
                         </td>
                       );
-                    })
+                    }),
                   )}
                 </tr>
               ))}

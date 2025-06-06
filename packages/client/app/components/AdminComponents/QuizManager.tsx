@@ -1,6 +1,6 @@
 // packages/client/app/components/AdminComponents/QuizManager.tsx
-"use client";
-import { useState, useEffect } from "react";
+'use client';
+import { useState, useEffect } from 'react';
 
 interface Quiz {
   id: number;
@@ -20,13 +20,13 @@ export default function QuizManager() {
   const [activeTab, setActiveTab] = useState(0);
 
   // For new question input
-  const [newQuestion, setNewQuestion] = useState("");
-  const [newOptions, setNewOptions] = useState<string[]>([""]);
+  const [newQuestion, setNewQuestion] = useState('');
+  const [newOptions, setNewOptions] = useState<string[]>(['']);
   const [newCorrectAnswer, setNewCorrectAnswer] = useState(1); // 1-based
 
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [loading, setLoading] = useState(false);
-  const [quizTitle, setQuizTitle] = useState("");
+  const [quizTitle, setQuizTitle] = useState('');
 
   useEffect(() => {
     fetchQuizzes();
@@ -34,7 +34,7 @@ export default function QuizManager() {
 
   const fetchQuizzes = async () => {
     setLoading(true);
-    const res = await fetch("/api/quizzes", { credentials: "include" });
+    const res = await fetch('/api/quizzes', { credentials: 'include' });
     if (res.ok) {
       const data = await res.json();
       setQuizzes(data);
@@ -43,7 +43,7 @@ export default function QuizManager() {
   };
 
   const handleAddOption = () => {
-    setNewOptions([...newOptions, ""]);
+    setNewOptions([...newOptions, '']);
   };
 
   const handleRemoveOption = (idx: number) => {
@@ -57,7 +57,8 @@ export default function QuizManager() {
   };
 
   const handleAddQuestion = () => {
-    if (!newQuestion || newOptions.some((opt) => !opt) || !newCorrectAnswer) return;
+    if (!newQuestion || newOptions.some((opt) => !opt) || !newCorrectAnswer)
+      return;
     setQuestions([
       ...questions,
       {
@@ -66,8 +67,8 @@ export default function QuizManager() {
         correctAnswer: newCorrectAnswer, // 1-based
       },
     ]);
-    setNewQuestion("");
-    setNewOptions([""]);
+    setNewQuestion('');
+    setNewOptions(['']);
     setNewCorrectAnswer(1);
     setActiveTab(questions.length + 1);
   };
@@ -81,31 +82,31 @@ export default function QuizManager() {
     if (!quizTitle.trim() || questions.length === 0) return;
     setLoading(true);
     try {
-      const res = await fetch("/api/quizzes", {
-        method: "POST",
+      const res = await fetch('/api/quizzes', {
+        method: 'POST',
         body: JSON.stringify({
           title: quizTitle,
-          questions: questions.map(q => ({
+          questions: questions.map((q) => ({
             question: q.question,
             options: q.options,
-            correctAnswer: q.correctAnswer
-          }))
+            correctAnswer: q.correctAnswer,
+          })),
         }),
-        headers: { "Content-Type": "application/json" },
-        credentials: "include"
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
       });
       if (!res.ok) {
         const data = await res.json();
-        alert(data.error || "Failed to save quiz");
+        alert(data.error || 'Failed to save quiz');
         setLoading(false);
         return;
       }
       setQuestions([]);
-      setQuizTitle("");
+      setQuizTitle('');
       setActiveTab(0);
       fetchQuizzes();
     } catch (err) {
-      alert("Network or server error");
+      alert('Network or server error');
     }
     setLoading(false);
   };
@@ -114,12 +115,14 @@ export default function QuizManager() {
     <div className="mb-8">
       <h2 className="text-xl font-semibold mb-4">Create Quiz</h2>
       <div className="mb-4">
-        <label htmlFor="quiz-title" className="block text-sm font-medium mb-1">Quiz Title</label>
+        <label htmlFor="quiz-title" className="block text-sm font-medium mb-1">
+          Quiz Title
+        </label>
         <input
           id="quiz-title"
           type="text"
           value={quizTitle}
-          onChange={e => setQuizTitle(e.target.value)}
+          onChange={(e) => setQuizTitle(e.target.value)}
           className="mb-2 block w-full px-3 py-2 border border-gray-300 rounded-md text-black"
           placeholder="Enter quiz title..."
         />
@@ -132,7 +135,10 @@ export default function QuizManager() {
       </div>
       <div className="mb-4">
         {questions.map((q, idx) => (
-          <div key={idx} className="border p-4 mb-2 rounded-md bg-gray-50 relative">
+          <div
+            key={idx}
+            className="border p-4 mb-2 rounded-md bg-gray-50 relative"
+          >
             <div className="flex justify-between items-center">
               <span className="font-semibold">Question {idx + 1}</span>
               <button
@@ -148,38 +154,60 @@ export default function QuizManager() {
               <div className="mb-2">{q.question}</div>
               <ul className="list-decimal ml-6">
                 {q.options.map((opt, i) => (
-                  <li key={i} className={q.correctAnswer === i + 1 ? "font-bold text-green-600" : ""}>
+                  <li
+                    key={i}
+                    className={
+                      q.correctAnswer === i + 1
+                        ? 'font-bold text-green-600'
+                        : ''
+                    }
+                  >
                     {opt}
                   </li>
                 ))}
               </ul>
-              <div className="text-xs text-gray-500 mt-1">Correct Answer: Option {q.correctAnswer}</div>
+              <div className="text-xs text-gray-500 mt-1">
+                Correct Answer: Option {q.correctAnswer}
+              </div>
             </div>
           </div>
         ))}
       </div>
       <div className="border p-4 rounded-md bg-white mb-4">
         <div className="font-semibold mb-2">Add New Question</div>
-        <form onSubmit={e => { e.preventDefault(); handleAddQuestion(); }} className="space-y-2">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            handleAddQuestion();
+          }}
+          className="space-y-2"
+        >
           <div>
-            <label htmlFor="new-question" className="block text-sm font-medium">Question</label>
+            <label htmlFor="new-question" className="block text-sm font-medium">
+              Question
+            </label>
             <input
               id="new-question"
               type="text"
               value={newQuestion}
-              onChange={e => setNewQuestion(e.target.value)}
+              onChange={(e) => setNewQuestion(e.target.value)}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md text-black"
             />
           </div>
           {newOptions.map((opt, i) => (
             <div key={i} className="flex items-center space-x-2">
               <div className="flex-1">
-                <label htmlFor={`new-option-${i}`} className="block text-sm font-medium">Option {i + 1}</label>
+                <label
+                  htmlFor={`new-option-${i}`}
+                  className="block text-sm font-medium"
+                >
+                  Option {i + 1}
+                </label>
                 <input
                   id={`new-option-${i}`}
                   type="text"
                   value={opt}
-                  onChange={e => {
+                  onChange={(e) => {
                     const opts = [...newOptions];
                     opts[i] = e.target.value;
                     setNewOptions(opts);
@@ -205,14 +233,19 @@ export default function QuizManager() {
             Add Option
           </button>
           <div>
-            <label htmlFor="new-correct-answer" className="block text-sm font-medium">Correct Answer (1-{newOptions.length})</label>
+            <label
+              htmlFor="new-correct-answer"
+              className="block text-sm font-medium"
+            >
+              Correct Answer (1-{newOptions.length})
+            </label>
             <input
               id="new-correct-answer"
               type="number"
               min="1"
               max={newOptions.length}
               value={newCorrectAnswer}
-              onChange={e => setNewCorrectAnswer(Number(e.target.value))}
+              onChange={(e) => setNewCorrectAnswer(Number(e.target.value))}
               className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md text-black"
             />
           </div>
@@ -233,26 +266,51 @@ export default function QuizManager() {
       </button>
       <div className="mt-8">
         <h3 className="text-lg font-semibold mb-2">All Quizzes</h3>
-        {loading ? <p>Loading...</p> : quizzes.map((quiz) => (
-          <div key={quiz.id} className="p-4 bg-white border border-gray-300 rounded-md mb-4">
-            <h4 className="text-md font-medium mb-2">{quiz.title}</h4>
-            {quiz.questions && quiz.questions.length > 0 ? (
-              quiz.questions.map((q: any, idx: number) => (
-                <div key={q.id || idx} className="mb-2 p-2 border rounded bg-gray-50">
-                  <div className="font-semibold">Question {idx + 1}: {q.question}</div>
-                  <ul className="list-decimal ml-6">
-                    {JSON.parse(q.options).map((opt: string, i: number) => (
-                      <li key={i} className={q.correctAnswer === i ? "font-bold text-green-600" : ""}>{opt}</li>
-                    ))}
-                  </ul>
-                  <div className="text-xs text-gray-500 mt-1">Correct Answer: Option {q.correctAnswer + 1}</div>
-                </div>
-              ))
-            ) : (
-              <p className="text-sm text-gray-500">No questions in this quiz.</p>
-            )}
-          </div>
-        ))}
+        {loading ? (
+          <p>Loading...</p>
+        ) : (
+          quizzes.map((quiz) => (
+            <div
+              key={quiz.id}
+              className="p-4 bg-white border border-gray-300 rounded-md mb-4"
+            >
+              <h4 className="text-md font-medium mb-2">{quiz.title}</h4>
+              {quiz.questions && quiz.questions.length > 0 ? (
+                quiz.questions.map((q: any, idx: number) => (
+                  <div
+                    key={q.id || idx}
+                    className="mb-2 p-2 border rounded bg-gray-50"
+                  >
+                    <div className="font-semibold">
+                      Question {idx + 1}: {q.question}
+                    </div>
+                    <ul className="list-decimal ml-6">
+                      {JSON.parse(q.options).map((opt: string, i: number) => (
+                        <li
+                          key={i}
+                          className={
+                            q.correctAnswer === i
+                              ? 'font-bold text-green-600'
+                              : ''
+                          }
+                        >
+                          {opt}
+                        </li>
+                      ))}
+                    </ul>
+                    <div className="text-xs text-gray-500 mt-1">
+                      Correct Answer: Option {q.correctAnswer + 1}
+                    </div>
+                  </div>
+                ))
+              ) : (
+                <p className="text-sm text-gray-500">
+                  No questions in this quiz.
+                </p>
+              )}
+            </div>
+          ))
+        )}
       </div>
     </div>
   );

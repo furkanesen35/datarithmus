@@ -29,10 +29,10 @@ body {
 }
 
 /* Google Auth Button Styles */
-.g_id_signin div[role="button"] > div:first-child {
+.g_id_signin div[role='button'] > div:first-child {
   display: none !important;
 }
-.g_id_signin div[role="button"] {
+.g_id_signin div[role='button'] {
   width: 40px !important;
   height: 40px !important;
   border-radius: 50% !important;
@@ -44,6 +44,6 @@ body {
   background: white !important;
   border: 1px solid #dadce0 !important;
 }
-.g_id_signin div[role="button"]:hover {
+.g_id_signin div[role='button']:hover {
   background: #f8f9fa !important;
 }

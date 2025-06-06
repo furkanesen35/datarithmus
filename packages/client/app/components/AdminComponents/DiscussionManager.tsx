@@ -1,6 +1,6 @@
 // packages/client/app/components/AdminComponents/DiscussionManager.tsx
-"use client";
-import { useEffect, useState } from "react";
+'use client';
+import { useEffect, useState } from 'react';
 
 interface Post {
   id: number;
@@ -16,9 +16,12 @@ interface DiscussionManagerProps {
   onError: (err: string) => void;
 }
 
-export default function DiscussionManager({ onMessage, onError }: DiscussionManagerProps) {
-  const [postTitle, setPostTitle] = useState("");
-  const [postContent, setPostContent] = useState("");
+export default function DiscussionManager({
+  onMessage,
+  onError,
+}: DiscussionManagerProps) {
+  const [postTitle, setPostTitle] = useState('');
+  const [postContent, setPostContent] = useState('');
   const [isPinned, setIsPinned] = useState(false);
   const [posts, setPosts] = useState<Post[]>([]);
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -31,11 +34,11 @@ export default function DiscussionManager({ onMessage, onError }: DiscussionMana
   const fetchPosts = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/discussion", { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch posts");
+      const res = await fetch('/api/discussion', { credentials: 'include' });
+      if (!res.ok) throw new Error('Failed to fetch posts');
       setPosts(await res.json());
     } catch (err: any) {
-      onError(err.message || "Failed to fetch posts");
+      onError(err.message || 'Failed to fetch posts');
     } finally {
       setLoading(false);
     }
@@ -44,36 +47,49 @@ export default function DiscussionManager({ onMessage, onError }: DiscussionMana
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!postTitle || !postContent) {
-      onError("Title and content are required");
+      onError('Title and content are required');
       return;
     }
     setLoading(true);
     try {
       let res;
       if (editingId) {
-        res = await fetch("/api/discussion", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({ id: editingId, title: postTitle, content: postContent, author: "Teacher", pinned: isPinned }),
+        res = await fetch('/api/discussion', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({
+            id: editingId,
+            title: postTitle,
+            content: postContent,
+            author: 'Teacher',
+            pinned: isPinned,
+          }),
         });
       } else {
-        res = await fetch("/api/discussion", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
-          body: JSON.stringify({ title: postTitle, content: postContent, author: "Teacher", pinned: isPinned }),
+        res = await fetch('/api/discussion', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({
+            title: postTitle,
+            content: postContent,
+            author: 'Teacher',
+            pinned: isPinned,
+          }),
         });
       }
-      if (!res.ok) throw new Error("Failed to save post");
+      if (!res.ok) throw new Error('Failed to save post');
       await fetchPosts();
-      onMessage(editingId ? "Post updated successfully" : "Post created successfully");
+      onMessage(
+        editingId ? 'Post updated successfully' : 'Post created successfully',
+      );
       setEditingId(null);
-      setPostTitle("");
-      setPostContent("");
+      setPostTitle('');
+      setPostContent('');
       setIsPinned(false);
     } catch (err: any) {
-      onError(err.message || "Failed to save post");
+      onError(err.message || 'Failed to save post');
     } finally {
       setLoading(false);
     }
@@ -89,17 +105,17 @@ export default function DiscussionManager({ onMessage, onError }: DiscussionMana
   const handleDelete = async (id: number) => {
     setLoading(true);
     try {
-      const res = await fetch("/api/discussion", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
+      const res = await fetch('/api/discussion', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ id }),
       });
-      if (!res.ok) throw new Error("Failed to delete post");
+      if (!res.ok) throw new Error('Failed to delete post');
       await fetchPosts();
-      onMessage("Post deleted successfully");
+      onMessage('Post deleted successfully');
     } catch (err: any) {
-      onError(err.message || "Failed to delete post");
+      onError(err.message || 'Failed to delete post');
     } finally {
       setLoading(false);
     }
@@ -110,17 +126,23 @@ export default function DiscussionManager({ onMessage, onError }: DiscussionMana
     try {
       const post = posts.find((p) => p.id === id);
       if (!post) return;
-      const res = await fetch("/api/discussion", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ id, title: post.title, content: post.content, author: post.author, pinned: !pinned }),
+      const res = await fetch('/api/discussion', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          id,
+          title: post.title,
+          content: post.content,
+          author: post.author,
+          pinned: !pinned,
+        }),
       });
-      if (!res.ok) throw new Error("Failed to toggle pin");
+      if (!res.ok) throw new Error('Failed to toggle pin');
       await fetchPosts();
-      onMessage("Post pin toggled");
+      onMessage('Post pin toggled');
     } catch (err: any) {
-      onError(err.message || "Failed to toggle pin");
+      onError(err.message || 'Failed to toggle pin');
     } finally {
       setLoading(false);
     }
@@ -129,7 +151,7 @@ export default function DiscussionManager({ onMessage, onError }: DiscussionMana
   return (
     <div className="mb-8">
       <h2 className="text-xl font-semibold mb-4">
-        {editingId ? "Edit Post" : "Add Post"}
+        {editingId ? 'Edit Post' : 'Add Post'}
       </h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
@@ -172,7 +194,7 @@ export default function DiscussionManager({ onMessage, onError }: DiscussionMana
             type="submit"
             className="py-2 px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600"
           >
-            {editingId ? "Update Post" : "Create Post"}
+            {editingId ? 'Update Post' : 'Create Post'}
           </button>
           {editingId && (
             <button
@@ -180,8 +202,8 @@ export default function DiscussionManager({ onMessage, onError }: DiscussionMana
               className="py-2 px-4 bg-gray-500 text-white rounded-md hover:bg-gray-600"
               onClick={() => {
                 setEditingId(null);
-                setPostTitle("");
-                setPostContent("");
+                setPostTitle('');
+                setPostContent('');
                 setIsPinned(false);
               }}
             >
@@ -201,9 +223,15 @@ export default function DiscussionManager({ onMessage, onError }: DiscussionMana
         ) : (
           <ul className="space-y-4">
             {posts.map((post) => (
-              <li key={post.id} className="p-4 bg-white border border-gray-300 rounded-md">
+              <li
+                key={post.id}
+                className="p-4 bg-white border border-gray-300 rounded-md"
+              >
                 <h4 className="text-md font-medium">
-                  {post.title} {post.pinned && <span className="text-yellow-500">[Pinned]</span>}
+                  {post.title}{' '}
+                  {post.pinned && (
+                    <span className="text-yellow-500">[Pinned]</span>
+                  )}
                 </h4>
                 <p className="text-sm">{post.content}</p>
                 <p className="text-sm">Author: {post.author}</p>
@@ -227,7 +255,7 @@ export default function DiscussionManager({ onMessage, onError }: DiscussionMana
                     onClick={() => togglePin(post.id, post.pinned)}
                     className="text-gray-500 hover:underline text-sm"
                   >
-                    {post.pinned ? "Unpin" : "Pin"}
+                    {post.pinned ? 'Unpin' : 'Pin'}
                   </button>
                 </div>
               </li>

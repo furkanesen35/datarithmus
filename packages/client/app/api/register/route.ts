@@ -14,7 +14,10 @@ export async function POST(req: NextRequest) {
     const existingUser = await prisma.user.findUnique({ where: { email } });
 
     if (existingUser) {
-      return NextResponse.json({ error: 'User already exists' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'User already exists' },
+        { status: 400 },
+      );
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -38,7 +41,7 @@ export async function POST(req: NextRequest) {
             <hr style="margin: 24px 0; border: none; border-top: 1px solid #eee;" />
             <small style="color: #888;">&copy; ${new Date().getFullYear()} Datarithmus</small>
           </div>
-        `
+        `,
       });
       // Only create the user and token if email send succeeds
       user = await prisma.user.create({
@@ -54,10 +57,16 @@ export async function POST(req: NextRequest) {
       });
     } catch (mailError) {
       console.error('Email send error:', mailError);
-      return NextResponse.json({ error: 'Registration failed: could not send verification email.' }, { status: 500 });
+      return NextResponse.json(
+        { error: 'Registration failed: could not send verification email.' },
+        { status: 500 },
+      );
     }
 
-    return NextResponse.json({ message: 'Registration successful! Please check your email to verify your account.' });
+    return NextResponse.json({
+      message:
+        'Registration successful! Please check your email to verify your account.',
+    });
   } catch (error) {
     // Log the error for debugging
     console.error('Registration error:', error);

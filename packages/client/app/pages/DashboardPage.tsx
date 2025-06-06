@@ -1,24 +1,24 @@
 // packages/client/app/pages/DashboardPage.tsx
-"use client";
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
-import { useAuth } from "../context/AuthContext";
-import Link from "next/link";
-import Overview from "app/components/DashboardComponents/Overview";
-import MyCourses from "app/components/DashboardComponents/MyCourses";
-import MyProgress from "app/components/DashboardComponents/MyProgress";
-import Recordings from "app/components/DashboardComponents/Recordings";
-import Schedule from "app/components/DashboardComponents/Schedule";
-import ImportantLinks from "app/components/DashboardComponents/ImportantLinks";
+'use client';
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuth } from '../context/AuthContext';
+import Link from 'next/link';
+import Overview from 'app/components/DashboardComponents/Overview';
+import MyCourses from 'app/components/DashboardComponents/MyCourses';
+import MyProgress from 'app/components/DashboardComponents/MyProgress';
+import Recordings from 'app/components/DashboardComponents/Recordings';
+import Schedule from 'app/components/DashboardComponents/Schedule';
+import ImportantLinks from 'app/components/DashboardComponents/ImportantLinks';
 
 export default function DashboardPage() {
   const { auth, logout, isAuthLoading } = useAuth();
   const router = useRouter();
-  const [activeSection, setActiveSection] = useState("overview");
+  const [activeSection, setActiveSection] = useState('overview');
 
   useEffect(() => {
     if (!isAuthLoading && !auth.isLoggedIn) {
-      router.push("/auth/login");
+      router.push('/auth/login');
     }
   }, [auth.isLoggedIn, isAuthLoading, router]);
 
@@ -31,7 +31,7 @@ export default function DashboardPage() {
 
   const handleLogout = async () => {
     await logout();
-    router.push("/auth/login");
+    router.push('/auth/login');
   };
 
   return (
@@ -43,9 +43,11 @@ export default function DashboardPage() {
           <li>
             <button
               className={`w-full text-left p-2 rounded ${
-                activeSection === "overview" ? "bg-blue-500 text-white" : "hover:bg-gray-200"
+                activeSection === 'overview'
+                  ? 'bg-blue-500 text-white'
+                  : 'hover:bg-gray-200'
               }`}
-              onClick={() => setActiveSection("overview")}
+              onClick={() => setActiveSection('overview')}
             >
               Overview
             </button>
@@ -53,9 +55,11 @@ export default function DashboardPage() {
           <li>
             <button
               className={`w-full text-left p-2 rounded ${
-                activeSection === "courses" ? "bg-blue-500 text-white" : "hover:bg-gray-200"
+                activeSection === 'courses'
+                  ? 'bg-blue-500 text-white'
+                  : 'hover:bg-gray-200'
               }`}
-              onClick={() => setActiveSection("courses")}
+              onClick={() => setActiveSection('courses')}
             >
               My Courses
             </button>
@@ -63,9 +67,11 @@ export default function DashboardPage() {
           <li>
             <button
               className={`w-full text-left p-2 rounded ${
-                activeSection === "progress" ? "bg-blue-500 text-white" : "hover:bg-gray-200"
+                activeSection === 'progress'
+                  ? 'bg-blue-500 text-white'
+                  : 'hover:bg-gray-200'
               }`}
-              onClick={() => setActiveSection("progress")}
+              onClick={() => setActiveSection('progress')}
             >
               Progress
             </button>
@@ -73,9 +79,11 @@ export default function DashboardPage() {
           <li>
             <button
               className={`w-full text-left p-2 rounded ${
-                activeSection === "recordings" ? "bg-blue-500 text-white" : "hover:bg-gray-200"
+                activeSection === 'recordings'
+                  ? 'bg-blue-500 text-white'
+                  : 'hover:bg-gray-200'
               }`}
-              onClick={() => setActiveSection("recordings")}
+              onClick={() => setActiveSection('recordings')}
             >
               Recordings
             </button>
@@ -83,9 +91,11 @@ export default function DashboardPage() {
           <li>
             <button
               className={`w-full text-left p-2 rounded ${
-                activeSection === "schedule" ? "bg-blue-500 text-white" : "hover:bg-gray-200"
+                activeSection === 'schedule'
+                  ? 'bg-blue-500 text-white'
+                  : 'hover:bg-gray-200'
               }`}
-              onClick={() => setActiveSection("schedule")}
+              onClick={() => setActiveSection('schedule')}
             >
               Schedule
             </button>
@@ -93,9 +103,11 @@ export default function DashboardPage() {
           <li>
             <button
               className={`w-full text-left p-2 rounded ${
-                activeSection === "links" ? "bg-blue-500 text-white" : "hover:bg-gray-200"
+                activeSection === 'links'
+                  ? 'bg-blue-500 text-white'
+                  : 'hover:bg-gray-200'
               }`}
-              onClick={() => setActiveSection("links")}
+              onClick={() => setActiveSection('links')}
             >
               Important Links
             </button>
@@ -110,12 +122,12 @@ export default function DashboardPage() {
 
       {/* Middle - Content */}
       <div className="flex-1 p-8">
-        {activeSection === "overview" && <Overview email={auth.user?.email} />}
-        {activeSection === "courses" && <MyCourses />}
-        {activeSection === "progress" && <MyProgress />}
-        {activeSection === "recordings" && <Recordings />}
-        {activeSection === "schedule" && <Schedule />}
-        {activeSection === "links" && <ImportantLinks />}
+        {activeSection === 'overview' && <Overview email={auth.user?.email} />}
+        {activeSection === 'courses' && <MyCourses />}
+        {activeSection === 'progress' && <MyProgress />}
+        {activeSection === 'recordings' && <Recordings />}
+        {activeSection === 'schedule' && <Schedule />}
+        {activeSection === 'links' && <ImportantLinks />}
       </div>
 
       {/* Right Sidebar - Account Settings */}

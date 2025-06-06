@@ -1,12 +1,8 @@
 // packages/client/app/components/HomeComponents/SecondContainer.tsx
-import React from 'react'
+import React from 'react';
 
 const SecondContainer = () => {
-  return (
-    <div>
-      
-    </div>
-  )
-}
+  return <div></div>;
+};
 
-export default SecondContainer
+export default SecondContainer;

@@ -14,9 +14,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <link rel="stylesheet" href="/output.css" />
       </head>
       <body>
-        <AuthProvider>
-          {children}
-        </AuthProvider>
+        <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );

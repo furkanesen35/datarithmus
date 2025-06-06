@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
-import jwt from "jsonwebtoken";
+import { NextRequest, NextResponse } from 'next/server';
+import { PrismaClient } from '@prisma/client';
+import jwt from 'jsonwebtoken';
 
 const prisma = new PrismaClient();
 
@@ -9,15 +9,23 @@ interface JwtPayload {
   isSuperuser: boolean;
 }
 
-async function requireSuperuser(req: NextRequest): Promise<NextResponse | null> {
+async function requireSuperuser(
+  req: NextRequest,
+): Promise<NextResponse | null> {
   const token = req.cookies.get('token')?.value;
   if (!token) {
     return NextResponse.json({ error: 'No token provided' }, { status: 401 });
   }
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret') as JwtPayload;
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET || 'fallback-secret',
+    ) as JwtPayload;
     if (!decoded.isSuperuser) {
-      return NextResponse.json({ error: 'Superuser access required' }, { status: 403 });
+      return NextResponse.json(
+        { error: 'Superuser access required' },
+        { status: 403 },
+      );
     }
     return null;
   } catch (error) {
@@ -31,8 +39,15 @@ export async function GET(req: NextRequest) {
 
   const students = await prisma.user.findMany({
     where: { isSuperuser: false },
-    orderBy: { createdAt: "desc" },
-    select: { id: true, email: true, username: true, isSuperuser: true, createdAt: true, isActive: true },
+    orderBy: { createdAt: 'desc' },
+    select: {
+      id: true,
+      email: true,
+      username: true,
+      isSuperuser: true,
+      createdAt: true,
+      isActive: true,
+    },
   });
   return NextResponse.json(students);
 }
@@ -42,14 +57,14 @@ export async function PATCH(req: NextRequest) {
   if (authCheck) return authCheck;
 
   const { id, isActive } = await req.json();
-  if (!id || typeof isActive !== "boolean") {
-    return NextResponse.json({ error: "Missing fields" }, { status: 400 });
+  if (!id || typeof isActive !== 'boolean') {
+    return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
   }
   const user = await prisma.user.update({
     where: { id: Number(id) },
     data: { isActive },
   });
-  return NextResponse.json({ message: "Status updated", user });
+  return NextResponse.json({ message: 'Status updated', user });
 }
 
 export async function DELETE(req: NextRequest) {
@@ -58,8 +73,8 @@ export async function DELETE(req: NextRequest) {
 
   const { id } = await req.json();
   if (!id) {
-    return NextResponse.json({ error: "ID required" }, { status: 400 });
+    return NextResponse.json({ error: 'ID required' }, { status: 400 });
   }
   await prisma.user.delete({ where: { id: Number(id) } });
-  return NextResponse.json({ message: "User deleted" });
+  return NextResponse.json({ message: 'User deleted' });
 }

@@ -14,9 +14,15 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret') as JwtPayload;
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET || 'fallback-secret',
+    ) as JwtPayload;
     if (!decoded.isSuperuser) {
-      return NextResponse.json({ error: 'Superuser access required' }, { status: 403 });
+      return NextResponse.json(
+        { error: 'Superuser access required' },
+        { status: 403 },
+      );
     }
     return NextResponse.json({ message: 'Admin data' });
   } catch (error) {

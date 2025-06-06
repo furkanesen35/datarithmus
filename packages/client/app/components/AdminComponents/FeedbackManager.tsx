@@ -1,6 +1,6 @@
 // packages/client/app/components/AdminComponents/FeedbackManager.tsx
-"use client";
-import { useState, useEffect } from "react";
+'use client';
+import { useState, useEffect } from 'react';
 
 interface Survey {
   id: number;
@@ -14,8 +14,11 @@ interface FeedbackManagerProps {
   onError: (err: string) => void;
 }
 
-export default function FeedbackManager({ onMessage, onError }: FeedbackManagerProps) {
-  const [question, setQuestion] = useState("");
+export default function FeedbackManager({
+  onMessage,
+  onError,
+}: FeedbackManagerProps) {
+  const [question, setQuestion] = useState('');
   const [scale, setScale] = useState(5);
   const [surveys, setSurveys] = useState<Survey[]>([]);
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -28,11 +31,11 @@ export default function FeedbackManager({ onMessage, onError }: FeedbackManagerP
   const fetchSurveys = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/feedback", { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch feedback");
+      const res = await fetch('/api/feedback', { credentials: 'include' });
+      if (!res.ok) throw new Error('Failed to fetch feedback');
       setSurveys(await res.json());
     } catch (err: any) {
-      onError(err.message || "Failed to fetch feedback");
+      onError(err.message || 'Failed to fetch feedback');
     } finally {
       setLoading(false);
     }
@@ -41,35 +44,39 @@ export default function FeedbackManager({ onMessage, onError }: FeedbackManagerP
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!question) {
-      onError("Question is required");
+      onError('Question is required');
       return;
     }
     setLoading(true);
     try {
       let res;
       if (editingId) {
-        res = await fetch("/api/feedback", {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
+        res = await fetch('/api/feedback', {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
           body: JSON.stringify({ id: editingId, question, scale }),
         });
       } else {
-        res = await fetch("/api/feedback", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          credentials: "include",
+        res = await fetch('/api/feedback', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
           body: JSON.stringify({ question, scale }),
         });
       }
-      if (!res.ok) throw new Error("Failed to save feedback");
+      if (!res.ok) throw new Error('Failed to save feedback');
       await fetchSurveys();
-      onMessage(editingId ? "Survey updated successfully" : "Survey created successfully");
+      onMessage(
+        editingId
+          ? 'Survey updated successfully'
+          : 'Survey created successfully',
+      );
       setEditingId(null);
-      setQuestion("");
+      setQuestion('');
       setScale(5);
     } catch (err: any) {
-      onError(err.message || "Failed to save feedback");
+      onError(err.message || 'Failed to save feedback');
     } finally {
       setLoading(false);
     }
@@ -84,17 +91,17 @@ export default function FeedbackManager({ onMessage, onError }: FeedbackManagerP
   const handleDelete = async (id: number) => {
     setLoading(true);
     try {
-      const res = await fetch("/api/feedback", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
+      const res = await fetch('/api/feedback', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ id }),
       });
-      if (!res.ok) throw new Error("Failed to delete feedback");
+      if (!res.ok) throw new Error('Failed to delete feedback');
       await fetchSurveys();
-      onMessage("Survey deleted successfully");
+      onMessage('Survey deleted successfully');
     } catch (err: any) {
-      onError(err.message || "Failed to delete feedback");
+      onError(err.message || 'Failed to delete feedback');
     } finally {
       setLoading(false);
     }
@@ -103,7 +110,7 @@ export default function FeedbackManager({ onMessage, onError }: FeedbackManagerP
   return (
     <div className="mb-8">
       <h2 className="text-xl font-semibold mb-4">
-        {editingId ? "Edit Survey" : "Create Survey"}
+        {editingId ? 'Edit Survey' : 'Create Survey'}
       </h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
@@ -137,7 +144,7 @@ export default function FeedbackManager({ onMessage, onError }: FeedbackManagerP
             type="submit"
             className="py-2 px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600"
           >
-            {editingId ? "Update Survey" : "Create Survey"}
+            {editingId ? 'Update Survey' : 'Create Survey'}
           </button>
           {editingId && (
             <button
@@ -145,7 +152,7 @@ export default function FeedbackManager({ onMessage, onError }: FeedbackManagerP
               className="py-2 px-4 bg-gray-500 text-white rounded-md hover:bg-gray-600"
               onClick={() => {
                 setEditingId(null);
-                setQuestion("");
+                setQuestion('');
                 setScale(5);
               }}
             >
@@ -165,7 +172,10 @@ export default function FeedbackManager({ onMessage, onError }: FeedbackManagerP
         ) : (
           <ul className="space-y-4">
             {surveys.map((sv) => (
-              <li key={sv.id} className="p-4 bg-white border border-gray-300 rounded-md">
+              <li
+                key={sv.id}
+                className="p-4 bg-white border border-gray-300 rounded-md"
+              >
                 <h4 className="text-md font-medium">{sv.question}</h4>
                 <p className="text-sm">Scale: 1-{sv.scale}</p>
                 <p className="text-xs text-gray-500 mt-1">

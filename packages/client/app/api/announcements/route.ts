@@ -10,16 +10,24 @@ interface JwtPayload {
   isSuperuser: boolean;
 }
 
-async function requireSuperuser(req: NextRequest): Promise<NextResponse | null> {
+async function requireSuperuser(
+  req: NextRequest,
+): Promise<NextResponse | null> {
   const token = req.cookies.get('token')?.value;
   if (!token) {
     return NextResponse.json({ error: 'No token provided' }, { status: 401 });
   }
 
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret') as JwtPayload;
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET || 'fallback-secret',
+    ) as JwtPayload;
     if (!decoded.isSuperuser) {
-      return NextResponse.json({ error: 'Superuser access required' }, { status: 403 });
+      return NextResponse.json(
+        { error: 'Superuser access required' },
+        { status: 403 },
+      );
     }
     return null;
   } catch (error) {
@@ -31,7 +39,9 @@ export async function GET(req: NextRequest) {
   const authCheck = await requireSuperuser(req);
   if (authCheck) return authCheck;
 
-  const announcements = await prisma.announcement.findMany({ orderBy: { createdAt: 'desc' } });
+  const announcements = await prisma.announcement.findMany({
+    orderBy: { createdAt: 'desc' },
+  });
   return NextResponse.json(announcements);
 }
 
@@ -48,7 +58,10 @@ export async function POST(req: NextRequest) {
     data: { title, content, pinned: pinned || false },
   });
 
-  return NextResponse.json({ message: 'Announcement created', announcement }, { status: 201 });
+  return NextResponse.json(
+    { message: 'Announcement created', announcement },
+    { status: 201 },
+  );
 }
 
 export async function PUT(req: NextRequest) {

@@ -1,6 +1,6 @@
 // packages/client/app/components/AdminComponents/ResourceManager.tsx
-"use client";
-import { useState, useEffect } from "react";
+'use client';
+import { useState, useEffect } from 'react';
 
 interface Resource {
   id: number;
@@ -16,16 +16,19 @@ interface ResourceManagerProps {
   onError: (err: string) => void;
 }
 
-export default function ResourceManager({ onMessage, onError }: ResourceManagerProps) {
-  const [resourceTitle, setResourceTitle] = useState("");
-  const [category, setCategory] = useState("Cheat Sheet");
+export default function ResourceManager({
+  onMessage,
+  onError,
+}: ResourceManagerProps) {
+  const [resourceTitle, setResourceTitle] = useState('');
+  const [category, setCategory] = useState('Cheat Sheet');
   const [resourceFile, setResourceFile] = useState<File | null>(null);
-  const [resourceLink, setResourceLink] = useState("");
+  const [resourceLink, setResourceLink] = useState('');
   const [resources, setResources] = useState<Resource[]>([]);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const categories = ["Cheat Sheet", "Tutorial", "Article", "Code Sample"];
+  const categories = ['Cheat Sheet', 'Tutorial', 'Article', 'Code Sample'];
 
   useEffect(() => {
     fetchResources();
@@ -34,11 +37,11 @@ export default function ResourceManager({ onMessage, onError }: ResourceManagerP
   const fetchResources = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/resources", { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch resources");
+      const res = await fetch('/api/resources', { credentials: 'include' });
+      if (!res.ok) throw new Error('Failed to fetch resources');
       setResources(await res.json());
     } catch (err: any) {
-      onError(err.message || "Failed to fetch resources");
+      onError(err.message || 'Failed to fetch resources');
     } finally {
       setLoading(false);
     }
@@ -47,32 +50,36 @@ export default function ResourceManager({ onMessage, onError }: ResourceManagerP
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!resourceTitle || (!resourceFile && !resourceLink)) {
-      onError("Title and either a file or link are required");
+      onError('Title and either a file or link are required');
       return;
     }
     setLoading(true);
     try {
       const formData = new FormData();
-      formData.append("title", resourceTitle);
-      formData.append("category", category);
-      if (resourceFile) formData.append("file", resourceFile);
-      if (resourceLink) formData.append("link", resourceLink);
-      if (editingId) formData.append("id", editingId.toString());
-      const res = await fetch("/api/resources", {
-        method: editingId ? "PUT" : "POST",
+      formData.append('title', resourceTitle);
+      formData.append('category', category);
+      if (resourceFile) formData.append('file', resourceFile);
+      if (resourceLink) formData.append('link', resourceLink);
+      if (editingId) formData.append('id', editingId.toString());
+      const res = await fetch('/api/resources', {
+        method: editingId ? 'PUT' : 'POST',
         body: formData,
-        credentials: "include"
+        credentials: 'include',
       });
-      if (!res.ok) throw new Error("Failed to save resource");
+      if (!res.ok) throw new Error('Failed to save resource');
       await fetchResources();
-      onMessage(editingId ? "Resource updated successfully" : "Resource created successfully");
+      onMessage(
+        editingId
+          ? 'Resource updated successfully'
+          : 'Resource created successfully',
+      );
       setEditingId(null);
-      setResourceTitle("");
-      setCategory("Cheat Sheet");
+      setResourceTitle('');
+      setCategory('Cheat Sheet');
       setResourceFile(null);
-      setResourceLink("");
+      setResourceLink('');
     } catch (err: any) {
-      onError(err.message || "Failed to save resource");
+      onError(err.message || 'Failed to save resource');
     } finally {
       setLoading(false);
     }
@@ -83,23 +90,23 @@ export default function ResourceManager({ onMessage, onError }: ResourceManagerP
     setResourceTitle(res.title);
     setCategory(res.category);
     setResourceFile(null); // File reset on edit
-    setResourceLink(res.link || "");
+    setResourceLink(res.link || '');
   };
 
   const handleDelete = async (id: number) => {
     setLoading(true);
     try {
-      const res = await fetch("/api/resources", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
+      const res = await fetch('/api/resources', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ id }),
       });
-      if (!res.ok) throw new Error("Failed to delete resource");
+      if (!res.ok) throw new Error('Failed to delete resource');
       await fetchResources();
-      onMessage("Resource deleted successfully");
+      onMessage('Resource deleted successfully');
     } catch (err: any) {
-      onError(err.message || "Failed to delete resource");
+      onError(err.message || 'Failed to delete resource');
     } finally {
       setLoading(false);
     }
@@ -108,7 +115,7 @@ export default function ResourceManager({ onMessage, onError }: ResourceManagerP
   return (
     <div className="mb-8">
       <h2 className="text-xl font-semibold mb-4">
-        {editingId ? "Edit Resource" : "Add Resource"}
+        {editingId ? 'Edit Resource' : 'Add Resource'}
       </h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
@@ -170,7 +177,7 @@ export default function ResourceManager({ onMessage, onError }: ResourceManagerP
             type="submit"
             className="py-2 px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600"
           >
-            {editingId ? "Update Resource" : "Add Resource"}
+            {editingId ? 'Update Resource' : 'Add Resource'}
           </button>
           {editingId && (
             <button
@@ -178,10 +185,10 @@ export default function ResourceManager({ onMessage, onError }: ResourceManagerP
               className="py-2 px-4 bg-gray-500 text-white rounded-md hover:bg-gray-600"
               onClick={() => {
                 setEditingId(null);
-                setResourceTitle("");
-                setCategory("Cheat Sheet");
+                setResourceTitle('');
+                setCategory('Cheat Sheet');
                 setResourceFile(null);
-                setResourceLink("");
+                setResourceLink('');
               }}
             >
               Cancel
@@ -200,17 +207,36 @@ export default function ResourceManager({ onMessage, onError }: ResourceManagerP
         ) : (
           <ul className="space-y-4">
             {resources.map((res) => (
-              <li key={res.id} className="p-4 bg-white border border-gray-300 rounded-md">
+              <li
+                key={res.id}
+                className="p-4 bg-white border border-gray-300 rounded-md"
+              >
                 <h4 className="text-md font-medium">{res.title}</h4>
                 <p className="text-sm">Category: {res.category}</p>
                 {res.filePath && (
                   <p className="text-sm">
-                    File: <a href={res.filePath} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">Download</a>
+                    File:{' '}
+                    <a
+                      href={res.filePath}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-500 underline"
+                    >
+                      Download
+                    </a>
                   </p>
                 )}
                 {res.link && (
                   <p className="text-sm">
-                    Link: <a href={res.link} className="text-blue-500 hover:underline" target="_blank" rel="noopener noreferrer">{res.link}</a>
+                    Link:{' '}
+                    <a
+                      href={res.link}
+                      className="text-blue-500 hover:underline"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {res.link}
+                    </a>
                   </p>
                 )}
                 <p className="text-xs text-gray-500 mt-1">

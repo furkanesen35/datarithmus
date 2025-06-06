@@ -16,7 +16,10 @@ export async function POST(req: NextRequest) {
     });
     const payload = ticket.getPayload();
     if (!payload || !payload.email) {
-      return NextResponse.json({ error: 'Invalid Google token' }, { status: 401 });
+      return NextResponse.json(
+        { error: 'Invalid Google token' },
+        { status: 401 },
+      );
     }
 
     const { email, sub: googleId } = payload;
@@ -35,10 +38,13 @@ export async function POST(req: NextRequest) {
     const jwtToken = jwt.sign(
       { email: user.email, isSuperuser: user.isSuperuser },
       process.env.JWT_SECRET!,
-      { expiresIn: '1h' }
+      { expiresIn: '1h' },
     );
 
-    const response = NextResponse.json({ email: user.email, isSuperuser: user.isSuperuser });
+    const response = NextResponse.json({
+      email: user.email,
+      isSuperuser: user.isSuperuser,
+    });
     response.cookies.set('token', jwtToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',

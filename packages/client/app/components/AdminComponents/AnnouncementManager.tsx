@@ -1,6 +1,6 @@
 // packages/client/app/components/AdminComponents/AnnouncementManager.tsx
-"use client";
-import { useState, useEffect } from "react";
+'use client';
+import { useState, useEffect } from 'react';
 
 interface Announcement {
   id: number;
@@ -11,8 +11,8 @@ interface Announcement {
 }
 
 export default function AnnouncementsManager() {
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
+  const [title, setTitle] = useState('');
+  const [content, setContent] = useState('');
   const [pinned, setPinned] = useState(false);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [editingId, setEditingId] = useState<number | null>(null);
@@ -24,14 +24,14 @@ export default function AnnouncementsManager() {
 
   const fetchAnnouncements = async () => {
     try {
-      const res = await fetch("/api/announcements", { credentials: "include" });
+      const res = await fetch('/api/announcements', { credentials: 'include' });
       if (!res.ok) {
         throw new Error(`HTTP error ${res.status}`);
       }
       setAnnouncements(await res.json());
       setError(null);
     } catch (err: any) {
-      setError(err.message || "Failed to fetch announcements");
+      setError(err.message || 'Failed to fetch announcements');
     }
   };
 
@@ -45,25 +45,25 @@ export default function AnnouncementsManager() {
         pinned,
         ...(editingId && { id: editingId }),
       };
-      const res = await fetch("/api/announcements", {
-        method: editingId ? "PUT" : "POST",
+      const res = await fetch('/api/announcements', {
+        method: editingId ? 'PUT' : 'POST',
         body: JSON.stringify(body),
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
-        credentials: "include"
+        credentials: 'include',
       });
       if (!res.ok) {
         throw new Error(`HTTP error ${res.status}`);
       }
       fetchAnnouncements();
-      setTitle("");
-      setContent("");
+      setTitle('');
+      setContent('');
       setPinned(false);
       setEditingId(null);
       setError(null);
     } catch (err: any) {
-      setError(err.message || "Failed to save announcement");
+      setError(err.message || 'Failed to save announcement');
     }
   };
 
@@ -76,13 +76,13 @@ export default function AnnouncementsManager() {
 
   const handleDelete = async (id: number) => {
     try {
-      const res = await fetch("/api/announcements", {
-        method: "DELETE",
+      const res = await fetch('/api/announcements', {
+        method: 'DELETE',
         body: JSON.stringify({ id }),
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
-        credentials: "include"
+        credentials: 'include',
       });
       if (!res.ok) {
         throw new Error(`HTTP error ${res.status}`);
@@ -90,17 +90,21 @@ export default function AnnouncementsManager() {
       fetchAnnouncements();
       setError(null);
     } catch (err: any) {
-      setError(err.message || "Failed to delete announcement");
+      setError(err.message || 'Failed to delete announcement');
     }
   };
 
   return (
     <div className="mb-8">
       {error && <p className="text-red-500 mb-4">{error}</p>}
-      <h2 className="text-xl font-semibold mb-4">{editingId ? "Edit Announcement" : "Create Announcement"}</h2>
+      <h2 className="text-xl font-semibold mb-4">
+        {editingId ? 'Edit Announcement' : 'Create Announcement'}
+      </h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="title" className="block text-sm font-medium">Title</label>
+          <label htmlFor="title" className="block text-sm font-medium">
+            Title
+          </label>
           <input
             id="title"
             type="text"
@@ -110,7 +114,9 @@ export default function AnnouncementsManager() {
           />
         </div>
         <div>
-          <label htmlFor="content" className="block text-sm font-medium">Content</label>
+          <label htmlFor="content" className="block text-sm font-medium">
+            Content
+          </label>
           <textarea
             id="content"
             value={content}
@@ -135,7 +141,7 @@ export default function AnnouncementsManager() {
           type="submit"
           className="py-2 px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600"
         >
-          {editingId ? "Update Announcement" : "Create Announcement"}
+          {editingId ? 'Update Announcement' : 'Create Announcement'}
         </button>
       </form>
       <div className="mt-6">
@@ -144,16 +150,28 @@ export default function AnnouncementsManager() {
           <p>No announcements yet.</p>
         ) : (
           announcements.map((announcement) => (
-            <div key={announcement.id} className="p-4 bg-white border border-gray-300 rounded-md mb-2">
+            <div
+              key={announcement.id}
+              className="p-4 bg-white border border-gray-300 rounded-md mb-2"
+            >
               <h4 className="text-md font-medium">
-                {announcement.title} {announcement.pinned && <span className="text-blue-500">[Pinned]</span>}
+                {announcement.title}{' '}
+                {announcement.pinned && (
+                  <span className="text-blue-500">[Pinned]</span>
+                )}
               </h4>
               <p className="text-sm">{announcement.content}</p>
               <div className="mt-2 flex space-x-2">
-                <button onClick={() => handleEdit(announcement)} className="text-blue-500 hover:underline">
+                <button
+                  onClick={() => handleEdit(announcement)}
+                  className="text-blue-500 hover:underline"
+                >
                   Edit
                 </button>
-                <button onClick={() => handleDelete(announcement.id)} className="text-red-500 hover:underline">
+                <button
+                  onClick={() => handleDelete(announcement.id)}
+                  className="text-red-500 hover:underline"
+                >
                   Delete
                 </button>
               </div>

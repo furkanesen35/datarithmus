@@ -6,16 +6,16 @@
  * or disable the default devtool with "devtool: false".
  * If you are looking for production-ready output files, see mode: "production" (https://webpack.js.org/configuration/mode/).
  */
-self["webpackHotUpdate_N_E"]("app/page",{
-
-/***/ "(app-pages-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-client-entry-loader.js?server=false!":
-/*!*******************************************************************************************************!*\
+self["webpackHotUpdate_N_E"]("app/page", {
+  /***/ "(app-pages-browser)/./node_modules/next/dist/build/webpack/loaders/next-flight-client-entry-loader.js?server=false!":
+    /*!*******************************************************************************************************!*\
   !*** ./node_modules/next/dist/build/webpack/loaders/next-flight-client-entry-loader.js?server=false! ***!
   \*******************************************************************************************************/
-/***/ ((__unused_webpack_module, __unused_webpack_exports, __webpack_require__) => {
-
-
-
-/***/ })
-
+    /***/ (
+      __unused_webpack_module,
+      __unused_webpack_exports,
+      __webpack_require__,
+    ) => {
+      /***/
+    },
 });

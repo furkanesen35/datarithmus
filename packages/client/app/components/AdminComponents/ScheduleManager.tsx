@@ -1,6 +1,6 @@
 // packages/client/app/components/AdminComponents/ScheduleManager.tsx
-"use client";
-import { useState } from "react";
+'use client';
+import { useState } from 'react';
 
 interface Event {
   id: number;
@@ -16,18 +16,21 @@ interface ScheduleManagerProps {
   onError: (err: string) => void;
 }
 
-export default function ScheduleManager({ onMessage, onError }: ScheduleManagerProps) {
-  const [eventTitle, setEventTitle] = useState("");
-  const [eventDate, setEventDate] = useState("");
-  const [eventTime, setEventTime] = useState("");
-  const [eventDescription, setEventDescription] = useState("");
+export default function ScheduleManager({
+  onMessage,
+  onError,
+}: ScheduleManagerProps) {
+  const [eventTitle, setEventTitle] = useState('');
+  const [eventDate, setEventDate] = useState('');
+  const [eventTime, setEventTime] = useState('');
+  const [eventDescription, setEventDescription] = useState('');
   const [events, setEvents] = useState<Event[]>([]);
   const [editingId, setEditingId] = useState<number | null>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!eventTitle || !eventDate || !eventTime || !eventDescription) {
-      onError("Title, date, time, and description are required");
+      onError('Title, date, time, and description are required');
       return;
     }
 
@@ -36,11 +39,17 @@ export default function ScheduleManager({ onMessage, onError }: ScheduleManagerP
       setEvents(
         events.map((ev) =>
           ev.id === editingId
-            ? { ...ev, title: eventTitle, date: eventDate, time: eventTime, description: eventDescription }
-            : ev
-        )
+            ? {
+                ...ev,
+                title: eventTitle,
+                date: eventDate,
+                time: eventTime,
+                description: eventDescription,
+              }
+            : ev,
+        ),
       );
-      onMessage("Event updated successfully");
+      onMessage('Event updated successfully');
       setEditingId(null);
     } else {
       // Create new event
@@ -53,13 +62,13 @@ export default function ScheduleManager({ onMessage, onError }: ScheduleManagerP
         createdAt: new Date().toISOString(),
       };
       setEvents([newEvent, ...events]);
-      onMessage("Event created successfully");
+      onMessage('Event created successfully');
     }
 
-    setEventTitle("");
-    setEventDate("");
-    setEventTime("");
-    setEventDescription("");
+    setEventTitle('');
+    setEventDate('');
+    setEventTime('');
+    setEventDescription('');
   };
 
   const handleEdit = (ev: Event) => {
@@ -72,13 +81,13 @@ export default function ScheduleManager({ onMessage, onError }: ScheduleManagerP
 
   const handleDelete = (id: number) => {
     setEvents(events.filter((ev) => ev.id !== id));
-    onMessage("Event deleted successfully");
+    onMessage('Event deleted successfully');
   };
 
   return (
     <div className="mb-8">
       <h2 className="text-xl font-semibold mb-4">
-        {editingId ? "Edit Event" : "Schedule Event"}
+        {editingId ? 'Edit Event' : 'Schedule Event'}
       </h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
@@ -118,7 +127,10 @@ export default function ScheduleManager({ onMessage, onError }: ScheduleManagerP
           />
         </div>
         <div>
-          <label htmlFor="eventDescription" className="block text-sm font-medium">
+          <label
+            htmlFor="eventDescription"
+            className="block text-sm font-medium"
+          >
             Description
           </label>
           <textarea
@@ -134,7 +146,7 @@ export default function ScheduleManager({ onMessage, onError }: ScheduleManagerP
             type="submit"
             className="py-2 px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600"
           >
-            {editingId ? "Update Event" : "Schedule Event"}
+            {editingId ? 'Update Event' : 'Schedule Event'}
           </button>
           {editingId && (
             <button
@@ -142,10 +154,10 @@ export default function ScheduleManager({ onMessage, onError }: ScheduleManagerP
               className="py-2 px-4 bg-gray-500 text-white rounded-md hover:bg-gray-600"
               onClick={() => {
                 setEditingId(null);
-                setEventTitle("");
-                setEventDate("");
-                setEventTime("");
-                setEventDescription("");
+                setEventTitle('');
+                setEventDate('');
+                setEventTime('');
+                setEventDescription('');
               }}
             >
               Cancel
@@ -162,9 +174,14 @@ export default function ScheduleManager({ onMessage, onError }: ScheduleManagerP
         ) : (
           <ul className="space-y-4">
             {events.map((ev) => (
-              <li key={ev.id} className="p-4 bg-white border border-gray-300 rounded-md">
+              <li
+                key={ev.id}
+                className="p-4 bg-white border border-gray-300 rounded-md"
+              >
                 <h4 className="text-md font-medium">{ev.title}</h4>
-                <p className="text-sm">Date: {new Date(ev.date).toLocaleDateString()}</p>
+                <p className="text-sm">
+                  Date: {new Date(ev.date).toLocaleDateString()}
+                </p>
                 <p className="text-sm">Time: {ev.time}</p>
                 <p className="text-sm">{ev.description}</p>
                 <p className="text-xs text-gray-500 mt-1">

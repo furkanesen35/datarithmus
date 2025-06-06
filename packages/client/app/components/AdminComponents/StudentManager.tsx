@@ -1,6 +1,6 @@
 // packages/client/app/components/AdminComponents/StudentManager.tsx
-"use client";
-import { useEffect, useState } from "react";
+'use client';
+import { useEffect, useState } from 'react';
 
 interface Student {
   id: number;
@@ -15,12 +15,15 @@ interface StudentManagerProps {
   onError: (err: string) => void;
 }
 
-export default function StudentManager({ onMessage, onError }: StudentManagerProps) {
+export default function StudentManager({
+  onMessage,
+  onError,
+}: StudentManagerProps) {
   const [students, setStudents] = useState<Student[]>([]);
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(false);
-  const [inviteEmail, setInviteEmail] = useState("");
-  const [inviteUsername, setInviteUsername] = useState("");
+  const [inviteEmail, setInviteEmail] = useState('');
+  const [inviteUsername, setInviteUsername] = useState('');
   const [inviteLoading, setInviteLoading] = useState(false);
 
   useEffect(() => {
@@ -30,11 +33,11 @@ export default function StudentManager({ onMessage, onError }: StudentManagerPro
   const fetchStudents = async () => {
     setLoading(true);
     try {
-      const res = await fetch("/api/students", { credentials: "include" });
-      if (!res.ok) throw new Error("Failed to fetch students");
+      const res = await fetch('/api/students', { credentials: 'include' });
+      if (!res.ok) throw new Error('Failed to fetch students');
       setStudents(await res.json());
     } catch (err: any) {
-      onError(err.message || "Failed to fetch students");
+      onError(err.message || 'Failed to fetch students');
     } finally {
       setLoading(false);
     }
@@ -43,63 +46,69 @@ export default function StudentManager({ onMessage, onError }: StudentManagerPro
   const handleToggleStatus = async (id: number, isActive: boolean) => {
     setLoading(true);
     try {
-      const res = await fetch("/api/students", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
+      const res = await fetch('/api/students', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ id, isActive: !isActive }),
       });
-      if (!res.ok) throw new Error("Failed to update status");
+      if (!res.ok) throw new Error('Failed to update status');
       await fetchStudents();
-      onMessage("Student status updated");
+      onMessage('Student status updated');
     } catch (err: any) {
-      onError(err.message || "Failed to update status");
+      onError(err.message || 'Failed to update status');
     } finally {
       setLoading(false);
     }
   };
 
   const handleDelete = async (id: number) => {
-    if (!window.confirm("Are you sure you want to delete this student? This cannot be undone.")) return;
+    if (
+      !window.confirm(
+        'Are you sure you want to delete this student? This cannot be undone.',
+      )
+    )
+      return;
     setLoading(true);
     try {
-      const res = await fetch("/api/students", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
+      const res = await fetch('/api/students', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ id }),
       });
-      if (!res.ok) throw new Error("Failed to delete student");
+      if (!res.ok) throw new Error('Failed to delete student');
       await fetchStudents();
-      onMessage("Student deleted");
+      onMessage('Student deleted');
     } catch (err: any) {
-      onError(err.message || "Failed to delete student");
+      onError(err.message || 'Failed to delete student');
     } finally {
       setLoading(false);
     }
   };
 
   const handleInvite = async () => {
-    if (!inviteEmail || !inviteUsername) return onError("Email and username required");
+    if (!inviteEmail || !inviteUsername)
+      return onError('Email and username required');
     setInviteLoading(true);
     try {
-      const res = await fetch("/api/admin/invite", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
+      const res = await fetch('/api/admin/invite', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ email: inviteEmail, username: inviteUsername }),
       });
       const data = await res.json();
       if (res.ok) {
-        onMessage("Invitation sent!");
-        setInviteEmail("");
-        setInviteUsername("");
+        onMessage('Invitation sent!');
+        setInviteEmail('');
+        setInviteUsername('');
         await fetchStudents();
       } else {
-        onError(data.error || "Failed to invite user");
+        onError(data.error || 'Failed to invite user');
       }
     } catch (err: any) {
-      onError(err.message || "Failed to invite user");
+      onError(err.message || 'Failed to invite user');
     } finally {
       setInviteLoading(false);
     }
@@ -108,20 +117,20 @@ export default function StudentManager({ onMessage, onError }: StudentManagerPro
   const handleAdminPasswordReset = async (email: string) => {
     setLoading(true);
     try {
-      const res = await fetch("/api/auth/request-password-reset", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
+      const res = await fetch('/api/auth/request-password-reset', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
         body: JSON.stringify({ email }),
       });
       const data = await res.json();
       if (res.ok) {
-        onMessage("Password reset email sent.");
+        onMessage('Password reset email sent.');
       } else {
-        onError(data.error || "Failed to send password reset email.");
+        onError(data.error || 'Failed to send password reset email.');
       }
     } catch (err: any) {
-      onError(err.message || "Failed to send password reset email.");
+      onError(err.message || 'Failed to send password reset email.');
     } finally {
       setLoading(false);
     }
@@ -130,7 +139,7 @@ export default function StudentManager({ onMessage, onError }: StudentManagerPro
   const filtered = students.filter(
     (stu) =>
       stu.email.toLowerCase().includes(search.toLowerCase()) ||
-      (stu.username || "").toLowerCase().includes(search.toLowerCase())
+      (stu.username || '').toLowerCase().includes(search.toLowerCase()),
   );
 
   return (
@@ -142,7 +151,7 @@ export default function StudentManager({ onMessage, onError }: StudentManagerPro
             type="text"
             placeholder="Search by name or email..."
             value={search}
-            onChange={e => setSearch(e.target.value)}
+            onChange={(e) => setSearch(e.target.value)}
             className="block w-full px-3 py-2 border border-gray-300 rounded-md text-black"
           />
         </div>
@@ -161,23 +170,41 @@ export default function StudentManager({ onMessage, onError }: StudentManagerPro
           </thead>
           <tbody>
             {loading ? (
-              <tr><td colSpan={6} className="text-center py-4">Loading...</td></tr>
+              <tr>
+                <td colSpan={6} className="text-center py-4">
+                  Loading...
+                </td>
+              </tr>
             ) : filtered.length === 0 ? (
-              <tr><td colSpan={6} className="text-center py-4">No students found.</td></tr>
+              <tr>
+                <td colSpan={6} className="text-center py-4">
+                  No students found.
+                </td>
+              </tr>
             ) : (
               filtered.map((stu) => (
                 <tr key={stu.id}>
                   <td className="border px-2 py-1">{stu.username}</td>
                   <td className="border px-2 py-1">{stu.email}</td>
-                  <td className="border px-2 py-1">{stu.isActive ? "Active" : "Inactive"}</td>
-                  <td className="border px-2 py-1">{stu.isActive ? "✔" : <span className="text-red-500">✖</span>}</td>
-                  <td className="border px-2 py-1">{new Date(stu.createdAt).toLocaleDateString()}</td>
+                  <td className="border px-2 py-1">
+                    {stu.isActive ? 'Active' : 'Inactive'}
+                  </td>
+                  <td className="border px-2 py-1">
+                    {stu.isActive ? (
+                      '✔'
+                    ) : (
+                      <span className="text-red-500">✖</span>
+                    )}
+                  </td>
+                  <td className="border px-2 py-1">
+                    {new Date(stu.createdAt).toLocaleDateString()}
+                  </td>
                   <td className="border px-2 py-1 space-x-2">
                     <button
                       onClick={() => handleToggleStatus(stu.id, stu.isActive)}
                       className="text-gray-500 hover:underline text-sm"
                     >
-                      {stu.isActive ? "Deactivate" : "Activate"}
+                      {stu.isActive ? 'Deactivate' : 'Activate'}
                     </button>
                     <button
                       onClick={() => handleDelete(stu.id)}
@@ -206,14 +233,14 @@ export default function StudentManager({ onMessage, onError }: StudentManagerPro
             type="text"
             placeholder="Invite email"
             value={inviteEmail}
-            onChange={e => setInviteEmail(e.target.value)}
+            onChange={(e) => setInviteEmail(e.target.value)}
             className="px-2 py-1 border border-gray-300 rounded text-black"
           />
           <input
             type="text"
             placeholder="Invite username"
             value={inviteUsername}
-            onChange={e => setInviteUsername(e.target.value)}
+            onChange={(e) => setInviteUsername(e.target.value)}
             className="px-2 py-1 border border-gray-300 rounded text-black"
           />
           <button
@@ -221,7 +248,7 @@ export default function StudentManager({ onMessage, onError }: StudentManagerPro
             disabled={inviteLoading}
             className="bg-blue-500 text-white rounded px-2 py-1 mt-1 hover:bg-blue-600 disabled:opacity-50"
           >
-            {inviteLoading ? "Inviting..." : "Invite User"}
+            {inviteLoading ? 'Inviting...' : 'Invite User'}
           </button>
         </div>
       </div>

@@ -29,7 +29,9 @@ export default function RegisterComponent() {
 
       const data = await response.json();
       if (response.ok) {
-        setMessage('✔ Registration successful! Please check your email to verify your account.');
+        setMessage(
+          '✔ Registration successful! Please check your email to verify your account.',
+        );
         setTimeout(() => router.push('/auth/login'), 3500);
       } else {
         setError(data.error);
@@ -52,7 +54,10 @@ export default function RegisterComponent() {
         localStorage.setItem('token', data.token);
         login(data.email, data.isSuperuser);
         setMessage('✔ Google registration successful, redirecting...');
-        setTimeout(() => router.push(data.isSuperuser ? '/admin' : '/dashboard'), 5000); // 5 seconds for better UX
+        setTimeout(
+          () => router.push(data.isSuperuser ? '/admin' : '/dashboard'),
+          5000,
+        ); // 5 seconds for better UX
       } else {
         setError(data.error);
       }
@@ -78,7 +83,9 @@ export default function RegisterComponent() {
                 onClick={async () => {
                   setError(null);
                   setMessage('Resending verification email...');
-                  const email = (document.getElementById('email') as HTMLInputElement)?.value;
+                  const email = (
+                    document.getElementById('email') as HTMLInputElement
+                  )?.value;
                   if (!email) {
                     setError('Please enter your email above.');
                     setMessage(null);
@@ -91,9 +98,13 @@ export default function RegisterComponent() {
                   });
                   const data = await res.json();
                   if (res.ok) {
-                    setMessage('Verification email resent! Please check your inbox.');
+                    setMessage(
+                      'Verification email resent! Please check your inbox.',
+                    );
                   } else {
-                    setError(data.error || 'Could not resend verification email.');
+                    setError(
+                      data.error || 'Could not resend verification email.',
+                    );
                   }
                 }}
               >
@@ -104,7 +115,10 @@ export default function RegisterComponent() {
         )}
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label htmlFor="username" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="username"
+              className="block text-sm font-medium text-gray-700"
+            >
               Username
             </label>
             <input
@@ -116,7 +130,10 @@ export default function RegisterComponent() {
             />
           </div>
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700"
+            >
               Email
             </label>
             <input
@@ -128,7 +145,10 @@ export default function RegisterComponent() {
             />
           </div>
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-700"
+            >
               Password
             </label>
             <input
@@ -142,7 +162,9 @@ export default function RegisterComponent() {
           <div className="mt-4 flex justify-center">
             <GoogleLogin
               onSuccess={handleGoogleSuccess}
-              onError={() => setError('Google registration failed. Please try again.')}
+              onError={() =>
+                setError('Google registration failed. Please try again.')
+              }
               text="signup_with"
               logo_alignment="center"
               size="large"
@@ -157,9 +179,7 @@ export default function RegisterComponent() {
           </button>
         </form>
         <div className="mt-4 text-center">
-          <Link href='/auth/login'
-            className="text-blue-500 hover:underline"
-          >
+          <Link href="/auth/login" className="text-blue-500 hover:underline">
             Already have an account? Login
           </Link>
         </div>

@@ -1,18 +1,18 @@
-"use client";
-import { useState } from "react";
+'use client';
+import { useState } from 'react';
 
 export default function RequestPasswordResetPage() {
-  const [email, setEmail] = useState("");
-  const [message, setMessage] = useState("");
+  const [email, setEmail] = useState('');
+  const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setMessage("");
-    const res = await fetch("/api/auth/request-password-reset", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+    setMessage('');
+    const res = await fetch('/api/auth/request-password-reset', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email }),
     });
     const data = await res.json();
@@ -27,7 +27,7 @@ export default function RequestPasswordResetPage() {
         <input
           type="email"
           value={email}
-          onChange={e => setEmail(e.target.value)}
+          onChange={(e) => setEmail(e.target.value)}
           placeholder="Your email"
           className="block w-full px-3 py-2 border border-gray-300 rounded-md text-black"
         />
@@ -36,7 +36,7 @@ export default function RequestPasswordResetPage() {
           className="py-2 px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600"
           disabled={loading}
         >
-          {loading ? "Sending..." : "Send Reset Link"}
+          {loading ? 'Sending...' : 'Send Reset Link'}
         </button>
       </form>
       {message && <div className="mt-2 text-center text-sm">{message}</div>}

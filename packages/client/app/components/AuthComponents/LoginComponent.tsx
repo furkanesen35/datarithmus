@@ -51,7 +51,10 @@ export default function LoginComponent() {
       if (response.ok) {
         login(data.email, data.isSuperuser);
         setMessage('✔ Google login successful, redirecting...');
-        setTimeout(() => router.push(data.isSuperuser ? '/admin' : '/dashboard'), 2000);
+        setTimeout(
+          () => router.push(data.isSuperuser ? '/admin' : '/dashboard'),
+          2000,
+        );
       } else {
         setError(data.error);
       }
@@ -75,7 +78,10 @@ export default function LoginComponent() {
         )}
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700"
+            >
               Email
             </label>
             <input
@@ -87,7 +93,10 @@ export default function LoginComponent() {
             />
           </div>
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-700"
+            >
               Password
             </label>
             <input
@@ -115,11 +124,14 @@ export default function LoginComponent() {
             Login
           </button>
         </form>
-        <a href="/auth/request-password-reset" className="text-blue-500 hover:underline text-sm">
+        <a
+          href="/auth/request-password-reset"
+          className="text-blue-500 hover:underline text-sm"
+        >
           Forgot Password?
         </a>
         <div className="mt-4 text-center">
-          <Link href='/auth/register' className="text-blue-500 hover:underline">
+          <Link href="/auth/register" className="text-blue-500 hover:underline">
             Don’t have an account? Register
           </Link>
         </div>

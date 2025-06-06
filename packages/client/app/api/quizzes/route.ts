@@ -1,7 +1,7 @@
 // packages/client/app/api/quizzes/route.ts
-import { NextRequest, NextResponse } from "next/server";
-import { PrismaClient } from "@prisma/client";
-import jwt from "jsonwebtoken";
+import { NextRequest, NextResponse } from 'next/server';
+import { PrismaClient } from '@prisma/client';
+import jwt from 'jsonwebtoken';
 
 const prisma = new PrismaClient();
 
@@ -10,15 +10,23 @@ interface JwtPayload {
   isSuperuser: boolean;
 }
 
-async function requireSuperuser(req: NextRequest): Promise<NextResponse | null> {
+async function requireSuperuser(
+  req: NextRequest,
+): Promise<NextResponse | null> {
   const token = req.cookies.get('token')?.value;
   if (!token) {
     return NextResponse.json({ error: 'No token provided' }, { status: 401 });
   }
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET || 'fallback-secret') as JwtPayload;
+    const decoded = jwt.verify(
+      token,
+      process.env.JWT_SECRET || 'fallback-secret',
+    ) as JwtPayload;
     if (!decoded.isSuperuser) {
-      return NextResponse.json({ error: 'Superuser access required' }, { status: 403 });
+      return NextResponse.json(
+        { error: 'Superuser access required' },
+        { status: 403 },
+      );
     }
     return null;
   } catch (error) {
@@ -31,7 +39,7 @@ export async function GET(req: NextRequest) {
   if (authCheck) return authCheck;
 
   const quizzes = await prisma.quiz.findMany({
-    orderBy: { createdAt: "desc" },
+    orderBy: { createdAt: 'desc' },
     include: { questions: true },
   });
   return NextResponse.json(quizzes);
@@ -43,7 +51,10 @@ export async function POST(req: NextRequest) {
 
   const { title, questions } = await req.json();
   if (!title || !Array.isArray(questions) || questions.length === 0) {
-    return NextResponse.json({ error: "Missing title or questions" }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Missing title or questions' },
+      { status: 400 },
+    );
   }
 
   const quiz = await prisma.quiz.create({
@@ -60,7 +71,7 @@ export async function POST(req: NextRequest) {
     include: { questions: true },
   });
 
-  return NextResponse.json({ message: "Quiz created", quiz }, { status: 201 });
+  return NextResponse.json({ message: 'Quiz created', quiz }, { status: 201 });
 }
 
 export async function PUT(req: NextRequest) {
@@ -69,7 +80,7 @@ export async function PUT(req: NextRequest) {
 
   const { id, question, options, correctAnswer } = await req.json();
   if (!id || !question || !options || correctAnswer === undefined) {
-    return NextResponse.json({ error: "Missing fields" }, { status: 400 });
+    return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
   }
 
   const quiz = await prisma.quiz.update({
@@ -81,7 +92,7 @@ export async function PUT(req: NextRequest) {
     },
   });
 
-  return NextResponse.json({ message: "Quiz updated", quiz });
+  return NextResponse.json({ message: 'Quiz updated', quiz });
 }
 
 export async function DELETE(req: NextRequest) {
@@ -90,9 +101,9 @@ export async function DELETE(req: NextRequest) {
 
   const { id } = await req.json();
   if (!id) {
-    return NextResponse.json({ error: "ID required" }, { status: 400 });
+    return NextResponse.json({ error: 'ID required' }, { status: 400 });
   }
 
   await prisma.quiz.delete({ where: { id: Number(id) } });
-  return NextResponse.json({ message: "Quiz deleted" });
+  return NextResponse.json({ message: 'Quiz deleted' });
 }

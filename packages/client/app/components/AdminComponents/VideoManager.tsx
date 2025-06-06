@@ -1,6 +1,6 @@
 // packages/client/app/components/AdminComponents/VideoManager.tsx
-"use client";
-import { useState, useEffect } from "react";
+'use client';
+import { useState, useEffect } from 'react';
 
 interface Video {
   id: number;
@@ -11,9 +11,9 @@ interface Video {
 }
 
 export default function VideoManager() {
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [videoUrl, setVideoUrl] = useState("");
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [videoUrl, setVideoUrl] = useState('');
   const [videos, setVideos] = useState<Video[]>([]);
   const [editingId, setEditingId] = useState<number | null>(null);
 
@@ -22,8 +22,8 @@ export default function VideoManager() {
   }, []);
 
   const fetchVideos = async () => {
-    const res = await fetch("/api/videos", {
-      headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+    const res = await fetch('/api/videos', {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
     });
     if (res.ok) {
       setVideos(await res.json());
@@ -39,19 +39,19 @@ export default function VideoManager() {
       description,
       videoUrl,
     });
-    const res = await fetch("/api/videos", {
-      method: editingId ? "PUT" : "POST",
+    const res = await fetch('/api/videos', {
+      method: editingId ? 'PUT' : 'POST',
       headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
       body,
     });
     if (res.ok) {
       fetchVideos();
-      setTitle("");
-      setDescription("");
-      setVideoUrl("");
+      setTitle('');
+      setDescription('');
+      setVideoUrl('');
       setEditingId(null);
     }
   };
@@ -64,12 +64,12 @@ export default function VideoManager() {
   };
 
   const handleDelete = async (id: number) => {
-    const res = await fetch("/api/videos", {
-      method: "DELETE",
+    const res = await fetch('/api/videos', {
+      method: 'DELETE',
       body: JSON.stringify({ id }),
       headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${localStorage.getItem("token")}`,
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
     });
     if (res.ok) fetchVideos();
@@ -77,10 +77,14 @@ export default function VideoManager() {
 
   return (
     <div className="mb-8">
-      <h2 className="text-xl font-semibold mb-4">{editingId ? "Edit Video" : "Add Video"}</h2>
+      <h2 className="text-xl font-semibold mb-4">
+        {editingId ? 'Edit Video' : 'Add Video'}
+      </h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label htmlFor="title" className="block text-sm font-medium">Title</label>
+          <label htmlFor="title" className="block text-sm font-medium">
+            Title
+          </label>
           <input
             id="title"
             type="text"
@@ -90,7 +94,9 @@ export default function VideoManager() {
           />
         </div>
         <div>
-          <label htmlFor="description" className="block text-sm font-medium">Description</label>
+          <label htmlFor="description" className="block text-sm font-medium">
+            Description
+          </label>
           <textarea
             id="description"
             value={description}
@@ -100,7 +106,9 @@ export default function VideoManager() {
           />
         </div>
         <div>
-          <label htmlFor="videoUrl" className="block text-sm font-medium">YouTube Link</label>
+          <label htmlFor="videoUrl" className="block text-sm font-medium">
+            YouTube Link
+          </label>
           <input
             id="videoUrl"
             type="url"
@@ -114,13 +122,16 @@ export default function VideoManager() {
           type="submit"
           className="py-2 px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600"
         >
-          {editingId ? "Update Video" : "Add Video"}
+          {editingId ? 'Update Video' : 'Add Video'}
         </button>
       </form>
       <div className="mt-6">
         <h3 className="text-lg font-semibold mb-2">Videos</h3>
         {videos.map((video) => (
-          <div key={video.id} className="p-4 bg-white border border-gray-300 rounded-md mb-2">
+          <div
+            key={video.id}
+            className="p-4 bg-white border border-gray-300 rounded-md mb-2"
+          >
             <h4 className="text-md font-medium">{video.title}</h4>
             <p className="text-sm">{video.description}</p>
             {video.videoUrl && (
@@ -138,10 +149,16 @@ export default function VideoManager() {
               </div>
             )}
             <div className="mt-2 flex space-x-2">
-              <button onClick={() => handleEdit(video)} className="text-blue-500 hover:underline">
+              <button
+                onClick={() => handleEdit(video)}
+                className="text-blue-500 hover:underline"
+              >
                 Edit
               </button>
-              <button onClick={() => handleDelete(video.id)} className="text-red-500 hover:underline">
+              <button
+                onClick={() => handleDelete(video.id)}
+                className="text-red-500 hover:underline"
+              >
                 Delete
               </button>
             </div>
@@ -153,6 +170,8 @@ export default function VideoManager() {
 }
 
 function getYouTubeId(url: string): string | undefined {
-  const match = url.match(/(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?|shorts)\/|.*[?&]v=)|youtu\.be\/)([\w-]{11})/);
+  const match = url.match(
+    /(?:youtube\.com\/(?:[^\/\n\s]+\/\S+\/|(?:v|e(?:mbed)?|shorts)\/|.*[?&]v=)|youtu\.be\/)([\w-]{11})/,
+  );
   return match ? match[1] : undefined;
 }

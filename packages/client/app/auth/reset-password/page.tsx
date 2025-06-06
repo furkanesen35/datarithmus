@@ -1,38 +1,38 @@
-"use client";
-import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+'use client';
+import { useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function ResetPasswordPage() {
-  const [password, setPassword] = useState("");
-  const [confirm, setConfirm] = useState("");
-  const [message, setMessage] = useState("");
+  const [password, setPassword] = useState('');
+  const [confirm, setConfirm] = useState('');
+  const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
   const params = useSearchParams();
-  const token = params.get("token");
+  const token = params.get('token');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!password || password.length < 6) {
-      setMessage("Password must be at least 6 characters.");
+      setMessage('Password must be at least 6 characters.');
       return;
     }
     if (password !== confirm) {
-      setMessage("Passwords do not match.");
+      setMessage('Passwords do not match.');
       return;
     }
     setLoading(true);
-    const res = await fetch("/api/auth/reset-password", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+    const res = await fetch('/api/auth/reset-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ token, password }),
     });
     const data = await res.json();
     if (res.ok) {
-      setMessage("Password reset! You can now log in.");
-      setTimeout(() => router.push("/auth/login"), 1500);
+      setMessage('Password reset! You can now log in.');
+      setTimeout(() => router.push('/auth/login'), 1500);
     } else {
-      setMessage(data.error || "Failed to reset password");
+      setMessage(data.error || 'Failed to reset password');
     }
     setLoading(false);
   };
@@ -50,7 +50,7 @@ export default function ResetPasswordPage() {
           <input
             type="password"
             value={password}
-            onChange={e => setPassword(e.target.value)}
+            onChange={(e) => setPassword(e.target.value)}
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md text-black"
           />
         </div>
@@ -59,7 +59,7 @@ export default function ResetPasswordPage() {
           <input
             type="password"
             value={confirm}
-            onChange={e => setConfirm(e.target.value)}
+            onChange={(e) => setConfirm(e.target.value)}
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md text-black"
           />
         </div>
@@ -68,7 +68,7 @@ export default function ResetPasswordPage() {
           className="py-2 px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600"
           disabled={loading}
         >
-          {loading ? "Resetting..." : "Reset Password"}
+          {loading ? 'Resetting...' : 'Reset Password'}
         </button>
         {message && <div className="text-center text-sm mt-2">{message}</div>}
       </form>

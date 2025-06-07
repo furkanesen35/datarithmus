@@ -4,10 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
-    "build:css": "npx tailwindcss-cli -i ./app/globals.css -o ./public/output.css --watch"
+    "build:css": "npx tailwindcss-cli -i ./app/globals.css -o ./public/output.css --watch",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@prisma/client": "^6.6.0",

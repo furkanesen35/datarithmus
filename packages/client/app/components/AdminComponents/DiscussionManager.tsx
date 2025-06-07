@@ -29,6 +29,7 @@ export default function DiscussionManager({
 
   useEffect(() => {
     fetchPosts();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchPosts = async () => {
@@ -37,8 +38,12 @@ export default function DiscussionManager({
       const res = await fetch('/api/discussion', { credentials: 'include' });
       if (!res.ok) throw new Error('Failed to fetch posts');
       setPosts(await res.json());
-    } catch (err: any) {
-      onError(err.message || 'Failed to fetch posts');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        onError(err.message || 'Failed to fetch posts');
+      } else {
+        onError('Failed to fetch posts');
+      }
     } finally {
       setLoading(false);
     }
@@ -88,8 +93,12 @@ export default function DiscussionManager({
       setPostTitle('');
       setPostContent('');
       setIsPinned(false);
-    } catch (err: any) {
-      onError(err.message || 'Failed to save post');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        onError(err.message || 'Failed to save post');
+      } else {
+        onError('Failed to save post');
+      }
     } finally {
       setLoading(false);
     }
@@ -114,8 +123,12 @@ export default function DiscussionManager({
       if (!res.ok) throw new Error('Failed to delete post');
       await fetchPosts();
       onMessage('Post deleted successfully');
-    } catch (err: any) {
-      onError(err.message || 'Failed to delete post');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        onError(err.message || 'Failed to delete post');
+      } else {
+        onError('Failed to delete post');
+      }
     } finally {
       setLoading(false);
     }
@@ -141,8 +154,12 @@ export default function DiscussionManager({
       if (!res.ok) throw new Error('Failed to toggle pin');
       await fetchPosts();
       onMessage('Post pin toggled');
-    } catch (err: any) {
-      onError(err.message || 'Failed to toggle pin');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        onError(err.message || 'Failed to toggle pin');
+      } else {
+        onError('Failed to toggle pin');
+      }
     } finally {
       setLoading(false);
     }

@@ -84,7 +84,7 @@ export default function AdminPage() {
           </button>
           {activeSection === 'videos' && (
             <div className="p-6 bg-white rounded-lg shadow-md">
-              <VideoManager onMessage={setMessage} onError={setError} />
+              <VideoManager />
             </div>
           )}
 
@@ -99,7 +99,7 @@ export default function AdminPage() {
           </button>
           {activeSection === 'announcements' && (
             <div className="p-6 bg-white rounded-lg shadow-md">
-              <AnnouncementsManager onMessage={setMessage} onError={setError} />
+              <AnnouncementsManager />
             </div>
           )}
 
@@ -159,7 +159,7 @@ export default function AdminPage() {
           </button>
           {activeSection === 'quizzes' && (
             <div className="p-6 bg-white rounded-lg shadow-md">
-              <QuizManager onMessage={setMessage} onError={setError} />
+              <QuizManager />
             </div>
           )}
 
@@ -176,10 +176,7 @@ export default function AdminPage() {
           </button>
           {activeSection === 'progress' && (
             <div className="p-6 bg-white rounded-lg shadow-md">
-              <StudentProgressManager
-                onMessage={setMessage}
-                onError={setError}
-              />
+              <StudentProgressManager />
             </div>
           )}
 

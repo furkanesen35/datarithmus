@@ -28,6 +28,7 @@ export default function StudentManager({
 
   useEffect(() => {
     fetchStudents();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchStudents = async () => {
@@ -36,8 +37,12 @@ export default function StudentManager({
       const res = await fetch('/api/students', { credentials: 'include' });
       if (!res.ok) throw new Error('Failed to fetch students');
       setStudents(await res.json());
-    } catch (err: any) {
-      onError(err.message || 'Failed to fetch students');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        onError(err.message || 'Failed to fetch students');
+      } else {
+        onError('Failed to fetch students');
+      }
     } finally {
       setLoading(false);
     }
@@ -55,8 +60,12 @@ export default function StudentManager({
       if (!res.ok) throw new Error('Failed to update status');
       await fetchStudents();
       onMessage('Student status updated');
-    } catch (err: any) {
-      onError(err.message || 'Failed to update status');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        onError(err.message || 'Failed to update status');
+      } else {
+        onError('Failed to update status');
+      }
     } finally {
       setLoading(false);
     }
@@ -80,8 +89,12 @@ export default function StudentManager({
       if (!res.ok) throw new Error('Failed to delete student');
       await fetchStudents();
       onMessage('Student deleted');
-    } catch (err: any) {
-      onError(err.message || 'Failed to delete student');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        onError(err.message || 'Failed to delete student');
+      } else {
+        onError('Failed to delete student');
+      }
     } finally {
       setLoading(false);
     }
@@ -107,8 +120,12 @@ export default function StudentManager({
       } else {
         onError(data.error || 'Failed to invite user');
       }
-    } catch (err: any) {
-      onError(err.message || 'Failed to invite user');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        onError(err.message || 'Failed to invite user');
+      } else {
+        onError('Failed to invite user');
+      }
     } finally {
       setInviteLoading(false);
     }
@@ -129,8 +146,12 @@ export default function StudentManager({
       } else {
         onError(data.error || 'Failed to send password reset email.');
       }
-    } catch (err: any) {
-      onError(err.message || 'Failed to send password reset email.');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        onError(err.message || 'Failed to send password reset email.');
+      } else {
+        onError('Failed to send password reset email.');
+      }
     } finally {
       setLoading(false);
     }

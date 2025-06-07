@@ -1,8 +1,8 @@
 // packages/client/middleware.ts
-import { NextRequest, NextResponse } from 'next/server';
-import jwt from 'jsonwebtoken';
+// import { NextRequest, NextResponse } from 'next/server';
+// import jwt from 'jsonwebtoken';
 
-export function middleware(req: NextRequest) {
+export function middleware(/* req: NextRequest */) {
   // const token = req.headers.get('authorization')?.split(' ')[1] || req.cookies.get('token')?.value;
   // const { pathname } = req.nextUrl;
   // // Allow unauthenticated access to public routes
@@ -36,3 +36,6 @@ export function middleware(req: NextRequest) {
 export const config = {
   // matcher: ['/admin/:path*', '/dashboard/:path*', '/api/:path*'],
 };
+
+// All code is commented out, so there are no ESLint or Prettier errors in this file.
+// If you want to enable the middleware, uncomment and clean up unused variables as needed.

@@ -26,6 +26,7 @@ export default function FeedbackManager({
 
   useEffect(() => {
     fetchSurveys();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchSurveys = async () => {
@@ -34,8 +35,12 @@ export default function FeedbackManager({
       const res = await fetch('/api/feedback', { credentials: 'include' });
       if (!res.ok) throw new Error('Failed to fetch feedback');
       setSurveys(await res.json());
-    } catch (err: any) {
-      onError(err.message || 'Failed to fetch feedback');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        onError(err.message || 'Failed to fetch feedback');
+      } else {
+        onError('Failed to fetch feedback');
+      }
     } finally {
       setLoading(false);
     }
@@ -75,8 +80,12 @@ export default function FeedbackManager({
       setEditingId(null);
       setQuestion('');
       setScale(5);
-    } catch (err: any) {
-      onError(err.message || 'Failed to save feedback');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        onError(err.message || 'Failed to save feedback');
+      } else {
+        onError('Failed to save feedback');
+      }
     } finally {
       setLoading(false);
     }
@@ -100,8 +109,12 @@ export default function FeedbackManager({
       if (!res.ok) throw new Error('Failed to delete feedback');
       await fetchSurveys();
       onMessage('Survey deleted successfully');
-    } catch (err: any) {
-      onError(err.message || 'Failed to delete feedback');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        onError(err.message || 'Failed to delete feedback');
+      } else {
+        onError('Failed to delete feedback');
+      }
     } finally {
       setLoading(false);
     }

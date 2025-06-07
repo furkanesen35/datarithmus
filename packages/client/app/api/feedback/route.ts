@@ -29,7 +29,7 @@ async function requireSuperuser(
       );
     }
     return null;
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
   }
 }

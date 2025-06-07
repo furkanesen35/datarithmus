@@ -17,7 +17,8 @@ interface QuizQuestion {
 
 export default function QuizManager() {
   const [questions, setQuestions] = useState<QuizQuestion[]>([]);
-  const [activeTab, setActiveTab] = useState(0);
+  // Remove unused activeTab state
+  // const [activeTab, setActiveTab] = useState(0);
 
   // For new question input
   const [newQuestion, setNewQuestion] = useState('');
@@ -70,12 +71,12 @@ export default function QuizManager() {
     setNewQuestion('');
     setNewOptions(['']);
     setNewCorrectAnswer(1);
-    setActiveTab(questions.length + 1);
+    // setActiveTab(questions.length + 1);
   };
 
   const handleRemoveQuestion = (idx: number) => {
     setQuestions(questions.filter((_, i) => i !== idx));
-    setActiveTab(0);
+    // setActiveTab(0);
   };
 
   const handleSaveQuiz = async () => {
@@ -103,9 +104,9 @@ export default function QuizManager() {
       }
       setQuestions([]);
       setQuizTitle('');
-      setActiveTab(0);
+      // setActiveTab(0);
       fetchQuizzes();
-    } catch (err) {
+    } catch {
       alert('Network or server error');
     }
     setLoading(false);
@@ -276,33 +277,39 @@ export default function QuizManager() {
             >
               <h4 className="text-md font-medium mb-2">{quiz.title}</h4>
               {quiz.questions && quiz.questions.length > 0 ? (
-                quiz.questions.map((q: any, idx: number) => (
-                  <div
-                    key={q.id || idx}
-                    className="mb-2 p-2 border rounded bg-gray-50"
-                  >
-                    <div className="font-semibold">
-                      Question {idx + 1}: {q.question}
+                quiz.questions.map((q: QuizQuestion, idx: number) => {
+                  // If q.options is a string, parse it; otherwise, use as is
+                  const options: string[] = Array.isArray(q.options)
+                    ? q.options
+                    : JSON.parse(q.options);
+                  return (
+                    <div
+                      key={idx}
+                      className="mb-2 p-2 border rounded bg-gray-50"
+                    >
+                      <div className="font-semibold">
+                        Question {idx + 1}: {q.question}
+                      </div>
+                      <ul className="list-decimal ml-6">
+                        {options.map((opt: string, i: number) => (
+                          <li
+                            key={i}
+                            className={
+                              q.correctAnswer === i
+                                ? 'font-bold text-green-600'
+                                : ''
+                            }
+                          >
+                            {opt}
+                          </li>
+                        ))}
+                      </ul>
+                      <div className="text-xs text-gray-500 mt-1">
+                        Correct Answer: Option {q.correctAnswer + 1}
+                      </div>
                     </div>
-                    <ul className="list-decimal ml-6">
-                      {JSON.parse(q.options).map((opt: string, i: number) => (
-                        <li
-                          key={i}
-                          className={
-                            q.correctAnswer === i
-                              ? 'font-bold text-green-600'
-                              : ''
-                          }
-                        >
-                          {opt}
-                        </li>
-                      ))}
-                    </ul>
-                    <div className="text-xs text-gray-500 mt-1">
-                      Correct Answer: Option {q.correctAnswer + 1}
-                    </div>
-                  </div>
-                ))
+                  );
+                })
               ) : (
                 <p className="text-sm text-gray-500">
                   No questions in this quiz.

@@ -5,7 +5,7 @@ import { requireSuperuser } from '../../../lib/authMiddleware';
 
 const prisma = new PrismaClient();
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   const authCheck = await requireSuperuser();
   if (authCheck) return authCheck;
 

@@ -4,7 +4,6 @@ import React, { FormEvent, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
 import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
-import { authFetch } from '../../../lib/fetch'; // Import custom fetch
 import Link from 'next/link';
 
 export default function RegisterComponent() {
@@ -36,14 +35,18 @@ export default function RegisterComponent() {
       } else {
         setError(data.error);
       }
-    } catch (error) {
+    } catch {
       setError('An error occurred. Please try again.');
     }
   };
 
-  const handleGoogleSuccess = async (credentialResponse: any) => {
+  const handleGoogleSuccess = async (credentialResponse: { credential?: string }) => {
     try {
       setError(null);
+      if (!credentialResponse.credential) {
+        setError('Google credential missing.');
+        return;
+      }
       const response = await fetch('/api/auth/google', {
         method: 'POST',
         body: JSON.stringify({ token: credentialResponse.credential }),
@@ -61,7 +64,7 @@ export default function RegisterComponent() {
       } else {
         setError(data.error);
       }
-    } catch (error) {
+    } catch {
       setError('Google registration failed. Please try again.');
     }
   };

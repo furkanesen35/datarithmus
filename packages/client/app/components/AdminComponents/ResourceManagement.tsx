@@ -7,6 +7,7 @@ interface Resource {
   title: string;
   category: string;
   fileName?: string;
+  filePath?: string;
   link?: string;
   createdAt: string;
 }
@@ -32,6 +33,7 @@ export default function ResourceManager({
 
   useEffect(() => {
     fetchResources();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchResources = async () => {
@@ -40,8 +42,12 @@ export default function ResourceManager({
       const res = await fetch('/api/resources', { credentials: 'include' });
       if (!res.ok) throw new Error('Failed to fetch resources');
       setResources(await res.json());
-    } catch (err: any) {
-      onError(err.message || 'Failed to fetch resources');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        onError(err.message || 'Failed to fetch resources');
+      } else {
+        onError('Failed to fetch resources');
+      }
     } finally {
       setLoading(false);
     }
@@ -78,8 +84,12 @@ export default function ResourceManager({
       setCategory('Cheat Sheet');
       setResourceFile(null);
       setResourceLink('');
-    } catch (err: any) {
-      onError(err.message || 'Failed to save resource');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        onError(err.message || 'Failed to save resource');
+      } else {
+        onError('Failed to save resource');
+      }
     } finally {
       setLoading(false);
     }
@@ -105,8 +115,12 @@ export default function ResourceManager({
       if (!res.ok) throw new Error('Failed to delete resource');
       await fetchResources();
       onMessage('Resource deleted successfully');
-    } catch (err: any) {
-      onError(err.message || 'Failed to delete resource');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        onError(err.message || 'Failed to delete resource');
+      } else {
+        onError('Failed to delete resource');
+      }
     } finally {
       setLoading(false);
     }

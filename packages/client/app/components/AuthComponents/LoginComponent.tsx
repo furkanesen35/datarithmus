@@ -34,14 +34,18 @@ export default function LoginComponent() {
       } else {
         setError(data.error);
       }
-    } catch (error) {
+    } catch {
       setError('An error occurred. Please try again.');
     }
   };
 
-  const handleGoogleSuccess = async (credentialResponse: any) => {
+  const handleGoogleSuccess = async (credentialResponse: { credential?: string }) => {
     try {
       setError(null);
+      if (!credentialResponse.credential) {
+        setError('Google credential missing.');
+        return;
+      }
       const response = await authFetch('/api/auth/google', {
         method: 'POST',
         body: JSON.stringify({ token: credentialResponse.credential }),
@@ -58,7 +62,7 @@ export default function LoginComponent() {
       } else {
         setError(data.error);
       }
-    } catch (error) {
+    } catch {
       setError('Google login failed. Please try again.');
     }
   };

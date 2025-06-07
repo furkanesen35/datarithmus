@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
       email: decoded.email,
       isSuperuser: decoded.isSuperuser,
     });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
   }
 }

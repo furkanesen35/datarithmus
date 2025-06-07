@@ -2,7 +2,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
-import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import { sendMail } from '../../../lib/mail';
 
@@ -67,12 +66,9 @@ export async function POST(req: NextRequest) {
       message:
         'Registration successful! Please check your email to verify your account.',
     });
-  } catch (error) {
+  } catch {
     // Log the error for debugging
-    console.error('Registration error:', error);
     // If error is an object, try to get a message
-    let message = 'Unknown error';
-    if (error instanceof Error) message = error.message;
-    return NextResponse.json({ error: message }, { status: 500 });
+    return NextResponse.json({ error: 'Unknown error' }, { status: 500 });
   }
 }

@@ -1,5 +1,6 @@
 // packages/client/app/components/HomeComponents/ThirdContainer.tsx
 import React from 'react';
+import Image from 'next/image';
 
 function ThirdContainer() {
   const cardsData = [
@@ -42,10 +43,14 @@ function ThirdContainer() {
             className="bg-white border border-gray-200 rounded-lg shadow-md overflow-hidden"
           >
             <a href={card.link}>
-              <img
+              <Image
                 className="w-full h-48 object-cover"
                 src={card?.image}
                 alt={card.title}
+                width={400}
+                height={192}
+                style={{ width: '100%', height: '12rem', objectFit: 'cover' }}
+                priority={index === 0}
               />
             </a>
             <div className="p-4">

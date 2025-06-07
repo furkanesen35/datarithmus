@@ -43,7 +43,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         } else {
           setAuth({ isLoggedIn: false, user: null });
         }
-      } catch (error) {
+      } catch {
         setAuth({ isLoggedIn: false, user: null });
       } finally {
         setIsAuthLoading(false);

@@ -31,7 +31,7 @@ async function requireSuperuser(
       );
     }
     return null;
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
   }
 }
@@ -95,7 +95,7 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
   }
 
-  const data: any = { title, description, dueDate: new Date(dueDate) };
+  const data: Record<string, unknown> = { title, description, dueDate: new Date(dueDate) };
   if (file) {
     const buffer = Buffer.from(await file.arrayBuffer());
     const filename = `${Date.now()}-${file.name}`;

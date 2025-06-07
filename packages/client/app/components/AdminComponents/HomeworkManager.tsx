@@ -31,6 +31,7 @@ export default function HomeworkManager({
 
   useEffect(() => {
     fetchHomeworks();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchHomeworks = async () => {
@@ -39,8 +40,12 @@ export default function HomeworkManager({
       const res = await fetch('/api/homework', { credentials: 'include' });
       if (!res.ok) throw new Error('Failed to fetch homework');
       setHomeworks(await res.json());
-    } catch (err: any) {
-      onError(err.message || 'Failed to fetch homework');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        onError(err.message || 'Failed to fetch homework');
+      } else {
+        onError('Failed to fetch homework');
+      }
     } finally {
       setLoading(false);
     }
@@ -77,8 +82,12 @@ export default function HomeworkManager({
       setHomeworkDescription('');
       setDueDate('');
       setHomeworkFile(null);
-    } catch (err: any) {
-      onError(err.message || 'Failed to save homework');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        onError(err.message || 'Failed to save homework');
+      } else {
+        onError('Failed to save homework');
+      }
     } finally {
       setLoading(false);
     }
@@ -104,8 +113,12 @@ export default function HomeworkManager({
       if (!res.ok) throw new Error('Failed to delete homework');
       await fetchHomeworks();
       onMessage('Homework deleted successfully');
-    } catch (err: any) {
-      onError(err.message || 'Failed to delete homework');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        onError(err.message || 'Failed to delete homework');
+      } else {
+        onError('Failed to delete homework');
+      }
     } finally {
       setLoading(false);
     }

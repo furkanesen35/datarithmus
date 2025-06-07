@@ -29,7 +29,7 @@ async function requireSuperuser(
       );
     }
     return null;
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
   }
 }
@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
     data: {
       title,
       questions: {
-        create: questions.map((q: any) => ({
+        create: questions.map((q: { question: string; options: string[]; correctAnswer: number }) => ({
           question: q.question,
           options: JSON.stringify(q.options),
           correctAnswer: q.correctAnswer - 1, // store as 0-based
@@ -78,18 +78,24 @@ export async function PUT(req: NextRequest) {
   const authCheck = await requireSuperuser(req);
   if (authCheck) return authCheck;
 
-  const { id, question, options, correctAnswer } = await req.json();
-  if (!id || !question || !options || correctAnswer === undefined) {
+  const { id, questions } = await req.json();
+  if (!id || !Array.isArray(questions) || questions.length === 0) {
     return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
   }
 
   const quiz = await prisma.quiz.update({
     where: { id: Number(id) },
     data: {
-      question,
-      options: JSON.stringify(options),
-      correctAnswer: Number(correctAnswer),
+      questions: {
+        set: [],
+        create: questions.map((q: { question: string; options: string[]; correctAnswer: number }) => ({
+          question: q.question,
+          options: JSON.stringify(q.options),
+          correctAnswer: q.correctAnswer - 1,
+        })),
+      },
     },
+    include: { questions: true },
   });
 
   return NextResponse.json({ message: 'Quiz updated', quiz });

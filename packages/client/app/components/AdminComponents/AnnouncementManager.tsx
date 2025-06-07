@@ -30,8 +30,12 @@ export default function AnnouncementsManager() {
       }
       setAnnouncements(await res.json());
       setError(null);
-    } catch (err: any) {
-      setError(err.message || 'Failed to fetch announcements');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message || 'Failed to fetch announcements');
+      } else {
+        setError('Failed to fetch announcements');
+      }
     }
   };
 
@@ -62,8 +66,12 @@ export default function AnnouncementsManager() {
       setPinned(false);
       setEditingId(null);
       setError(null);
-    } catch (err: any) {
-      setError(err.message || 'Failed to save announcement');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message || 'Failed to save announcement');
+      } else {
+        setError('Failed to save announcement');
+      }
     }
   };
 
@@ -89,8 +97,12 @@ export default function AnnouncementsManager() {
       }
       fetchAnnouncements();
       setError(null);
-    } catch (err: any) {
-      setError(err.message || 'Failed to delete announcement');
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        setError(err.message || 'Failed to delete announcement');
+      } else {
+        setError('Failed to delete announcement');
+      }
     }
   };
 

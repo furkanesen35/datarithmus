@@ -22,7 +22,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { email, sub: googleId } = payload;
+    const { email } = payload;
     let user = await prisma.user.findUnique({ where: { email } });
 
     if (!user) {
@@ -31,6 +31,7 @@ export async function POST(req: NextRequest) {
           email,
           password: '',
           isSuperuser: false,
+          username: email.split('@')[0], // Use email prefix as username
         },
       });
     }

@@ -5,8 +5,8 @@ import { requireSuperuser } from '../../../lib/authMiddleware';
 
 const prisma = new PrismaClient();
 
-export async function GET(req: NextRequest) {
-  const authCheck = await requireSuperuser(req);
+export async function GET() {
+  const authCheck = await requireSuperuser();
   if (authCheck) return authCheck;
 
   const schedules = await prisma.schedule.findMany({
@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
-  const authCheck = await requireSuperuser(req);
+  const authCheck = await requireSuperuser();
   if (authCheck) return authCheck;
 
   const { title, date, time, description } = await req.json();
@@ -35,7 +35,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function PUT(req: NextRequest) {
-  const authCheck = await requireSuperuser(req);
+  const authCheck = await requireSuperuser();
   if (authCheck) return authCheck;
 
   const { id, title, date, time, description } = await req.json();
@@ -52,7 +52,7 @@ export async function PUT(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  const authCheck = await requireSuperuser(req);
+  const authCheck = await requireSuperuser();
   if (authCheck) return authCheck;
 
   const { id } = await req.json();

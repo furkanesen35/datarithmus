@@ -18,5 +18,9 @@
   },
   "workspaces": [
     "packages/client"
-  ]
+  ],
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "multer": "^2.0.1"
+  }
 }

@@ -2,6 +2,8 @@
 import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
+export const dynamic = "force-dynamic";
+
 export default function VerifyEmailPage() {
   const [message, setMessage] = useState('Verifying...');
   const [loading, setLoading] = useState(true);

@@ -4,6 +4,7 @@ import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcrypt';
 import crypto from 'crypto';
 import { sendMail } from '../../../lib/mail';
+import { getBaseUrl } from '../../utils/baseUrl';
 
 const prisma = new PrismaClient();
 
@@ -27,7 +28,7 @@ export async function POST(req: NextRequest) {
     let user;
     try {
       // Try to send the email before creating the user
-      const verifyUrl = `http://localhost:3000/auth/verify-email?token=${token}`;
+      const verifyUrl = `${getBaseUrl()}/auth/verify-email?token=${token}`;
       await sendMail({
         to: email,
         subject: 'Verify your email',

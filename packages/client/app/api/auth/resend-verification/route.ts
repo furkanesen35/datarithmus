@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { sendMail } from '../../../../lib/mail';
 import crypto from 'crypto';
+import { getBaseUrl } from '../../../utils/baseUrl';
 
 const prisma = new PrismaClient();
 
@@ -31,7 +32,7 @@ export async function POST(req: NextRequest) {
   await prisma.emailVerificationToken.create({
     data: { userId: user.id, token, expiresAt },
   });
-  const verifyUrl = `http://localhost:3000/auth/verify-email?token=${token}`;
+  const verifyUrl = `${getBaseUrl()}/auth/verify-email?token=${token}`;
   try {
     await sendMail({
       to: user.email,

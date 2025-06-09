@@ -36,6 +36,13 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    if (!user.isActive) {
+      return NextResponse.json(
+        { error: 'Account not verified. Please check your email.' },
+        { status: 403 },
+      );
+    }
+
     const jwtToken = jwt.sign(
       { email: user.email, isSuperuser: user.isSuperuser },
       process.env.JWT_SECRET!,

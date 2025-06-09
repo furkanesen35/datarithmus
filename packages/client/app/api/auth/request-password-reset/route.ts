@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import crypto from 'crypto';
 import { sendMail } from '../../../../lib/mail';
+import { getBaseUrl } from '../../../utils/baseUrl';
 
 const prisma = new PrismaClient();
 
@@ -18,7 +19,7 @@ export async function POST(req: NextRequest) {
   await prisma.passwordResetToken.create({
     data: { userId: user.id, token, expiresAt },
   });
-  const resetUrl = `http://localhost:3000/auth/reset-password?token=${token}`;
+  const resetUrl = `${getBaseUrl()}/auth/reset-password?token=${token}`;
   // Send password reset email
   await sendMail({
     to: user.email,

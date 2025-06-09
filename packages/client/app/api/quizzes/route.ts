@@ -61,11 +61,17 @@ export async function POST(req: NextRequest) {
     data: {
       title,
       questions: {
-        create: questions.map((q: { question: string; options: string[]; correctAnswer: number }) => ({
-          question: q.question,
-          options: JSON.stringify(q.options),
-          correctAnswer: q.correctAnswer - 1, // store as 0-based
-        })),
+        create: questions.map(
+          (q: {
+            question: string;
+            options: string[];
+            correctAnswer: number;
+          }) => ({
+            question: q.question,
+            options: JSON.stringify(q.options),
+            correctAnswer: q.correctAnswer - 1, // store as 0-based
+          }),
+        ),
       },
     },
     include: { questions: true },
@@ -88,11 +94,17 @@ export async function PUT(req: NextRequest) {
     data: {
       questions: {
         set: [],
-        create: questions.map((q: { question: string; options: string[]; correctAnswer: number }) => ({
-          question: q.question,
-          options: JSON.stringify(q.options),
-          correctAnswer: q.correctAnswer - 1,
-        })),
+        create: questions.map(
+          (q: {
+            question: string;
+            options: string[];
+            correctAnswer: number;
+          }) => ({
+            question: q.question,
+            options: JSON.stringify(q.options),
+            correctAnswer: q.correctAnswer - 1,
+          }),
+        ),
       },
     },
     include: { questions: true },

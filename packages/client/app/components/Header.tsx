@@ -36,8 +36,8 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50">
       <div className="hidden lg:flex justify-center items-center bg-[#4a0083] h-[40px] text-white text-xs sm:text-sm">
-        Think you&apos;ve got what it takes for a career in Data? Find out in just
-        one minute!
+        Think you&apos;ve got what it takes for a career in Data? Find out in
+        just one minute!
         <button className="text-black bg-yellow-400 px-2 py-1 ml-2 rounded">
           Take the test now!
         </button>

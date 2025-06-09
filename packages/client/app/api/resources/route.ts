@@ -95,7 +95,11 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
   }
 
-  const data: Record<string, unknown> = { title, category, link: link || undefined };
+  const data: Record<string, unknown> = {
+    title,
+    category,
+    link: link || undefined,
+  };
   if (file) {
     const buffer = Buffer.from(await file.arrayBuffer());
     const filename = `${Date.now()}-${file.name}`;

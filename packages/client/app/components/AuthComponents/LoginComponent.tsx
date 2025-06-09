@@ -39,7 +39,9 @@ export default function LoginComponent() {
     }
   };
 
-  const handleGoogleSuccess = async (credentialResponse: { credential?: string }) => {
+  const handleGoogleSuccess = async (credentialResponse: {
+    credential?: string;
+  }) => {
     try {
       setError(null);
       if (!credentialResponse.credential) {

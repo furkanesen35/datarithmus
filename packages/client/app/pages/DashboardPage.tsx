@@ -251,10 +251,7 @@ export default function DashboardPage() {
             </button>
           </li>
           <li>
-            <Link
-              href="/"
-              className="block p-2 rounded hover:bg-gray-200"
-            >
+            <Link href="/" className="block p-2 rounded hover:bg-gray-200">
               Back to Home
             </Link>
           </li>

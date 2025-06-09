@@ -1,4 +1,4 @@
 {
-  "buildCommand": "npx prisma generate --schema=./prisma/schema.prisma && npx next build",
-  "rootDirectory": "packages/client"
+  "buildCommand": "cd packages/client && npx prisma generate && npx next build",
+  "outputDirectory": "packages/client/.next"
 }

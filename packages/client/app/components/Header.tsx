@@ -6,8 +6,7 @@ import { useAuth } from '../context/AuthContext';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
-  const [isCoursesDropdownOpen, setIsCoursesDropdownOpen] =
-    useState<boolean>(false);
+  const [isCoursesDropdownOpen, setIsCoursesDropdownOpen] = useState<boolean>(false);
   const { auth, logout } = useAuth();
 
   const coursesLinks = (
@@ -127,22 +126,40 @@ export default function Header() {
           </Link>
         </div>
 
-        <div className="hidden lg:block">
-          {auth.isLoggedIn ? (
-            <button
-              onClick={logout}
-              className="inline-block px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
-            >
-              Logout
-            </button>
-          ) : (
+        <div className="flex items-center gap-2">
+          {auth.isLoggedIn && (
             <Link
-              href="/auth/login"
-              className="inline-block px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              href="/dashboard"
+              className="inline-block px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600"
             >
-              Login / Register
+              Dashboard
             </Link>
           )}
+          {auth.isLoggedIn && auth.user?.isSuperuser && (
+            <Link
+              href="/admin"
+              className="inline-block px-3 py-1 bg-yellow-600 text-white rounded hover:bg-yellow-500"
+            >
+              Admin Page
+            </Link>
+          )}
+          <div className="hidden lg:block">
+            {auth.isLoggedIn ? (
+              <button
+                onClick={logout}
+                className="inline-block px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+              >
+                Logout
+              </button>
+            ) : (
+              <Link
+                href="/auth/login"
+                className="inline-block px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+              >
+                Login / Register
+              </Link>
+            )}
+          </div>
         </div>
       </nav>
     </header>

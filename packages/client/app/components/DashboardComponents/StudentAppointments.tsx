@@ -1,9 +1,17 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../../context/AuthContext';
 
+interface Appointment {
+  id: string;
+  date: string;
+  time: string;
+  adminEmail: string;
+  status: string;
+}
+
 export default function StudentAppointments() {
   const { auth } = useAuth();
-  const [appointments, setAppointments] = useState([]);
+  const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {

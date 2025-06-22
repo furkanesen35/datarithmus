@@ -8,43 +8,43 @@ datasource db {
 }
 
 model User {
-  id         Int      @id @default(autoincrement())
-  email      String   @unique
-  password   String
-  username   String
-  isSuperuser Boolean @default(false)
-  isActive   Boolean  @default(true)
-  createdAt  DateTime @default(now())
-  quizResults QuizResult[]
-  passwordResetTokens PasswordResetToken[]
+  id                      Int                      @id @default(autoincrement())
+  email                   String                   @unique
+  password                String
+  username                String
+  isSuperuser             Boolean                  @default(false)
+  isActive                Boolean                  @default(true)
+  createdAt               DateTime                 @default(now())
   emailVerificationTokens EmailVerificationToken[]
+  passwordResetTokens     PasswordResetToken[]
+  quizResults             QuizResult[]
 }
 
 model Video {
   id          Int      @id @default(autoincrement())
   title       String
   description String
-  videoUrl    String   // changed from filePath
+  videoUrl    String
   createdAt   DateTime @default(now())
 }
 
 model Quiz {
-  id        Int            @id @default(autoincrement())
-  title     String
-  createdAt DateTime       @default(now())
-  questions QuizQuestion[]
+  id          Int            @id @default(autoincrement())
+  title       String
+  createdAt   DateTime       @default(now())
+  questions   QuizQuestion[]
   quizResults QuizResult[]
 }
 
 model QuizQuestion {
-  id            Int      @id @default(autoincrement())
+  id            Int          @id @default(autoincrement())
   question      String
-  options       String   // JSON string, e.g., ["opt1", "opt2", ...]
-  correctAnswer Int      // 0-based index
-  quiz          Quiz     @relation(fields: [quizId], references: [id])
+  options       String
+  correctAnswer Int
   quizId        Int
-  createdAt     DateTime @default(now())
-  quizResults QuizResult[]
+  createdAt     DateTime     @default(now())
+  quiz          Quiz         @relation(fields: [quizId], references: [id])
+  quizResults   QuizResult[]
 }
 
 model Announcement {
@@ -65,12 +65,12 @@ model Homework {
 }
 
 model Resource {
-  id          Int      @id @default(autoincrement())
-  title       String
-  category    String
-  filePath    String?
-  link        String?
-  createdAt   DateTime @default(now())
+  id        Int      @id @default(autoincrement())
+  title     String
+  category  String
+  filePath  String?
+  link      String?
+  createdAt DateTime @default(now())
 }
 
 model Schedule {
@@ -83,12 +83,12 @@ model Schedule {
 }
 
 model StudentProgress {
-  id               Int      @id @default(autoincrement())
-  studentEmail     String
+  id                Int      @id @default(autoincrement())
+  studentEmail      String
   homeworkCompleted Int      @default(0)
-  quizScore        Int      @default(0)
-  notes            String?
-  createdAt        DateTime @default(now())
+  quizScore         Int      @default(0)
+  notes             String?
+  createdAt         DateTime @default(now())
 }
 
 model Discussion {
@@ -116,17 +116,16 @@ model Student {
 }
 
 model QuizResult {
-  id         Int      @id @default(autoincrement())
-  userId    Int
-  quizId    Int
+  id         Int          @id @default(autoincrement())
+  userId     Int
+  quizId     Int
   questionId Int
-  answer    Int      // 0-based index of selected answer
-  isCorrect Boolean
-  createdAt DateTime @default(now())
-
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  quiz      Quiz     @relation(fields: [quizId], references: [id])
-  question  QuizQuestion @relation(fields: [questionId], references: [id])
+  answer     Int
+  isCorrect  Boolean
+  createdAt  DateTime     @default(now())
+  question   QuizQuestion @relation(fields: [questionId], references: [id])
+  quiz       Quiz         @relation(fields: [quizId], references: [id])
+  user       User         @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model PasswordResetToken {
@@ -145,4 +144,15 @@ model EmailVerificationToken {
   expiresAt DateTime
   used      Boolean  @default(false)
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model AppointmentRequest {
+  id           Int      @id @default(autoincrement())
+  studentEmail String
+  adminEmail   String
+  date         String
+  time         String
+  message      String?
+  status       String   @default("pending") // pending, approved, rejected
+  createdAt    DateTime @default(now())
 }

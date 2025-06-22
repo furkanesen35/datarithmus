@@ -13,6 +13,8 @@ import FeedbackManager from '../components/AdminComponents/FeedbackManager';
 import StudentManager from '../components/AdminComponents/StudentManager';
 import AnnouncementsManager from 'app/components/AdminComponents/AnnouncementManager';
 import ResourceManager from 'app/components/AdminComponents/ResourceManagement';
+import AdminAppointments from '../components/DashboardComponents/AdminAppointments';
+import AdminUpcomingAppointments from '../components/DashboardComponents/AdminUpcomingAppointments';
 
 export default function AdminPage() {
   const { auth, logout, isAuthLoading } = useAuth();
@@ -161,6 +163,8 @@ export default function AdminPage() {
           {activeSection === 'schedule' && (
             <div className="p-6 bg-white rounded-lg shadow-md">
               <ScheduleManager onMessage={setMessage} onError={setError} />
+              <AdminAppointments />
+              <AdminUpcomingAppointments />
             </div>
           )}
 

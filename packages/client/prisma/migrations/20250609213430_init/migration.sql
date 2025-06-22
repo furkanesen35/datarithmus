@@ -170,6 +170,19 @@ CREATE TABLE "EmailVerificationToken" (
     CONSTRAINT "EmailVerificationToken_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "AppointmentRequest" (
+    "id" SERIAL NOT NULL,
+    "studentEmail" TEXT NOT NULL,
+    "adminEmail" TEXT NOT NULL,
+    "date" TEXT NOT NULL,
+    "time" TEXT NOT NULL,
+    "message" TEXT,
+    "status" TEXT NOT NULL DEFAULT 'pending',
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT "AppointmentRequest_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "User_email_key" ON "User"("email");
 

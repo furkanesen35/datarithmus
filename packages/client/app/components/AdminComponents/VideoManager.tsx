@@ -23,7 +23,7 @@ export default function VideoManager() {
 
   const fetchVideos = async () => {
     const res = await fetch('/api/videos', {
-      headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+      credentials: 'include', // Send cookies for authentication
     });
     if (res.ok) {
       setVideos(await res.json());
@@ -43,8 +43,8 @@ export default function VideoManager() {
       method: editingId ? 'PUT' : 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
+      credentials: 'include', // Send cookies for authentication
       body,
     });
     if (res.ok) {
@@ -69,8 +69,8 @@ export default function VideoManager() {
       body: JSON.stringify({ id }),
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
+      credentials: 'include', // Send cookies for authentication
     });
     if (res.ok) fetchVideos();
   };

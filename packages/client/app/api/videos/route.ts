@@ -1,12 +1,29 @@
 // packages/client/app/api/students/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
-import { requireSuperuser } from '../../../lib/authMiddleware';
+import { jwtVerify } from 'jose';
 
 const prisma = new PrismaClient();
 
-export async function GET() {
-  const authCheck = await requireSuperuser();
+async function requireSuperuserJWT(req: NextRequest) {
+  const token = req.cookies.get('token')?.value;
+  if (!token) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+  }
+  try {
+    const secret = new TextEncoder().encode(process.env.JWT_SECRET!);
+    const { payload } = await jwtVerify(token, secret);
+    if (!payload.isSuperuser) {
+      return NextResponse.json({ error: 'Superuser access required' }, { status: 403 });
+    }
+    return null;
+  } catch {
+    return NextResponse.json({ error: 'Invalid token' }, { status: 403 });
+  }
+}
+
+export async function GET(req: NextRequest) {
+  const authCheck = await requireSuperuserJWT(req);
   if (authCheck) return authCheck;
 
   const videos = await prisma.video.findMany({
@@ -16,7 +33,7 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  const authCheck = await requireSuperuser();
+  const authCheck = await requireSuperuserJWT(req);
   if (authCheck) return authCheck;
 
   const { title, description, videoUrl } = await req.json();
@@ -32,7 +49,7 @@ export async function POST(req: NextRequest) {
 }
 
 export async function PUT(req: NextRequest) {
-  const authCheck = await requireSuperuser();
+  const authCheck = await requireSuperuserJWT(req);
   if (authCheck) return authCheck;
 
   const { id, title, description, videoUrl } = await req.json();
@@ -49,7 +66,7 @@ export async function PUT(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
-  const authCheck = await requireSuperuser();
+  const authCheck = await requireSuperuserJWT(req);
   if (authCheck) return authCheck;
 
   const { id } = await req.json();

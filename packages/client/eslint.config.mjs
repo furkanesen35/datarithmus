@@ -11,8 +11,25 @@ const compat = new FlatCompat({
 });
 
 const eslintConfig = [
-  // Add ignores for build output and typegen files
-  { ignores: ['.next', '**/types/'] },
+  // Add ignores for build output, typegen files, and common patterns
+  {
+    ignores: [
+      '.next',
+      '**/types/',
+      'node_modules/',
+      'dist/',
+      'build/',
+      'coverage/',
+      '*.config.js',
+      '*.config.mjs',
+      '*.config.cjs',
+      '*.config.ts',
+      '**/*.d.ts',
+      '**/*.test.*',
+      '**/__tests__/**',
+      '**/__mocks__/**',
+    ],
+  },
   ...compat.extends('next/core-web-vitals', 'next/typescript'),
 ];
 

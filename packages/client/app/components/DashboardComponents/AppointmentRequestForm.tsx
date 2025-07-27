@@ -10,7 +10,9 @@ interface AppointmentRequestFormProps {
   onRequestSuccess?: () => void;
 }
 
-export default function AppointmentRequestForm({ onRequestSuccess }: AppointmentRequestFormProps) {
+export default function AppointmentRequestForm({
+  onRequestSuccess,
+}: AppointmentRequestFormProps) {
   const { auth } = useAuth();
   const [admins, setAdmins] = useState<Admin[]>([]);
   const [adminEmail, setAdminEmail] = useState('');
@@ -74,11 +76,11 @@ export default function AppointmentRequestForm({ onRequestSuccess }: Appointment
         <select
           className="w-full border rounded p-1 mt-1"
           value={adminEmail}
-          onChange={e => setAdminEmail(e.target.value)}
+          onChange={(e) => setAdminEmail(e.target.value)}
           required
         >
           <option value="">Choose an admin</option>
-          {admins.map(admin => (
+          {admins.map((admin) => (
             <option key={admin.email} value={admin.email}>
               {admin.username} ({admin.email})
             </option>
@@ -91,7 +93,7 @@ export default function AppointmentRequestForm({ onRequestSuccess }: Appointment
           type="date"
           className="w-full border rounded p-1 mt-1"
           value={date}
-          onChange={e => setDate(e.target.value)}
+          onChange={(e) => setDate(e.target.value)}
           required
         />
       </label>
@@ -101,7 +103,7 @@ export default function AppointmentRequestForm({ onRequestSuccess }: Appointment
           type="time"
           className="w-full border rounded p-1 mt-1"
           value={time}
-          onChange={e => setTime(e.target.value)}
+          onChange={(e) => setTime(e.target.value)}
           required
         />
       </label>
@@ -110,7 +112,7 @@ export default function AppointmentRequestForm({ onRequestSuccess }: Appointment
         <textarea
           className="w-full border rounded p-1 mt-1"
           value={message}
-          onChange={e => setMessage(e.target.value)}
+          onChange={(e) => setMessage(e.target.value)}
         />
       </label>
       <button

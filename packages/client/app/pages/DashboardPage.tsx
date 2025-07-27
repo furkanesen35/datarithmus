@@ -279,7 +279,9 @@ export default function DashboardPage() {
         </div>
         {/* Main Content (adapts to available space) */}
         <div className="flex-1 p-4 sm:p-8 min-w-0">
-          {activeSection === 'overview' && <Overview email={auth.user?.email} />}
+          {activeSection === 'overview' && (
+            <Overview email={auth.user?.email} />
+          )}
           {activeSection === 'courses' && <MyCourses />}
           {activeSection === 'progress' && <MyProgress />}
           {activeSection === 'recordings' && <Recordings />}

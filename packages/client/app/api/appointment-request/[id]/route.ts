@@ -12,6 +12,5 @@ export async function PATCH(req: NextRequest) {
     where: { id },
     data: { status },
   });
-  // TODO: Optionally send Calendly link to student if approved
   return NextResponse.json(updated);
 }

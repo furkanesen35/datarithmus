@@ -17,7 +17,9 @@ export default function StudentAppointments() {
   useEffect(() => {
     async function fetchAppointments() {
       if (!auth.user?.email) return;
-      const res = await fetch(`/api/appointment-request?studentEmail=${auth.user.email}`);
+      const res = await fetch(
+        `/api/appointment-request?studentEmail=${auth.user.email}`,
+      );
       if (res.ok) {
         setAppointments(await res.json());
       }
@@ -33,11 +35,13 @@ export default function StudentAppointments() {
       <h3 className="text-lg font-bold mb-2">Your Upcoming Appointments</h3>
       {appointments.length === 0 && <div>No appointments found.</div>}
       <ul className="list-disc pl-5">
-        {appointments.filter(a => a.status === 'approved').map(a => (
-          <li key={a.id}>
-            {a.date} {a.time} with {a.adminEmail}
-          </li>
-        ))}
+        {appointments
+          .filter((a) => a.status === 'approved')
+          .map((a) => (
+            <li key={a.id}>
+              {a.date} {a.time} with {a.adminEmail}
+            </li>
+          ))}
       </ul>
     </div>
   );

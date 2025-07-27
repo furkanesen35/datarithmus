@@ -7,7 +7,10 @@ const prisma = new PrismaClient();
 export async function POST(req: NextRequest) {
   const { studentEmail, adminEmail, date, time, message } = await req.json();
   if (!studentEmail || !adminEmail || !date || !time) {
-    return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Missing required fields' },
+      { status: 400 },
+    );
   }
   const appointment = await prisma.appointmentRequest.create({
     data: {
@@ -33,7 +36,10 @@ export async function GET(req: NextRequest) {
   } else if (adminEmail) {
     where = { adminEmail };
   } else {
-    return NextResponse.json({ error: 'Missing studentEmail or adminEmail' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Missing studentEmail or adminEmail' },
+      { status: 400 },
+    );
   }
   const requests = await prisma.appointmentRequest.findMany({
     where,

@@ -1,5 +1,5 @@
-import { NextResponse } from "next/server";
-import prisma from "../../../lib/prisma";
+import { NextResponse } from 'next/server';
+import prisma from '../../../lib/prisma';
 
 // GET /api/admins - returns a list of admin users (isSuperuser=true)
 export async function GET() {
@@ -10,6 +10,9 @@ export async function GET() {
     });
     return NextResponse.json({ admins });
   } catch {
-    return NextResponse.json({ error: "Failed to fetch admins" }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Failed to fetch admins' },
+      { status: 500 },
+    );
   }
 }

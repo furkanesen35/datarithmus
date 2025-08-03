@@ -18,6 +18,7 @@ model User {
   emailVerificationTokens EmailVerificationToken[]
   passwordResetTokens     PasswordResetToken[]
   quizResults             QuizResult[]
+  schedules               Schedule[]               // Relation to Schedule model
 }
 
 model Video {
@@ -74,12 +75,17 @@ model Resource {
 }
 
 model Schedule {
-  id          Int      @id @default(autoincrement())
-  title       String
-  date        DateTime
-  time        String
-  description String?
-  createdAt   DateTime @default(now())
+  id            Int      @id @default(autoincrement())
+  title         String
+  date          DateTime
+  time          String
+  description   String?
+  userId        Int?     // ID of the participant user
+  googleMeetLink String? // Google Meet link for the meeting
+  createdAt     DateTime @default(now())
+  
+  // Relation to User model
+  user          User?    @relation(fields: [userId], references: [id])
 }
 
 model StudentProgress {

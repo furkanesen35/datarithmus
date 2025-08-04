@@ -58,8 +58,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const logout = () => {
     setAuth({ isLoggedIn: false, user: null });
-    // Optionally, call /api/auth/logout to clear cookie
-    fetch('/api/auth/logout', { method: 'POST' });
+    // Call /api/auth/logout to clear cookies, then redirect
+    fetch('/api/auth/logout', { method: 'POST', credentials: 'include' }).then(
+      () => {
+        window.location.href = '/auth/login';
+      },
+    );
   };
 
   return (

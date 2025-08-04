@@ -16,9 +16,9 @@ model User {
   isActive                Boolean                  @default(true)
   createdAt               DateTime                 @default(now())
   emailVerificationTokens EmailVerificationToken[]
+  meetingParticipants     MeetingParticipant[]
   passwordResetTokens     PasswordResetToken[]
   quizResults             QuizResult[]
-  schedules               Schedule[]               // Relation to Schedule model
 }
 
 model Video {
@@ -75,17 +75,26 @@ model Resource {
 }
 
 model Schedule {
-  id            Int      @id @default(autoincrement())
-  title         String
-  date          DateTime
-  time          String
-  description   String?
-  userId        Int?     // ID of the participant user
-  googleMeetLink String? // Google Meet link for the meeting
-  createdAt     DateTime @default(now())
-  
-  // Relation to User model
-  user          User?    @relation(fields: [userId], references: [id])
+  id             Int                  @id @default(autoincrement())
+  title          String
+  start          DateTime
+  end            DateTime
+  description    String?
+  createdAt      DateTime             @default(now())
+  googleMeetLink String?
+  status         String               @default("pending")
+  participants   MeetingParticipant[]
+}
+
+model MeetingParticipant {
+  id         Int      @id @default(autoincrement())
+  scheduleId Int
+  userId     Int
+  createdAt  DateTime @default(now())
+  schedule   Schedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id])
+
+  @@unique([scheduleId, userId])
 }
 
 model StudentProgress {
@@ -159,6 +168,6 @@ model AppointmentRequest {
   date         String
   time         String
   message      String?
-  status       String   @default("pending") // pending, approved, rejected
+  status       String   @default("pending")
   createdAt    DateTime @default(now())
 }

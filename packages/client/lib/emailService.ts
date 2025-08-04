@@ -31,8 +31,18 @@ export class EmailService {
 
   async sendMeetingInvitation(data: MeetingInviteData): Promise<boolean> {
     try {
-      const { title, date, time, googleMeetLink, organizerEmail, organizerName, participantEmail, participantName, description } = data;
-      
+      const {
+        title,
+        date,
+        time,
+        googleMeetLink,
+        organizerEmail,
+        organizerName,
+        participantEmail,
+        participantName,
+        description,
+      } = data;
+
       const formattedDate = date.toLocaleDateString('en-US', {
         weekday: 'long',
         year: 'numeric',
@@ -79,7 +89,7 @@ export class EmailService {
 
               <div style="text-align: center; margin: 20px 0;">
                 <a href="${googleMeetLink}" class="button meet-button">🎥 Join Google Meet</a>
-                <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${date.toISOString().replace(/[-:]/g, '').split('.')[0]}Z/${new Date(date.getTime() + 60*60*1000).toISOString().replace(/[-:]/g, '').split('.')[0]}Z&details=${encodeURIComponent(description || '')}&location=${encodeURIComponent(googleMeetLink)}" class="button">📅 Add to Calendar</a>
+                <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${date.toISOString().replace(/[-:]/g, '').split('.')[0]}Z/${new Date(date.getTime() + 60 * 60 * 1000).toISOString().replace(/[-:]/g, '').split('.')[0]}Z&details=${encodeURIComponent(description || '')}&location=${encodeURIComponent(googleMeetLink)}" class="button">📅 Add to Calendar</a>
               </div>
 
               <div style="border-top: 1px solid #ddd; padding-top: 15px; margin-top: 20px;">
@@ -113,7 +123,7 @@ export class EmailService {
         
         Join the meeting: ${googleMeetLink}
         
-        Add to your calendar: https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${date.toISOString().replace(/[-:]/g, '').split('.')[0]}Z/${new Date(date.getTime() + 60*60*1000).toISOString().replace(/[-:]/g, '').split('.')[0]}Z&details=${encodeURIComponent(description || '')}&location=${encodeURIComponent(googleMeetLink)}
+        Add to your calendar: https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${date.toISOString().replace(/[-:]/g, '').split('.')[0]}Z/${new Date(date.getTime() + 60 * 60 * 1000).toISOString().replace(/[-:]/g, '').split('.')[0]}Z&details=${encodeURIComponent(description || '')}&location=${encodeURIComponent(googleMeetLink)}
         
         Looking forward to meeting with you!
         
@@ -139,8 +149,16 @@ export class EmailService {
 
 // Simple email function for development/testing
 export function createMeetingInviteText(data: MeetingInviteData): string {
-  const { title, date, time, googleMeetLink, organizerName, participantName, description } = data;
-  
+  const {
+    title,
+    date,
+    time,
+    googleMeetLink,
+    organizerName,
+    participantName,
+    description,
+  } = data;
+
   const formattedDate = date.toLocaleDateString('en-US', {
     weekday: 'long',
     year: 'numeric',
@@ -162,7 +180,7 @@ ${description ? `📝 Description: ${description}` : ''}
 
 🎥 Join Google Meet: ${googleMeetLink}
 
-📅 Add to Calendar: https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${date.toISOString().replace(/[-:]/g, '').split('.')[0]}Z/${new Date(date.getTime() + 60*60*1000).toISOString().replace(/[-:]/g, '').split('.')[0]}Z&details=${encodeURIComponent(description || '')}&location=${encodeURIComponent(googleMeetLink)}
+📅 Add to Calendar: https://calendar.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent(title)}&dates=${date.toISOString().replace(/[-:]/g, '').split('.')[0]}Z/${new Date(date.getTime() + 60 * 60 * 1000).toISOString().replace(/[-:]/g, '').split('.')[0]}Z&details=${encodeURIComponent(description || '')}&location=${encodeURIComponent(googleMeetLink)}
 
 Looking forward to meeting with you!
 

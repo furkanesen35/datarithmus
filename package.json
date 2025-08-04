@@ -8,6 +8,7 @@
     "start": "npm run start --prefix packages/client"
   },
   "devDependencies": {
+    "@types/node-fetch": "^2.6.13",
     "autoprefixer": "^10.4.21",
     "eslint-config-prettier": "^10.1.5",
     "eslint-plugin-prettier": "^5.4.1",

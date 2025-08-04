@@ -1,4 +1,3 @@
-// packages/client/app/api/schedule/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { generateGoogleMeetLink } from '../../../lib/googleMeet';
@@ -7,159 +6,224 @@ import { sendMail } from '../../../lib/mail';
 const prisma = new PrismaClient();
 
 export async function GET() {
-  const schedules = await prisma.schedule.findMany({
-    orderBy: { createdAt: 'desc' },
-  });
-  
-  // Transform data to match FullCalendar format
-  const transformedSchedules = schedules.map(schedule => ({
-    id: schedule.id.toString(),
-    title: schedule.title,
-    start: schedule.date.toISOString(),
-    end: schedule.date.toISOString(), // For now, same as start
-    userId: schedule.userId?.toString(),
-    googleMeetLink: schedule.googleMeetLink,
-    extendedProps: {
-      time: schedule.time,
-      description: schedule.description,
-      googleMeetLink: schedule.googleMeetLink,
-      userId: schedule.userId,
-    }
-  }));
-  
-  return NextResponse.json(transformedSchedules);
+  try {
+    const schedules = await prisma.schedule.findMany({
+      orderBy: { createdAt: 'desc' },
+    });
+    return NextResponse.json(schedules);
+  } catch {
+    return NextResponse.json(
+      { error: 'Failed to fetch schedules' },
+      { status: 500 },
+    );
+  }
 }
 
 export async function POST(req: NextRequest) {
   try {
-    const { title, date, time, description, userId } = await req.json();
-    if (!title || !date || !time) {
-      return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
+    const { title, start, end, description, participants } = await req.json();
+    if (!title || !start || !end) {
+      return NextResponse.json(
+        { error: 'Missing required fields' },
+        { status: 400 },
+      );
     }
-
-    // Generate Google Meet link
-    const googleMeetLink = generateGoogleMeetLink();
-
-    // Create the schedule in database
-    const schedule = await prisma.schedule.create({
-      data: { 
-        title, 
-        date: new Date(date), 
-        time, 
+    const startDate = new Date(start);
+    const endDate = new Date(end);
+    const participantEmails = [];
+    if (
+      participants &&
+      Array.isArray(participants) &&
+      participants.length > 0
+    ) {
+      for (const participantId of participants) {
+        const user = await prisma.user.findUnique({
+          where: { id: parseInt(participantId) },
+          select: { email: true },
+        });
+        if (user?.email) participantEmails.push(user.email);
+      }
+    }
+    let googleMeetLink = '';
+    try {
+      const googleAccessToken =
+        req.cookies.get('google_access_token')?.value || '';
+      const meetResult = await generateGoogleMeetLink({
+        title,
+        start: startDate,
+        end: endDate,
         description,
-        userId: userId ? parseInt(userId) : null,
+        participants: participantEmails,
+        userAccessToken: googleAccessToken,
+      });
+      if (meetResult.success && meetResult.meetLink) {
+        googleMeetLink = meetResult.meetLink;
+      }
+    } catch {}
+    const schedule = await prisma.schedule.create({
+      data: {
+        title,
+        start: startDate,
+        end: endDate,
+        description,
         googleMeetLink,
       },
     });
-
-    // Get user details for email if userId is provided
-    let user = null;
-    if (userId) {
-      try {
-        user = await prisma.user.findUnique({
-          where: { id: parseInt(userId) },
+    if (
+      participants &&
+      Array.isArray(participants) &&
+      participants.length > 0
+    ) {
+      for (const participantId of participants) {
+        await prisma.meetingParticipant.create({
+          data: {
+            scheduleId: schedule.id,
+            userId: parseInt(participantId),
+          },
         });
-      } catch (error) {
-        console.error('Error fetching user:', error);
       }
     }
-
-    // Send email invitation if user is found
-    if (user && user.email) {
-      try {
-        const inviteData = {
-          title: schedule.title,
-          date: schedule.date,
-          time: schedule.time,
-          googleMeetLink: schedule.googleMeetLink || '',
-          organizerEmail: process.env.ADMIN_EMAIL || 'admin@datarithmus.com',
-          organizerName: 'Datarithmus Admin',
-          participantEmail: user.email,
-          participantName: user.username,
-          description: schedule.description || undefined,
-        };
-
-        // Send email invitation
-        console.log('📧 Meeting Invitation Created:');
-        console.log('To:', user.email);
-        console.log('Subject: Meeting Invitation -', schedule.title);
-        
-        // Send actual email
-        try {
-          await sendMail({
-            to: user.email,
-            subject: `Meeting Invitation - ${schedule.title}`,
-            html: `
-              <div style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
-                <h2>📅 MEETING INVITATION</h2>
-                <p>Hello ${user.username},</p>
-                <p>You have been invited to a meeting by Datarithmus Admin.</p>
-                
-                <div style="background-color: #f4f4f4; padding: 15px; border-radius: 5px; margin: 20px 0;">
-                  <p><strong>📋 Title:</strong> ${schedule.title}</p>
-                  <p><strong>📅 Date:</strong> ${inviteData.date.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
-                  <p><strong>🕒 Time:</strong> ${schedule.time}</p>
-                  ${schedule.description ? `<p><strong>Description:</strong> ${schedule.description}</p>` : ''}
-                </div>
-                
-                <p>
-                  <a href="${schedule.googleMeetLink}" style="background-color: #4285f4; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px; display: inline-block;">
-                    🎥 Join Google Meet
-                  </a>
-                </p>
-                
-                <p>Looking forward to meeting with you!</p>
-                <p>Best regards,<br>Datarithmus Admin</p>
-              </div>
-            `
-          });
-          console.log('✅ Email sent successfully to:', user.email);
-        } catch (emailSendError) {
-          console.error('❌ Failed to send email:', emailSendError);
-          // Don't fail the meeting creation if email fails
-        }
-        
-      } catch (emailError) {
-        console.error('Error sending email invitation:', emailError);
+    if (participantEmails.length > 0) {
+      const emailSubject = `Meeting Scheduled: ${title}`;
+      const emailBody = `You have been invited to a meeting:<br>Title: ${title}<br>Start: ${startDate.toLocaleString()}<br>End: ${endDate.toLocaleString()}<br>${description ? `Description: ${description}<br>` : ''}${googleMeetLink ? `Google Meet Link: <a href='${googleMeetLink}'>${googleMeetLink}</a>` : ''}`;
+      for (const email of participantEmails) {
+        await sendMail({ to: email, subject: emailSubject, html: emailBody });
       }
     }
-
+    return NextResponse.json({ success: true, schedule });
+  } catch {
     return NextResponse.json(
-      { 
-        message: 'Schedule created successfully', 
-        schedule: {
-          ...schedule,
-          googleMeetLink: schedule.googleMeetLink,
-        }
-      },
-      { status: 201 },
+      { error: 'Failed to create schedule' },
+      { status: 500 },
     );
-  } catch (error) {
-    console.error('Error creating schedule:', error);
-    return NextResponse.json({ error: 'Failed to create schedule' }, { status: 500 });
   }
 }
 
 export async function PUT(req: NextRequest) {
-  const { id, title, date, time, description } = await req.json();
-  if (!id || !title || !date || !time) {
-    return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
+  try {
+    const body = await req.json();
+    console.log('PUT /api/schedule body:', body);
+    const { id, title, start, end, description, participants } = body;
+    if (!id || !title || !start || !end) {
+      console.log('PUT /api/schedule missing fields:', {
+        id,
+        title,
+        start,
+        end,
+      });
+      return NextResponse.json(
+        {
+          error: 'Missing required fields',
+          received: { id, title, start, end },
+        },
+        { status: 400 },
+      );
+    }
+    const startDate = new Date(start);
+    const endDate = new Date(end);
+    const participantEmails = [];
+    if (
+      participants &&
+      Array.isArray(participants) &&
+      participants.length > 0
+    ) {
+      for (const participantId of participants) {
+        const user = await prisma.user.findUnique({
+          where: { id: parseInt(participantId) },
+          select: { email: true },
+        });
+        if (user?.email) participantEmails.push(user.email);
+      }
+    }
+    let googleMeetLink = '';
+    try {
+      const googleAccessToken =
+        req.cookies.get('google_access_token')?.value || '';
+      const meetResult = await generateGoogleMeetLink({
+        title,
+        start: startDate,
+        end: endDate,
+        description,
+        participants: participantEmails,
+        userAccessToken: googleAccessToken,
+      });
+      if (meetResult.success && meetResult.meetLink) {
+        googleMeetLink = meetResult.meetLink;
+      }
+    } catch {}
+    // Update schedule
+    const schedule = await prisma.schedule.update({
+      where: { id: parseInt(id) },
+      data: {
+        title,
+        start: startDate,
+        end: endDate,
+        description,
+        googleMeetLink,
+      },
+    });
+    // Update participants: remove all, then add new
+    await prisma.meetingParticipant.deleteMany({
+      where: { scheduleId: parseInt(id) },
+    });
+    if (
+      participants &&
+      Array.isArray(participants) &&
+      participants.length > 0
+    ) {
+      for (const participantId of participants) {
+        await prisma.meetingParticipant.create({
+          data: {
+            scheduleId: schedule.id,
+            userId: parseInt(participantId),
+          },
+        });
+      }
+    }
+    if (participantEmails.length > 0) {
+      const emailSubject = `Meeting Updated: ${title}`;
+      const emailBody = `Your meeting has been updated:<br>Title: ${title}<br>Start: ${startDate.toLocaleString()}<br>End: ${endDate.toLocaleString()}<br>${description ? `Description: ${description}<br>` : ''}${googleMeetLink ? `Google Meet Link: <a href='${googleMeetLink}'>${googleMeetLink}</a>` : ''}`;
+      for (const email of participantEmails) {
+        await sendMail({ to: email, subject: emailSubject, html: emailBody });
+      }
+    }
+    return NextResponse.json({ success: true, schedule });
+  } catch {
+    return NextResponse.json(
+      { error: 'Failed to update schedule' },
+      { status: 500 },
+    );
   }
-
-  const schedule = await prisma.schedule.update({
-    where: { id: Number(id) },
-    data: { title, date: new Date(date), time, description },
-  });
-
-  return NextResponse.json({ message: 'Schedule updated', schedule });
 }
 
 export async function DELETE(req: NextRequest) {
-  const { id } = await req.json();
-  if (!id) {
-    return NextResponse.json({ error: 'ID required' }, { status: 400 });
+  try {
+    let id: string | undefined;
+    // Try to get id from query param first
+    const url = new URL(req.url);
+    id = url.searchParams.get('id') || undefined;
+    // If not found, try to get from body (for fetch with body)
+    if (!id) {
+      try {
+        const body = await req.json();
+        id = body.id;
+      } catch {}
+    }
+    if (!id) {
+      return NextResponse.json(
+        { error: 'Missing schedule ID' },
+        { status: 400 },
+      );
+    }
+    await prisma.meetingParticipant.deleteMany({
+      where: { scheduleId: parseInt(id) },
+    });
+    await prisma.schedule.delete({ where: { id: parseInt(id) } });
+    return NextResponse.json({ success: true });
+  } catch {
+    return NextResponse.json(
+      { error: 'Failed to delete schedule' },
+      { status: 500 },
+    );
   }
-
-  await prisma.schedule.delete({ where: { id: Number(id) } });
-  return NextResponse.json({ message: 'Schedule deleted' });
 }

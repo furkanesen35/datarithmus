@@ -3,7 +3,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { jwtVerify } from 'jose';
 
 export async function middleware(req: NextRequest) {
-  const token = req.headers.get('authorization')?.split(' ')[1] || req.cookies.get('token')?.value;
+  const token =
+    req.headers.get('authorization')?.split(' ')[1] ||
+    req.cookies.get('token')?.value;
   const { pathname } = req.nextUrl;
 
   // Allow unauthenticated access to public routes

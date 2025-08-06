@@ -4,7 +4,7 @@ import React from 'react';
 const announcements = [
   {
     course: 'Data Science Bootcamp',
-    startDate: 'August 15, 2025',
+    startDate: 'September 01, 2025',
     description:
       'Kickstart your career in Data Science with our intensive bootcamp.',
   },
@@ -15,7 +15,7 @@ const announcements = [
   },
   {
     course: 'Python for Data Analysis',
-    startDate: 'September 20, 2025',
+    startDate: 'September 01, 2025',
     description: 'Master Python and data analysis techniques.',
   },
 ];

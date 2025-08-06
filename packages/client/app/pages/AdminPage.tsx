@@ -15,6 +15,7 @@ import AnnouncementsManager from 'app/components/AdminComponents/AnnouncementMan
 import ResourceManager from 'app/components/AdminComponents/ResourceManagement';
 import AdminAppointments from '../components/DashboardComponents/AdminAppointments';
 import AdminUpcomingAppointments from '../components/DashboardComponents/AdminUpcomingAppointments';
+import ApplicationManager from '../components/AdminComponents/ApplicationManager';
 
 export default function AdminPage() {
   const { auth, logout, isAuthLoading } = useAuth();
@@ -227,6 +228,21 @@ export default function AdminPage() {
           {activeSection === 'feedback' && (
             <div className="p-6 bg-white rounded-lg shadow-md">
               <FeedbackManager onMessage={setMessage} onError={setError} />
+            </div>
+          )}
+
+          <button
+            onClick={() => toggleSection('applications')}
+            className="w-full flex justify-between items-center p-4 bg-white rounded-lg shadow-md hover:bg-blue-50 transition-colors"
+          >
+            <span className="text-lg font-semibold">Manage Pending Applications</span>
+            <span className="text-xl">
+              {activeSection === 'applications' ? '−' : '+'}
+            </span>
+          </button>
+          {activeSection === 'applications' && (
+            <div className="p-6 bg-white rounded-lg shadow-md">
+              <ApplicationManager onMessage={setMessage} onError={setError} />
             </div>
           )}
 

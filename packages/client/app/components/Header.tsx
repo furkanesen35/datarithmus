@@ -107,6 +107,9 @@ export default function Header() {
               </div>
             </div>
           </div>
+          <Link href="/skills" className="hover:text-gray-300 ml-6">
+            Skills
+          </Link>
           <Link href="/events" className="hover:text-gray-300 ml-6">
             Events
           </Link>
@@ -183,6 +186,9 @@ export default function Header() {
                 {coursesLinks}
               </div>
             </div>
+            <Link href="/skills" className="block py-2 px-4 hover:bg-gray-700">
+              Skills
+            </Link>
             <Link href="/career" className="block py-2 px-4 hover:bg-gray-700">
               Career
             </Link>

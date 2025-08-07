@@ -1,4 +1,5 @@
 // packages/client/app/components/HomeComponents/SecondContainer.tsx
+import Link from 'next/link';
 import React from 'react';
 
 const announcements = [
@@ -22,24 +23,24 @@ const announcements = [
 
 const SecondContainer = () => {
   return (
-    <section className="w-full py-8 bg-[#301934] flex flex-col items-center">
-      <h2 className="text-3xl font-bold text-white mb-6 text-center">
+    <section className="w-full py-8 bg-[#1A202C] flex flex-col items-center">
+      <h2 className="text-3xl font-bold text-[#E2E8F0] mb-6 text-center">
         Upcoming Course Starts
       </h2>
       <div className="grid gap-8 md:grid-cols-3 w-full max-w-5xl px-4">
         {announcements.map((a, idx) => (
           <div
             key={idx}
-            className="bg-[#e4ed94] rounded-xl shadow-lg p-8 flex flex-col items-center text-[#1c2229] border-2 border-blue-500"
+            className="bg-[#2D3748] rounded-xl shadow-lg p-8 flex flex-col items-center text-[#E2E8F0] border-2 border-[#4A5568]"
           >
-            <h3 className="text-xl font-semibold mb-2">{a.course}</h3>
-            <p className="text-base mb-1">
-              Start Date: <span className="font-bold">{a.startDate}</span>
+            <h3 className="text-xl font-semibold mb-2 text-[#E2E8F0]">{a.course}</h3>
+            <p className="text-base mb-1 text-[#E2E8F0]">
+              Start Date: <span className="font-bold text-[#38B2AC]">{a.startDate}</span>
             </p>
-            <p className="mb-4 text-center text-white/80">{a.description}</p>
-            <button className="mt-auto px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-all duration-300">
+            <p className="mb-4 text-center text-[#E2E8F0]/80">{a.description}</p>
+            <Link href="/enroll" className="mt-auto px-4 py-2 bg-[#38B2AC] text-[#E2E8F0] rounded-md hover:bg-[#9F7AEA] transition-all duration-300 font-semibold">
               Enroll Now
-            </button>
+            </Link>
           </div>
         ))}
       </div>

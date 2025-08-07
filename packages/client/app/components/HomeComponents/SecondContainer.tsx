@@ -38,7 +38,7 @@ const SecondContainer = () => {
               Start Date: <span className="font-bold text-[#38B2AC]">{a.startDate}</span>
             </p>
             <p className="mb-4 text-center text-[#E2E8F0]/80">{a.description}</p>
-            <Link href="/enroll" className="mt-auto px-4 py-2 bg-[#38B2AC] text-[#E2E8F0] rounded-md hover:bg-[#9F7AEA] transition-all duration-300 font-semibold">
+            <Link href="/enroll" className="mt-auto px-4 py-2 bg-blue-500 text-[#E2E8F0] rounded-md hover:bg-blue-600 transition-all duration-300 font-semibold">
               Enroll Now
             </Link>
           </div>

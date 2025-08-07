@@ -107,17 +107,11 @@ export default function Header() {
               </div>
             </div>
           </div>
-          <Link href="/career" className="hover:text-gray-300 ml-6">
-            Career
-          </Link>
           <Link href="/events" className="hover:text-gray-300 ml-6">
             Events
           </Link>
           <Link href="/about" className="hover:text-gray-300 ml-6">
             About Us
-          </Link>
-          <Link href="/blog" className="hover:text-gray-300 ml-6">
-            Blog
           </Link>
         </div>
 

@@ -27,7 +27,8 @@ model User {
   emailVerificationTokens EmailVerificationToken[]
   meetingParticipants     MeetingParticipant[]
   passwordResetTokens     PasswordResetToken[]
-  quizResults             QuizResult[]
+  questionResults         QuestionResult[]
+  quizResults             QuizResults[]
 }
 
 model Video {
@@ -43,7 +44,9 @@ model Quiz {
   title       String
   createdAt   DateTime       @default(now())
   questions   QuizQuestion[]
-  quizResults QuizResult[]
+  questionResults QuestionResult[]
+  quizResults QuizResults[]
+  passingScore Int @default(50)
 }
 
 model QuizQuestion {
@@ -54,7 +57,7 @@ model QuizQuestion {
   quizId        Int
   createdAt     DateTime     @default(now())
   quiz          Quiz         @relation(fields: [quizId], references: [id])
-  quizResults   QuizResult[]
+  questionResults   QuestionResult[]
 }
 
 model Announcement {
@@ -132,14 +135,14 @@ model Feedback {
 }
 
 model Student {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  name      String
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
+  id          Int          @id @default(autoincrement())
+  email       String       @unique
+  name        String
+  isActive    Boolean      @default(true)
+  createdAt   DateTime     @default(now())
 }
 
-model QuizResult {
+model QuestionResult {
   id         Int          @id @default(autoincrement())
   userId     Int
   quizId     Int
@@ -150,6 +153,18 @@ model QuizResult {
   question   QuizQuestion @relation(fields: [questionId], references: [id])
   quiz       Quiz         @relation(fields: [quizId], references: [id])
   user       User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model QuizResults {
+  id          Int      @id @default(autoincrement())
+  studentId   Int
+  quizId      Int
+  answers     Json     // Stores all answers for the quiz
+  score       Int
+  submittedAt DateTime @default(now())
+  student     User     @relation(fields: [studentId], references: [id])
+  quiz        Quiz     @relation(fields: [quizId], references: [id])
+  @@unique([studentId, quizId]) // One result per student per quiz
 }
 
 model PasswordResetToken {

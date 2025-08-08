@@ -1,6 +1,7 @@
 // packages/client/app/components/DashboardComponents/Quizzes.tsx
 'use client';
 import { useEffect, useState } from 'react';
+import { useAuth } from '../../context/AuthContext';
 
 interface Quiz {
   id: number;
@@ -16,6 +17,7 @@ interface QuizQuestion {
 }
 
 export default function Quizzes() {
+  const { auth } = useAuth();
   const [submitted, setSubmitted] = useState(false);
   const [score, setScore] = useState<number | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -112,12 +114,29 @@ export default function Quizzes() {
           <button
             onClick={async () => {
               setSubmitting(true);
-              // Submission logic will be discussed and implemented later
-              setTimeout(() => {
+              setError(null);
+              try {
+                // Prepare answers as array of selected option indices
+                const answerArr = questions.map((_, idx) => answers[`${quiz.id}-${idx}`]);
+                const res = await fetch('/api/quiz-results', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    studentId: auth.user?.id, // use numeric user id
+                    quizId: quiz.id,
+                    answers: answerArr,
+                  }),
+                });
+                if (!res.ok) throw new Error('Failed to submit quiz');
+                const data = await res.json();
                 setSubmitted(true);
-                setScore(null); // Placeholder for score
+                setScore(data.result.score);
+              } catch (err: unknown) {
+                if (err instanceof Error) setError(err.message);
+                else setError('Failed to submit quiz');
+              } finally {
                 setSubmitting(false);
-              }, 1000);
+              }
             }}
             className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
             disabled={submitting}
@@ -129,7 +148,9 @@ export default function Quizzes() {
       {submitted && (
         <div className="mt-6 p-4 bg-blue-100 text-blue-800 rounded">
           <div>Quiz submitted!</div>
-          {/* Score and feedback will be shown here after backend integration */}
+          {score !== null && (
+            <div className="mt-2">Your score: <span className="font-bold">{score}</span></div>
+          )}
         </div>
       )}
       {quizzes.length > 1 && (

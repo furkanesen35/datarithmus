@@ -28,6 +28,7 @@ export default function QuizManager() {
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [loading, setLoading] = useState(false);
   const [quizTitle, setQuizTitle] = useState('');
+  const [titleError, setTitleError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchQuizzes();
@@ -80,7 +81,12 @@ export default function QuizManager() {
   };
 
   const handleSaveQuiz = async () => {
-    if (!quizTitle.trim() || questions.length === 0) return;
+    if (!quizTitle.trim()) {
+      setTitleError('Quiz title is required.');
+      return;
+    }
+    setTitleError(null);
+    if (questions.length === 0) return;
     setLoading(true);
     try {
       const res = await fetch('/api/quizzes', {
@@ -115,6 +121,9 @@ export default function QuizManager() {
   return (
     <div className="mb-8">
       <h2 className="text-xl font-semibold mb-4">Create Quiz</h2>
+      {titleError && (
+        <div className="mb-2 p-2 bg-red-100 text-red-700 rounded">{titleError}</div>
+      )}
       <div className="mb-4">
         <label htmlFor="quiz-title" className="block text-sm font-medium mb-1">
           Quiz Title

@@ -41,39 +41,8 @@ export default function Header() {
     }
   }, [pathname]);
 
-  const coursesLinks = (
-    <>
-      <Link
-        href="/courses/data-science"
-        className="block py-2 px-4 hover:bg-gray-700"
-      >
-        Data Science
-      </Link>
-      <Link
-        href="/courses/machine-learning"
-        className="block py-2 px-4 hover:bg-gray-700"
-      >
-        Machine Learning
-      </Link>
-      <Link
-        href="/courses/data-analysis"
-        className="block py-2 px-4 hover:bg-gray-700"
-      >
-        Data Analysis
-      </Link>
-    </>
-  );
-
   return (
     <header className="sticky top-0 z-50">
-      {/* <div className="hidden lg:flex justify-center items-center bg-[#4a0083] h-[40px] text-white text-xs sm:text-sm">
-        Think you&apos;ve got what it takes for a career in Data? Find out in
-        just one minute!
-        <button className="text-black bg-yellow-400 px-2 py-1 ml-2 rounded">
-          Take the test now!
-        </button>
-      </div> */}
-
       <nav className="flex items-center bg-black text-white h-[50px] px-4">
         {/* Left: Logo */}
         <div className="flex-1 flex items-center">Datarithmus</div>
@@ -190,69 +159,84 @@ export default function Header() {
           </div>
         </div>
 
-        {/* Mobile menu */}
+        {/* Mobile menu - updated to match desktop navigation */}
         {isMenuOpen && (
           <div className="lg:hidden absolute top-[50px] left-0 w-full bg-black transition-opacity duration-500 z-50">
-            <div>
-              <a
-                href="#courses"
-                className="block py-2 px-4 hover:bg-gray-700"
-                onClick={(e) => {
-                  e.preventDefault();
-                  setIsCoursesDropdownOpen(!isCoursesDropdownOpen);
-                }}
+            {/* Career Paths dropdown for mobile */}
+            <div className="border-b border-gray-700">
+              <button
+                className="w-full text-left py-2 px-4 text-white hover:bg-gray-800 focus:outline-none flex justify-between items-center"
+                onClick={() => setIsCoursesDropdownOpen((open) => !open)}
               >
-                Our Courses
-              </a>
-              <div
-                className={`${isCoursesDropdownOpen && isMenuOpen ? 'block' : 'hidden'}`}
-              >
-                {coursesLinks}
-              </div>
+                Career Paths
+                <span>{isCoursesDropdownOpen ? '▲' : '▼'}</span>
+              </button>
+              {isCoursesDropdownOpen && (
+                <div className="bg-gray-900">
+                  <button
+                    className={`block w-full text-left py-2 px-6 text-white hover:bg-blue-900 ${activeTab === 'career' ? 'bg-blue-800' : ''}`}
+                    onClick={() => setActiveTab('career')}
+                  >
+                    Courses
+                  </button>
+                  <button
+                    className={`block w-full text-left py-2 px-6 text-white hover:bg-blue-900 ${activeTab === 'expert' ? 'bg-blue-800' : ''}`}
+                    onClick={() => setActiveTab('expert')}
+                  >
+                    Expert Courses
+                  </button>
+                  <button
+                    className={`block w-full text-left py-2 px-6 text-white hover:bg-blue-900 ${activeTab === 'cert' ? 'bg-blue-800' : ''}`}
+                    onClick={() => setActiveTab('cert')}
+                  >
+                    Certifications
+                  </button>
+                  {/* Tab content for mobile */}
+                  <div className="bg-gray-950 p-4">
+                    {activeTab === 'career' && <CoursesTab />}
+                    {activeTab === 'expert' && <ExpertCoursesTab />}
+                    {activeTab === 'cert' && <CertificationsTab />}
+                  </div>
+                </div>
+              )}
             </div>
-            <Link href="/skills" className="block py-2 px-4 hover:bg-gray-700">
+            <Link href="/skills" className="block py-2 px-4 text-white hover:bg-gray-800 border-b border-gray-700">
               Skills
             </Link>
-            <Link href="/career" className="block py-2 px-4 hover:bg-gray-700">
-              Career
-            </Link>
-            <Link href="/events" className="block py-2 px-4 hover:bg-gray-700">
+            <Link href="/events" className="block py-2 px-4 text-white hover:bg-gray-800 border-b border-gray-700">
               Events
             </Link>
-            <Link href="/about" className="block py-2 px-4 hover:bg-gray-700">
+            <Link href="/about" className="block py-2 px-4 text-white hover:bg-gray-800 border-b border-gray-700">
               About Us
             </Link>
-            <Link href="/blog" className="block py-2 px-4 hover:bg-gray-700">
-              Blog
-            </Link>
-            {/* Only show auth buttons in mobile menu if not xl */}
+            {/* Auth buttons for mobile */}
             {!auth.isLoggedIn && (
               <Link
                 href="/auth/login"
-                className="block py-2 px-4 bg-blue-700 hover:bg-red-700 "
+                className="block py-2 px-4 bg-blue-700 text-white hover:bg-red-700 border-b border-gray-700"
               >
-                Login/Register
+                Login / Register
               </Link>
             )}
             {auth.isLoggedIn && (
               <>
                 <Link
                   href="/dashboard"
-                  className="block py-2 px-6 bg-blue-600 text-white rounded hover:bg-blue-500 w-full"
+                  className="block py-2 px-6 bg-blue-600 text-white rounded hover:bg-blue-500 w-full border-b border-gray-700"
                 >
                   Dashboard
                 </Link>
                 {auth.user?.isSuperuser && (
                   <Link
                     href="/admin"
-                    className="block py-2 px-6 bg-green-600 text-white rounded hover:bg-green-500 w-full"
+                    className="block py-2 px-6 bg-green-600 text-white rounded hover:bg-green-500 w-full border-b border-gray-700"
                   >
                     Admin Page
                   </Link>
                 )}
                 <button
                   onClick={logout}
-                  className="block py-2 px-6 bg-red-600 text-white rounded hover:bg-red-500 w-full text-left"
+                  className="block py-2 px-6 bg-red-600 text-white rounded hover:bg-red-500 w-full text-left border-b border-gray-700"
                 >
                   Logout
                 </button>

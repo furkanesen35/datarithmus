@@ -5,11 +5,11 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
 import Link from 'next/link';
 import Overview from 'app/components/DashboardComponents/Overview';
-import MyCourses from 'app/components/DashboardComponents/MyCourses';
-import MyProgress from 'app/components/DashboardComponents/MyProgress';
-import Recordings from 'app/components/DashboardComponents/Recordings';
+import Announcements from 'app/components/DashboardComponents/Announcements';
 import Schedule from 'app/components/DashboardComponents/Schedule';
-import ImportantLinks from 'app/components/DashboardComponents/ImportantLinks';
+import Homework from 'app/components/DashboardComponents/Homework';
+import Resources from 'app/components/DashboardComponents/Resources';
+import Quizzes from 'app/components/DashboardComponents/Quizzes';
 
 export default function DashboardPage() {
   const { auth, isAuthLoading, logout } = useAuth();
@@ -29,7 +29,7 @@ export default function DashboardPage() {
   }, [auth.isLoggedIn, isAuthLoading, router]);
 
   if (isAuthLoading) {
-    return null; // or a loading spinner if you prefer
+    return null;
   }
   if (!auth.isLoggedIn) {
     return null;
@@ -71,6 +71,30 @@ export default function DashboardPage() {
         {mobileNavOpen && (
           <div className="fixed top-[56px] left-0 w-full bg-[#e5e5e5] z-40 p-4 border-b border-gray-300 md:hidden animate-fade-in">
             <ul className="space-y-2">
+            <li>
+              <button
+                className={`w-full text-left p-2 rounded ${
+                  activeSection === 'quizzes'
+                    ? 'bg-blue-500 text-white'
+                    : 'hover:bg-gray-200'
+                }`}
+                onClick={() => setActiveSection('quizzes')}
+              >
+                Quizzes
+              </button>
+            </li>
+            <li>
+              <button
+                className={`w-full text-left p-2 rounded ${
+                  activeSection === 'resources'
+                    ? 'bg-blue-500 text-white'
+                    : 'hover:bg-gray-200'
+                }`}
+                onClick={() => setActiveSection('resources')}
+              >
+                Resources
+              </button>
+            </li>
               <li>
                 <button
                   className={`w-full text-left p-2 rounded ${
@@ -89,51 +113,6 @@ export default function DashboardPage() {
               <li>
                 <button
                   className={`w-full text-left p-2 rounded ${
-                    activeSection === 'courses'
-                      ? 'bg-blue-500 text-white'
-                      : 'hover:bg-gray-200'
-                  }`}
-                  onClick={() => {
-                    setActiveSection('courses');
-                    setMobileNavOpen(false);
-                  }}
-                >
-                  My Courses
-                </button>
-              </li>
-              <li>
-                <button
-                  className={`w-full text-left p-2 rounded ${
-                    activeSection === 'progress'
-                      ? 'bg-blue-500 text-white'
-                      : 'hover:bg-gray-200'
-                  }`}
-                  onClick={() => {
-                    setActiveSection('progress');
-                    setMobileNavOpen(false);
-                  }}
-                >
-                  Progress
-                </button>
-              </li>
-              <li>
-                <button
-                  className={`w-full text-left p-2 rounded ${
-                    activeSection === 'recordings'
-                      ? 'bg-blue-500 text-white'
-                      : 'hover:bg-gray-200'
-                  }`}
-                  onClick={() => {
-                    setActiveSection('recordings');
-                    setMobileNavOpen(false);
-                  }}
-                >
-                  Recordings
-                </button>
-              </li>
-              <li>
-                <button
-                  className={`w-full text-left p-2 rounded ${
                     activeSection === 'schedule'
                       ? 'bg-blue-500 text-white'
                       : 'hover:bg-gray-200'
@@ -144,21 +123,6 @@ export default function DashboardPage() {
                   }}
                 >
                   Schedule
-                </button>
-              </li>
-              <li>
-                <button
-                  className={`w-full text-left p-2 rounded ${
-                    activeSection === 'links'
-                      ? 'bg-blue-500 text-white'
-                      : 'hover:bg-gray-200'
-                  }`}
-                  onClick={() => {
-                    setActiveSection('links');
-                    setMobileNavOpen(false);
-                  }}
-                >
-                  Important Links
                 </button>
               </li>
               <li>
@@ -213,37 +177,49 @@ export default function DashboardPage() {
             <li>
               <button
                 className={`w-full text-left p-2 rounded ${
-                  activeSection === 'courses'
+                  activeSection === 'announcements'
                     ? 'bg-blue-500 text-white'
                     : 'hover:bg-gray-200'
                 }`}
-                onClick={() => setActiveSection('courses')}
+                onClick={() => setActiveSection('announcements')}
               >
-                My Courses
+                Announcements
               </button>
             </li>
             <li>
               <button
                 className={`w-full text-left p-2 rounded ${
-                  activeSection === 'progress'
+                  activeSection === 'homework'
                     ? 'bg-blue-500 text-white'
                     : 'hover:bg-gray-200'
                 }`}
-                onClick={() => setActiveSection('progress')}
+                onClick={() => setActiveSection('homework')}
               >
-                Progress
+                Homework
               </button>
             </li>
             <li>
               <button
                 className={`w-full text-left p-2 rounded ${
-                  activeSection === 'recordings'
+                  activeSection === 'resources'
                     ? 'bg-blue-500 text-white'
                     : 'hover:bg-gray-200'
                 }`}
-                onClick={() => setActiveSection('recordings')}
+                onClick={() => setActiveSection('resources')}
               >
-                Recordings
+                Resources
+              </button>
+            </li>
+            <li>
+              <button
+                className={`w-full text-left p-2 rounded ${
+                  activeSection === 'quizzes'
+                    ? 'bg-blue-500 text-white'
+                    : 'hover:bg-gray-200'
+                }`}
+                onClick={() => setActiveSection('quizzes')}
+              >
+                Quizzes
               </button>
             </li>
             <li>
@@ -259,18 +235,6 @@ export default function DashboardPage() {
               </button>
             </li>
             <li>
-              <button
-                className={`w-full text-left p-2 rounded ${
-                  activeSection === 'links'
-                    ? 'bg-blue-500 text-white'
-                    : 'hover:bg-gray-200'
-                }`}
-                onClick={() => setActiveSection('links')}
-              >
-                Important Links
-              </button>
-            </li>
-            <li>
               <Link href="/" className="block p-2 rounded hover:bg-gray-200">
                 Back to Home
               </Link>
@@ -279,14 +243,12 @@ export default function DashboardPage() {
         </div>
         {/* Main Content (adapts to available space) */}
         <div className="flex-1 p-4 sm:p-8 min-w-0">
-          {activeSection === 'overview' && (
-            <Overview email={auth.user?.email} />
-          )}
-          {activeSection === 'courses' && <MyCourses />}
-          {activeSection === 'progress' && <MyProgress />}
-          {activeSection === 'recordings' && <Recordings />}
+          {activeSection === 'overview' && <Overview email={auth.user?.email} />}
+          {activeSection === 'announcements' && <Announcements />}
+          {activeSection === 'homework' && <Homework />}
+          {activeSection === 'resources' && <Resources />}
+          {activeSection === 'quizzes' && <Quizzes />}
           {activeSection === 'schedule' && <Schedule />}
-          {activeSection === 'links' && <ImportantLinks />}
         </div>
         {/* Right Sidebar (hidden on mobile) */}
         <div className="hidden md:flex flex-col w-[250px] bg-[#e5e5e5] p-4 border-l border-gray-300 min-h-screen">

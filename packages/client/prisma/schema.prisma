@@ -29,6 +29,9 @@ model User {
   passwordResetTokens     PasswordResetToken[]
   questionResults         QuestionResult[]
   quizResults             QuizResults[]
+  discussions             Discussion[] @relation("UserDiscussions")
+  comments                Comment[]    @relation("UserComments")
+  feedbackResponses       FeedbackResponse[]
 }
 
 model Video {
@@ -122,16 +125,53 @@ model Discussion {
   id        Int      @id @default(autoincrement())
   title     String
   content   String
-  author    String
+  authorId  Int
+  author    User     @relation("UserDiscussions", fields: [authorId], references: [id])
   pinned    Boolean  @default(false)
   createdAt DateTime @default(now())
+  comments  Comment[]
 }
 
-model Feedback {
+model Comment {
+  id          Int        @id @default(autoincrement())
+  content     String
+  authorId    Int
+  author      User       @relation("UserComments", fields: [authorId], references: [id])
+  discussionId Int
+  discussion  Discussion @relation(fields: [discussionId], references: [id])
+  createdAt   DateTime   @default(now())
+}
+
+model FeedbackForm {
   id        Int      @id @default(autoincrement())
-  question  String
-  scale     Int
+  title     String
   createdAt DateTime @default(now())
+  questions FeedbackQuestion[]
+  responses FeedbackResponse[]
+}
+
+model FeedbackQuestion {
+  id        Int      @id @default(autoincrement())
+  formId    Int
+  form      FeedbackForm @relation(fields: [formId], references: [id])
+  question  String
+  createdAt DateTime @default(now())
+  responses FeedbackResponse[]
+}
+
+model FeedbackResponse {
+  id          Int      @id @default(autoincrement())
+  questionId  Int
+  question    FeedbackQuestion @relation(fields: [questionId], references: [id])
+  studentId   Int
+  student     User     @relation(fields: [studentId], references: [id])
+  formId      Int
+  form        FeedbackForm @relation(fields: [formId], references: [id])
+  rating      Int
+  comment     String?
+  createdAt   DateTime @default(now())
+  
+  @@unique([questionId, studentId])
 }
 
 model Student {

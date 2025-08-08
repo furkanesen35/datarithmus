@@ -1,14 +1,27 @@
-// packages/client/app/components/AdminComponents/DiscussionManager.tsx
+// Admin Discussion Management Component
 'use client';
 import { useEffect, useState } from 'react';
 
-interface Post {
+interface User {
+  username: string;
+  email: string;
+}
+
+interface Comment {
+  id: number;
+  content: string;
+  author: User;
+  createdAt: string;
+}
+
+interface Discussion {
   id: number;
   title: string;
   content: string;
-  author: string;
+  author: User;
   pinned: boolean;
   createdAt: string;
+  comments: Comment[];
 }
 
 interface DiscussionManagerProps {
@@ -20,266 +33,153 @@ export default function DiscussionManager({
   onMessage,
   onError,
 }: DiscussionManagerProps) {
-  const [postTitle, setPostTitle] = useState('');
-  const [postContent, setPostContent] = useState('');
-  const [isPinned, setIsPinned] = useState(false);
-  const [posts, setPosts] = useState<Post[]>([]);
-  const [editingId, setEditingId] = useState<number | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [discussions, setDiscussions] = useState<Discussion[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchPosts();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    fetchDiscussions();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const fetchPosts = async () => {
-    setLoading(true);
+  async function fetchDiscussions() {
     try {
-      const res = await fetch('/api/discussion', { credentials: 'include' });
-      if (!res.ok) throw new Error('Failed to fetch posts');
-      setPosts(await res.json());
+      const res = await fetch('/api/discussion');
+      if (!res.ok) throw new Error('Failed to fetch discussions');
+      setDiscussions(await res.json());
     } catch (err: unknown) {
-      if (err instanceof Error) {
-        onError(err.message || 'Failed to fetch posts');
-      } else {
-        onError('Failed to fetch posts');
-      }
+      onError(err instanceof Error ? err.message : 'Failed to fetch discussions');
     } finally {
       setLoading(false);
     }
-  };
+  }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!postTitle || !postContent) {
-      onError('Title and content are required');
-      return;
-    }
-    setLoading(true);
-    try {
-      let res;
-      if (editingId) {
-        res = await fetch('/api/discussion', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({
-            id: editingId,
-            title: postTitle,
-            content: postContent,
-            author: 'Teacher',
-            pinned: isPinned,
-          }),
-        });
-      } else {
-        res = await fetch('/api/discussion', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({
-            title: postTitle,
-            content: postContent,
-            author: 'Teacher',
-            pinned: isPinned,
-          }),
-        });
-      }
-      if (!res.ok) throw new Error('Failed to save post');
-      await fetchPosts();
-      onMessage(
-        editingId ? 'Post updated successfully' : 'Post created successfully',
-      );
-      setEditingId(null);
-      setPostTitle('');
-      setPostContent('');
-      setIsPinned(false);
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        onError(err.message || 'Failed to save post');
-      } else {
-        onError('Failed to save post');
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
+  async function deleteDiscussion(id: number) {
+    if (!confirm('Are you sure you want to delete this discussion?')) return;
 
-  const handleEdit = (post: Post) => {
-    setEditingId(post.id);
-    setPostTitle(post.title);
-    setPostContent(post.content);
-    setIsPinned(post.pinned);
-  };
-
-  const handleDelete = async (id: number) => {
-    setLoading(true);
     try {
       const res = await fetch('/api/discussion', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ id }),
+        body: JSON.stringify({ id })
       });
-      if (!res.ok) throw new Error('Failed to delete post');
-      await fetchPosts();
-      onMessage('Post deleted successfully');
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        onError(err.message || 'Failed to delete post');
-      } else {
-        onError('Failed to delete post');
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
 
-  const togglePin = async (id: number, pinned: boolean) => {
-    setLoading(true);
+      if (!res.ok) throw new Error('Failed to delete discussion');
+      onMessage('Discussion deleted successfully');
+      fetchDiscussions();
+    } catch (err: unknown) {
+      onError(err instanceof Error ? err.message : 'Failed to delete discussion');
+    }
+  }
+
+  async function togglePin(discussion: Discussion) {
     try {
-      const post = posts.find((p) => p.id === id);
-      if (!post) return;
       const res = await fetch('/api/discussion', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({
-          id,
-          title: post.title,
-          content: post.content,
-          author: post.author,
-          pinned: !pinned,
-        }),
+          id: discussion.id,
+          title: discussion.title,
+          content: discussion.content,
+          pinned: !discussion.pinned
+        })
       });
-      if (!res.ok) throw new Error('Failed to toggle pin');
-      await fetchPosts();
-      onMessage('Post pin toggled');
+
+      if (!res.ok) throw new Error('Failed to update discussion');
+      onMessage(`Discussion ${discussion.pinned ? 'unpinned' : 'pinned'} successfully`);
+      fetchDiscussions();
     } catch (err: unknown) {
-      if (err instanceof Error) {
-        onError(err.message || 'Failed to toggle pin');
-      } else {
-        onError('Failed to toggle pin');
-      }
-    } finally {
-      setLoading(false);
+      onError(err instanceof Error ? err.message : 'Failed to update discussion');
     }
-  };
+  }
+
+  async function deleteComment(commentId: number) {
+    if (!confirm('Are you sure you want to delete this comment?')) return;
+
+    try {
+      const res = await fetch('/api/comments', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: commentId })
+      });
+
+      if (!res.ok) throw new Error('Failed to delete comment');
+      onMessage('Comment deleted successfully');
+      fetchDiscussions();
+    } catch (err: unknown) {
+      onError(err instanceof Error ? err.message : 'Failed to delete comment');
+    }
+  }
+
+  if (loading) return <div>Loading discussions...</div>;
 
   return (
     <div className="mb-8">
-      <h2 className="text-xl font-semibold mb-4">
-        {editingId ? 'Edit Post' : 'Add Post'}
-      </h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label htmlFor="postTitle" className="block text-sm font-medium">
-            Post Title
-          </label>
-          <input
-            type="text"
-            id="postTitle"
-            value={postTitle}
-            onChange={(e) => setPostTitle(e.target.value)}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md text-black"
-          />
-        </div>
-        <div>
-          <label htmlFor="postContent" className="block text-sm font-medium">
-            Content
-          </label>
-          <textarea
-            id="postContent"
-            value={postContent}
-            onChange={(e) => setPostContent(e.target.value)}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md text-black"
-            rows={4}
-          />
-        </div>
-        <div>
-          <label className="flex items-center">
-            <input
-              type="checkbox"
-              checked={isPinned}
-              onChange={(e) => setIsPinned(e.target.checked)}
-              className="mr-2"
-            />
-            Pin this post
-          </label>
-        </div>
-        <div className="flex space-x-4">
-          <button
-            type="submit"
-            className="py-2 px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600"
-          >
-            {editingId ? 'Update Post' : 'Create Post'}
-          </button>
-          {editingId && (
-            <button
-              type="button"
-              className="py-2 px-4 bg-gray-500 text-white rounded-md hover:bg-gray-600"
-              onClick={() => {
-                setEditingId(null);
-                setPostTitle('');
-                setPostContent('');
-                setIsPinned(false);
-              }}
-            >
-              Cancel
-            </button>
-          )}
-        </div>
-      </form>
-
-      {/* Posts List */}
-      <div className="mt-6">
-        <h3 className="text-lg font-semibold mb-2">Discussion Posts</h3>
-        {loading ? (
-          <p>Loading...</p>
-        ) : posts.length === 0 ? (
-          <p>No posts yet.</p>
-        ) : (
-          <ul className="space-y-4">
-            {posts.map((post) => (
-              <li
-                key={post.id}
-                className="p-4 bg-white border border-gray-300 rounded-md"
-              >
-                <h4 className="text-md font-medium">
-                  {post.title}{' '}
-                  {post.pinned && (
-                    <span className="text-yellow-500">[Pinned]</span>
-                  )}
-                </h4>
-                <p className="text-sm">{post.content}</p>
-                <p className="text-sm">Author: {post.author}</p>
-                <p className="text-xs text-gray-500 mt-1">
-                  Created: {new Date(post.createdAt).toLocaleDateString()}
-                </p>
-                <div className="mt-2 flex space-x-2">
+      <h2 className="text-xl font-bold mb-4">Discussion Management</h2>
+      
+      {discussions.length === 0 ? (
+        <div>No discussions yet.</div>
+      ) : (
+        <div className="space-y-6">
+          {discussions.map(d => (
+            <div key={d.id} className={`p-4 rounded shadow border ${d.pinned ? 'bg-yellow-50 border-yellow-300' : 'bg-white border-gray-200'}`}>
+              <div className="flex justify-between items-start mb-2">
+                <div className="flex-1">
+                  <div className="font-semibold text-lg">{d.title}</div>
+                  <div className="text-gray-700 mb-2">{d.content}</div>
+                  <div className="text-xs text-gray-500">
+                    By {d.author.username} ({d.author.email}) • {new Date(d.createdAt).toLocaleString()}
+                    {d.pinned && <span className="text-yellow-700 font-bold ml-2">📌 Pinned</span>}
+                  </div>
+                </div>
+                <div className="flex gap-2 ml-4">
                   <button
-                    onClick={() => handleEdit(post)}
-                    className="text-blue-500 hover:underline text-sm"
+                    onClick={() => togglePin(d)}
+                    className={`px-3 py-1 text-sm rounded ${
+                      d.pinned 
+                        ? 'bg-yellow-500 text-white hover:bg-yellow-600' 
+                        : 'bg-gray-500 text-white hover:bg-gray-600'
+                    }`}
                   >
-                    Edit
+                    {d.pinned ? 'Unpin' : 'Pin'}
                   </button>
                   <button
-                    onClick={() => handleDelete(post.id)}
-                    className="text-red-500 hover:underline text-sm"
+                    onClick={() => deleteDiscussion(d.id)}
+                    className="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-sm"
                   >
                     Delete
                   </button>
-                  <button
-                    onClick={() => togglePin(post.id, post.pinned)}
-                    className="text-gray-500 hover:underline text-sm"
-                  >
-                    {post.pinned ? 'Unpin' : 'Pin'}
-                  </button>
                 </div>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+              </div>
+
+              {/* Comments section */}
+              <div className="border-t pt-4 mt-4">
+                <h4 className="font-semibold text-sm mb-2">Comments ({d.comments.length})</h4>
+                
+                {d.comments.map(comment => (
+                  <div key={comment.id} className="bg-gray-50 p-3 rounded mb-2 flex justify-between items-start">
+                    <div className="flex-1">
+                      <div className="text-sm">{comment.content}</div>
+                      <div className="text-xs text-gray-500 mt-1">
+                        By {comment.author.username} ({comment.author.email}) • {new Date(comment.createdAt).toLocaleString()}
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => deleteComment(comment.id)}
+                      className="ml-2 px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-xs"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                ))}
+
+                {d.comments.length === 0 && (
+                  <div className="text-gray-500 text-sm italic">No comments yet.</div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

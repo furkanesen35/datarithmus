@@ -10,6 +10,8 @@ import Schedule from 'app/components/DashboardComponents/Schedule';
 import Homework from 'app/components/DashboardComponents/Homework';
 import Resources from 'app/components/DashboardComponents/Resources';
 import Quizzes from 'app/components/DashboardComponents/Quizzes';
+import Discussion from 'app/components/DashboardComponents/Discussion';
+import Feedback from 'app/components/DashboardComponents/Feedback';
 
 export default function DashboardPage() {
   const { auth, isAuthLoading, logout } = useAuth();
@@ -126,6 +128,33 @@ export default function DashboardPage() {
                 </button>
               </li>
               <li>
+                <button
+                  className={`w-full text-left p-2 rounded ${
+                    activeSection === 'discussion'
+                      ? 'bg-blue-500 text-white'
+                      : 'hover:bg-gray-200'
+                  }`}
+                  onClick={() => {
+                    setActiveSection('discussion');
+                    setMobileNavOpen(false);
+                  }}
+                >
+                  Discussion
+                </button>
+              </li>
+              <li>
+                <button
+                  className={`w-full text-left p-2 rounded ${
+                    activeSection === 'feedback'
+                      ? 'bg-blue-500 text-white'
+                      : 'hover:bg-gray-200'
+                  }`}
+                  onClick={() => setActiveSection('feedback')}
+                >
+                  Feedback
+                </button>
+              </li>
+              <li>
                 <Link
                   href="/"
                   className="block p-2 rounded hover:bg-gray-200"
@@ -235,6 +264,30 @@ export default function DashboardPage() {
               </button>
             </li>
             <li>
+              <button
+                className={`w-full text-left p-2 rounded ${
+                  activeSection === 'discussion'
+                    ? 'bg-blue-500 text-white'
+                    : 'hover:bg-gray-200'
+                }`}
+                onClick={() => setActiveSection('discussion')}
+              >
+                Discussion
+              </button>
+            </li>
+            <li>
+              <button
+                className={`w-full text-left p-2 rounded ${
+                  activeSection === 'feedback'
+                    ? 'bg-blue-500 text-white'
+                    : 'hover:bg-gray-200'
+                }`}
+                onClick={() => setActiveSection('feedback')}
+              >
+                Feedback
+              </button>
+            </li>
+            <li>
               <Link href="/" className="block p-2 rounded hover:bg-gray-200">
                 Back to Home
               </Link>
@@ -249,6 +302,8 @@ export default function DashboardPage() {
           {activeSection === 'resources' && <Resources />}
           {activeSection === 'quizzes' && <Quizzes />}
           {activeSection === 'schedule' && <Schedule />}
+          {activeSection === 'discussion' && <Discussion />}
+          {activeSection === 'feedback' && <Feedback />}
         </div>
         {/* Right Sidebar (hidden on mobile) */}
         <div className="hidden md:flex flex-col w-[250px] bg-[#e5e5e5] p-4 border-l border-gray-300 min-h-screen">

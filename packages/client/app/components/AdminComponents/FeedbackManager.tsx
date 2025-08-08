@@ -1,12 +1,29 @@
 // packages/client/app/components/AdminComponents/FeedbackManager.tsx
 'use client';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 
-interface Survey {
+interface FeedbackQuestion {
   id: number;
   question: string;
-  scale: number;
+  responses: Array<{
+    id: number;
+    rating: number;
+    comment?: string;
+    student: {
+      username: string;
+      email: string;
+    };
+  }>;
+}
+
+interface FeedbackForm {
+  id: number;
+  title: string;
   createdAt: string;
+  questions: FeedbackQuestion[];
+  _count: {
+    responses: number;
+  };
 }
 
 interface FeedbackManagerProps {
@@ -18,199 +35,356 @@ export default function FeedbackManager({
   onMessage,
   onError,
 }: FeedbackManagerProps) {
-  const [question, setQuestion] = useState('');
-  const [scale, setScale] = useState(5);
-  const [surveys, setSurveys] = useState<Survey[]>([]);
-  const [editingId, setEditingId] = useState<number | null>(null);
+  const [forms, setForms] = useState<FeedbackForm[]>([]);
+  const [selectedForm, setSelectedForm] = useState<FeedbackForm | null>(null);
+  const [showCreateForm, setShowCreateForm] = useState(false);
+  const [newFormTitle, setNewFormTitle] = useState('');
+  const [newFormQuestions, setNewFormQuestions] = useState<string[]>(['']);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    fetchSurveys();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const fetchSurveys = async () => {
+  const fetchForms = React.useCallback(async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/feedback', { credentials: 'include' });
-      if (!res.ok) throw new Error('Failed to fetch feedback');
-      setSurveys(await res.json());
+      const res = await fetch('/api/feedback/forms', {
+        credentials: 'include',
+      });
+      if (!res.ok) throw new Error('Failed to fetch feedback forms');
+      const data = await res.json();
+      setForms(data);
     } catch (err: unknown) {
       if (err instanceof Error) {
-        onError(err.message || 'Failed to fetch feedback');
+        onError(err.message || 'Failed to fetch feedback forms');
       } else {
-        onError('Failed to fetch feedback');
+        onError('Failed to fetch feedback forms');
       }
     } finally {
       setLoading(false);
     }
-  };
+  }, [onError]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  useEffect(() => {
+    fetchForms();
+  }, [fetchForms]);
+
+  const handleCreateForm = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!question) {
-      onError('Question is required');
+    if (!newFormTitle.trim()) {
+      onError('Form title is required');
       return;
     }
+
+    const validQuestions = newFormQuestions.filter((q) => q.trim());
+    if (validQuestions.length === 0) {
+      onError('At least one question is required');
+      return;
+    }
+
     setLoading(true);
     try {
-      let res;
-      if (editingId) {
-        res = await fetch('/api/feedback', {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({ id: editingId, question, scale }),
-        });
-      } else {
-        res = await fetch('/api/feedback', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          credentials: 'include',
-          body: JSON.stringify({ question, scale }),
-        });
-      }
-      if (!res.ok) throw new Error('Failed to save feedback');
-      await fetchSurveys();
-      onMessage(
-        editingId
-          ? 'Survey updated successfully'
-          : 'Survey created successfully',
-      );
-      setEditingId(null);
-      setQuestion('');
-      setScale(5);
+      const res = await fetch('/api/feedback/forms', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          title: newFormTitle,
+          questions: validQuestions,
+        }),
+      });
+
+      if (!res.ok) throw new Error('Failed to create feedback form');
+
+      await fetchForms();
+      onMessage('Feedback form created successfully');
+      setShowCreateForm(false);
+      setNewFormTitle('');
+      setNewFormQuestions(['']);
     } catch (err: unknown) {
       if (err instanceof Error) {
-        onError(err.message || 'Failed to save feedback');
+        onError(err.message || 'Failed to create feedback form');
       } else {
-        onError('Failed to save feedback');
+        onError('Failed to create feedback form');
       }
     } finally {
       setLoading(false);
     }
   };
 
-  const handleEdit = (sv: Survey) => {
-    setEditingId(sv.id);
-    setQuestion(sv.question);
-    setScale(sv.scale);
-  };
+  const handleDeleteForm = async (id: number) => {
+    if (
+      !confirm(
+        'Are you sure you want to delete this feedback form? This will also delete all responses.',
+      )
+    ) {
+      return;
+    }
 
-  const handleDelete = async (id: number) => {
     setLoading(true);
     try {
-      const res = await fetch('/api/feedback', {
+      const res = await fetch('/api/feedback/forms', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({ id }),
       });
-      if (!res.ok) throw new Error('Failed to delete feedback');
-      await fetchSurveys();
-      onMessage('Survey deleted successfully');
+
+      if (!res.ok) throw new Error('Failed to delete feedback form');
+
+      await fetchForms();
+      onMessage('Feedback form deleted successfully');
+      if (selectedForm?.id === id) {
+        setSelectedForm(null);
+      }
     } catch (err: unknown) {
       if (err instanceof Error) {
-        onError(err.message || 'Failed to delete feedback');
+        onError(err.message || 'Failed to delete feedback form');
       } else {
-        onError('Failed to delete feedback');
+        onError('Failed to delete feedback form');
       }
     } finally {
       setLoading(false);
     }
   };
 
+  const addQuestion = () => {
+    setNewFormQuestions([...newFormQuestions, '']);
+  };
+
+  const updateQuestion = (index: number, value: string) => {
+    const updated = [...newFormQuestions];
+    updated[index] = value;
+    setNewFormQuestions(updated);
+  };
+
+  const removeQuestion = (index: number) => {
+    if (newFormQuestions.length > 1) {
+      setNewFormQuestions(newFormQuestions.filter((_, i) => i !== index));
+    }
+  };
+
+  const calculateAverageRating = (responses: FeedbackQuestion['responses']) => {
+    if (responses.length === 0) return 0;
+    const sum = responses.reduce((acc, response) => acc + response.rating, 0);
+    return (sum / responses.length).toFixed(1);
+  };
+
+  if (selectedForm) {
+    return (
+      <div className="mb-8">
+        <div className="flex items-center gap-4 mb-6">
+          <button
+            onClick={() => setSelectedForm(null)}
+            className="text-blue-500 hover:text-blue-700"
+          >
+            ← Back to Forms
+          </button>
+          <h2 className="text-2xl font-semibold">{selectedForm.title}</h2>
+        </div>
+
+        <div className="space-y-6">
+            {selectedForm.questions.map((question, questionIndex) => {
+              const responses = question.responses ?? [];
+              return (
+                <div
+                  key={question.id}
+                  className="bg-white p-6 border border-gray-300 rounded-lg"
+                >
+                  <div className="flex justify-between items-start mb-4">
+                    <h3 className="text-lg font-medium">
+                      {questionIndex + 1}. {question.question}
+                    </h3>
+                    <div className="text-right">
+                      <div className="text-sm text-gray-600">
+                        {responses.length} response{responses.length !== 1 ? 's' : ''}
+                      </div>
+                      {responses.length > 0 && (
+                        <div className="text-lg font-semibold text-blue-600">
+                          ★ {calculateAverageRating(responses)}/5
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {responses.length === 0 ? (
+                    <p className="text-gray-500 italic">No responses yet</p>
+                  ) : (
+                    <div className="space-y-3">
+                      {responses.map((response) => (
+                        <div
+                          key={response.id}
+                          className="p-3 bg-gray-50 rounded border"
+                        >
+                          <div className="flex justify-between items-start mb-2">
+                            <div className="text-sm font-medium text-gray-700">
+                              {response.student.username} ({response.student.email})
+                            </div>
+                            <div className="flex items-center gap-1">
+                              <span className="text-yellow-500">
+                                {'★'.repeat(response.rating)}
+                              </span>
+                              <span className="text-gray-400">
+                                {'☆'.repeat(5 - response.rating)}
+                              </span>
+                              <span className="ml-1 text-sm">
+                                ({response.rating}/5)
+                              </span>
+                            </div>
+                          </div>
+                          {response.comment && (
+                            <p className="text-sm text-gray-600 mt-2">&quot;{response.comment}&quot;</p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+        </div>
+
+        <div className="mt-6 pt-4 border-t">
+          <button
+            onClick={() => handleDeleteForm(selectedForm.id)}
+            className="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+            disabled={loading}
+          >
+            Delete Form
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="mb-8">
-      <h2 className="text-xl font-semibold mb-4">
-        {editingId ? 'Edit Survey' : 'Create Survey'}
-      </h2>
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label htmlFor="question" className="block text-sm font-medium">
-            Survey Question
-          </label>
-          <input
-            type="text"
-            id="question"
-            value={question}
-            onChange={(e) => setQuestion(e.target.value)}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md text-black"
-          />
-        </div>
-        <div>
-          <label htmlFor="scale" className="block text-sm font-medium">
-            Rating Scale (Max)
-          </label>
-          <select
-            id="scale"
-            value={scale}
-            onChange={(e) => setScale(Number(e.target.value))}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md text-black"
-          >
-            <option value={5}>1-5</option>
-            <option value={10}>1-10</option>
-          </select>
-        </div>
-        <div className="flex space-x-4">
-          <button
-            type="submit"
-            className="py-2 px-4 bg-blue-500 text-white rounded-md hover:bg-blue-600"
-          >
-            {editingId ? 'Update Survey' : 'Create Survey'}
-          </button>
-          {editingId && (
-            <button
-              type="button"
-              className="py-2 px-4 bg-gray-500 text-white rounded-md hover:bg-gray-600"
-              onClick={() => {
-                setEditingId(null);
-                setQuestion('');
-                setScale(5);
-              }}
-            >
-              Cancel
-            </button>
-          )}
-        </div>
-      </form>
+      <div className="flex justify-between items-center mb-6">
+        <h2 className="text-2xl font-semibold">Feedback Management</h2>
+        <button
+          onClick={() => setShowCreateForm(true)}
+          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+        >
+          Create New Form
+        </button>
+      </div>
 
-      {/* Surveys List */}
-      <div className="mt-6">
-        <h3 className="text-lg font-semibold mb-2">Feedback Surveys</h3>
-        {loading ? (
-          <p>Loading...</p>
-        ) : surveys.length === 0 ? (
-          <p>No surveys created yet.</p>
-        ) : (
-          <ul className="space-y-4">
-            {surveys.map((sv) => (
-              <li
-                key={sv.id}
-                className="p-4 bg-white border border-gray-300 rounded-md"
-              >
-                <h4 className="text-md font-medium">{sv.question}</h4>
-                <p className="text-sm">Scale: 1-{sv.scale}</p>
-                <p className="text-xs text-gray-500 mt-1">
-                  Created: {new Date(sv.createdAt).toLocaleDateString()}
-                </p>
-                <div className="mt-2 flex space-x-2">
+      {showCreateForm && (
+        <div className="mb-6 p-6 bg-gray-50 border rounded-lg">
+          <h3 className="text-lg font-semibold mb-4">Create Feedback Form</h3>
+          <form onSubmit={handleCreateForm} className="space-y-4">
+            <div>
+              <label htmlFor="title" className="block text-sm font-medium mb-1">
+                Form Title
+              </label>
+              <input
+                type="text"
+                id="title"
+                value={newFormTitle}
+                onChange={(e) => setNewFormTitle(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md text-black"
+                placeholder="e.g., Course Feedback Survey"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium mb-2">
+                Questions
+              </label>
+              {newFormQuestions.map((question, index) => (
+                <div key={index} className="flex gap-2 mb-2">
+                  <input
+                    type="text"
+                    value={question}
+                    onChange={(e) => updateQuestion(index, e.target.value)}
+                    className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-black"
+                    placeholder={`Question ${index + 1}`}
+                  />
                   <button
-                    onClick={() => handleEdit(sv)}
-                    className="text-blue-500 hover:underline text-sm"
+                    type="button"
+                    onClick={() => removeQuestion(index)}
+                    className="px-3 py-2 bg-red-500 text-white rounded hover:bg-red-600"
+                    disabled={newFormQuestions.length === 1}
                   >
-                    Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(sv.id)}
-                    className="text-red-500 hover:underline text-sm"
-                  >
-                    Delete
+                    Remove
                   </button>
                 </div>
-              </li>
+              ))}
+              <button
+                type="button"
+                onClick={addQuestion}
+                className="px-3 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+              >
+                Add Question
+              </button>
+            </div>
+
+            <div className="flex gap-2">
+              <button
+                type="submit"
+                className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                disabled={loading}
+              >
+                Create Form
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowCreateForm(false);
+                  setNewFormTitle('');
+                  setNewFormQuestions(['']);
+                }}
+                className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+
+      <div className="space-y-4">
+        <h3 className="text-lg font-semibold">Existing Forms</h3>
+        {loading ? (
+          <p>Loading...</p>
+        ) : forms.length === 0 ? (
+          <p className="text-gray-500">No feedback forms created yet.</p>
+        ) : (
+          <div className="grid gap-4">
+            {forms.map((form) => (
+              <div
+                key={form.id}
+                className="p-4 bg-white border border-gray-300 rounded-lg hover:border-gray-400 transition-colors"
+              >
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h4 className="text-lg font-medium">{form.title}</h4>
+                    <p className="text-sm text-gray-600">
+                      {form.questions.length} question
+                      {form.questions.length !== 1 ? 's' : ''} •
+                      {form._count.responses} response
+                      {form._count.responses !== 1 ? 's' : ''}
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      Created: {new Date(form.createdAt).toLocaleDateString()}
+                    </p>
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={() => setSelectedForm(form)}
+                      className="px-3 py-1 bg-blue-500 text-white rounded text-sm hover:bg-blue-600"
+                    >
+                      View Details
+                    </button>
+                    <button
+                      onClick={() => handleDeleteForm(form.id)}
+                      className="px-3 py-1 bg-red-500 text-white rounded text-sm hover:bg-red-600"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              </div>
             ))}
-          </ul>
+          </div>
         )}
       </div>
     </div>

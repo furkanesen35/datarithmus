@@ -19,6 +19,29 @@ async function main() {
     },
   });
   console.log('Superuser created: furkanesen35@gmail.com');
+
+  // Create a sample feedback form
+  const existingForm = await prisma.feedbackForm.findFirst({
+    where: { title: 'Course Experience Feedback' }
+  });
+  
+  if (!existingForm) {
+    await prisma.feedbackForm.create({
+      data: {
+        title: 'Course Experience Feedback',
+        questions: {
+          create: [
+            { question: 'How would you rate the overall course quality?' },
+            { question: 'How satisfied are you with the instructor\'s teaching?' },
+            { question: 'How well did the course meet your learning objectives?' },
+            { question: 'How would you rate the course materials and resources?' },
+            { question: 'How likely are you to recommend this course to others?' }
+          ]
+        }
+      }
+    });
+    console.log('Sample feedback form created');
+  }
 }
 
 main()

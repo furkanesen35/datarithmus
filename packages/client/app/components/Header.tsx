@@ -1,21 +1,45 @@
 // packages/client/app/components/Header.tsx
 'use client';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
-
 import CoursesTab from './HeaderComponents/CoursesTab';
 import ExpertCoursesTab from './HeaderComponents/ExpertCoursesTab';
 import CertificationsTab from './HeaderComponents/CertificationsTab';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
-  const [isCoursesDropdownOpen, setIsCoursesDropdownOpen] =
-    useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<'career' | 'expert' | 'cert'>(
-    'career',
-  );
+  const [isCoursesDropdownOpen, setIsCoursesDropdownOpen] = useState<boolean>(false);
+  const [activeTab, setActiveTab] = useState<'career' | 'expert' | 'cert'>('career');
   const { auth, logout } = useAuth();
+  const pathname = usePathname();
+
+  // Force close mobile menu on desktop (component mount and resize)
+  useEffect(() => {
+    const checkAndCloseMobileMenu = () => {
+      if (window.innerWidth >= 1024) {
+        setIsMenuOpen(false);
+      }
+    };
+    
+    // Check immediately on mount
+    checkAndCloseMobileMenu();
+    
+    const handleResize = () => {
+      checkAndCloseMobileMenu();
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Close mobile menu on route change and ensure it's closed if on desktop
+  useEffect(() => {
+    if (window.innerWidth >= 1024) {
+      setIsMenuOpen(false);
+    }
+  }, [pathname]);
 
   const coursesLinks = (
     <>

@@ -9,14 +9,15 @@ export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 
   // Allow unauthenticated access to public routes
-  if (
-    pathname.startsWith('/auth') ||
-    pathname === '/api/login' ||
-    pathname === '/api/register' ||
-    pathname === '/api/auth/google'
-  ) {
-    return NextResponse.next();
-  }
+    if (
+      pathname.startsWith('/auth') ||
+      pathname === '/api/login' ||
+      pathname === '/api/register' ||
+      pathname === '/api/auth/google' ||
+      pathname === '/api/enroll'
+    ) {
+      return NextResponse.next();
+    }
 
   if (!token) {
     return NextResponse.redirect(new URL('/auth/login', req.url));

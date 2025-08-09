@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function ResetPasswordClient() {
+  const [tempPassword, setTempPassword] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
   const [message, setMessage] = useState('');
@@ -13,6 +14,10 @@ export default function ResetPasswordClient() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!tempPassword) {
+      setMessage('Temporary password is required.');
+      return;
+    }
     if (!password || password.length < 6) {
       setMessage('Password must be at least 6 characters.');
       return;
@@ -25,7 +30,7 @@ export default function ResetPasswordClient() {
     const res = await fetch('/api/auth/reset-password', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token, password }),
+      body: JSON.stringify({ token, tempPassword, password }),
     });
     const data = await res.json();
     if (res.ok) {
@@ -45,6 +50,15 @@ export default function ResetPasswordClient() {
     <div className="max-w-md mx-auto mt-12 p-6 bg-white rounded shadow">
       <h2 className="text-xl font-semibold mb-4">Reset Password</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium">Temporary Password</label>
+          <input
+            type="password"
+            value={tempPassword}
+            onChange={(e) => setTempPassword(e.target.value)}
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md text-black"
+          />
+        </div>
         <div>
           <label className="block text-sm font-medium">New Password</label>
           <input

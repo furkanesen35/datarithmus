@@ -6,10 +6,10 @@ const prisma = new PrismaClient();
 
 // POST /api/auth/reset-password { token, password }
 export async function POST(req: NextRequest) {
-  const { token, password } = await req.json();
-  if (!token || !password)
+  const { token, tempPassword, password } = await req.json();
+  if (!token || !tempPassword || !password)
     return NextResponse.json(
-      { error: 'Missing token or password' },
+      { error: 'Missing token, temporary password, or new password' },
       { status: 400 },
     );
   const reset = await prisma.passwordResetToken.findUnique({
@@ -18,6 +18,12 @@ export async function POST(req: NextRequest) {
   if (!reset || reset.used || reset.expiresAt < new Date()) {
     return NextResponse.json(
       { error: 'Invalid or expired token' },
+      { status: 400 },
+    );
+  }
+  if (reset.tempPassword !== tempPassword) {
+    return NextResponse.json(
+      { error: 'Temporary password is incorrect' },
       { status: 400 },
     );
   }

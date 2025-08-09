@@ -211,6 +211,7 @@ model PasswordResetToken {
   id        Int      @id @default(autoincrement())
   userId    Int
   token     String   @unique
+  tempPassword String
   expiresAt DateTime
   used      Boolean  @default(false)
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)

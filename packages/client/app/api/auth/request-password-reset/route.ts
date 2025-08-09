@@ -15,18 +15,19 @@ export async function POST(req: NextRequest) {
   if (!user)
     return NextResponse.json({ error: 'User not found' }, { status: 404 });
   const token = crypto.randomBytes(32).toString('hex');
+  const tempPassword = crypto.randomBytes(8).toString('hex');
   const expiresAt = new Date(Date.now() + 1000 * 60 * 60); // 1 hour
   await prisma.passwordResetToken.create({
-    data: { userId: user.id, token, expiresAt },
+    data: { userId: user.id, token, tempPassword, expiresAt },
   });
   const resetUrl = `${getBaseUrl()}/auth/reset-password?token=${token}`;
-  // Send password reset email
+  // Send password reset email with temp password
   await sendMail({
     to: user.email,
     subject: 'Password Reset',
-    html: `<p>Click the link below to reset your password:</p><p><a href="${resetUrl}">${resetUrl}</a></p>`,
+    html: `<p>Your temporary password: <b>${tempPassword}</b></p><p>Click the link below to reset your password:</p><p><a href="${resetUrl}">${resetUrl}</a></p>`,
   });
   return NextResponse.json({
-    message: 'Password reset link sent to your email.',
+    message: 'Password reset link and temporary password sent to your email.',
   });
 }

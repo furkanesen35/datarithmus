@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
     },
   });
   await prisma.emailVerificationToken.create({
-    data: { userId: user.id, token, expiresAt },
+    data: { userId: user.id, token, tempPassword, expiresAt },
   });
   await prisma.enrollmentApplication.update({
     where: { id },

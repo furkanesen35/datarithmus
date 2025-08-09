@@ -34,19 +34,8 @@ export async function POST(req: NextRequest) {
   // Instead, fetch from the last invite-from-application (or store temp password in a field or another table)
   // For now, let's try to find the latest PasswordResetToken for this user, if any
   // If not found, generate a new temp password
-  let tempPassword = null;
-  // Try to find an unused PasswordResetToken for this user
-  const latestToken = await prisma.passwordResetToken.findFirst({
-    where: { userId: user.id, used: false },
-    orderBy: { expiresAt: 'desc' },
-  });
-  if (latestToken && latestToken.tempPassword) {
-    tempPassword = latestToken.tempPassword;
-  } else {
-    // Generate new temp password
-    tempPassword = crypto.randomBytes(8).toString('hex');
-  }
-  // Create PasswordResetToken for onboarding
+  // Use tempPassword from EmailVerificationToken
+  const tempPassword = record.tempPassword ?? '';
   const resetToken = crypto.randomBytes(32).toString('hex');
   const expiresAt = new Date(Date.now() + 1000 * 60 * 60); // 1 hour
   await prisma.passwordResetToken.create({

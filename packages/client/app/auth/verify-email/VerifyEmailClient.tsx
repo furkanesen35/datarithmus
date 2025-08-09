@@ -24,7 +24,14 @@ export default function VerifyEmailClient() {
         const data = await res.json();
         if (res.ok) {
           setMessage('✔ Email verified! Please set your password.');
-          setTimeout(() => router.push(`/auth/reset-password?token=${token}`), 3500);
+          // Use resetToken from API response for redirect
+          setTimeout(() => {
+            if (data.resetToken) {
+              router.push(`/auth/reset-password?token=${data.resetToken}`);
+            } else {
+              router.push(`/auth/reset-password?token=${token}`);
+            }
+          }, 3500);
         } else {
           setMessage(data.error || 'Verification failed.');
         }

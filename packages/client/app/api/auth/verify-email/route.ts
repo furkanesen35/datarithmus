@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
+import crypto from 'crypto';
 
 const prisma = new PrismaClient();
 
@@ -17,7 +18,8 @@ export async function POST(req: NextRequest) {
       { status: 400 },
     );
   }
-  await prisma.user.update({
+  // Activate user
+  const user = await prisma.user.update({
     where: { id: record.userId },
     data: { isActive: true },
   });
@@ -25,5 +27,39 @@ export async function POST(req: NextRequest) {
     where: { token },
     data: { used: true },
   });
-  return NextResponse.json({ message: 'Email verified successfully' });
+
+  // Find temp password from user (set at creation)
+  // If you store temp password elsewhere, adjust this logic
+  // For now, assume user.password is hashed temp password, so we need to get the unhashed temp password
+  // Instead, fetch from the last invite-from-application (or store temp password in a field or another table)
+  // For now, let's try to find the latest PasswordResetToken for this user, if any
+  // If not found, generate a new temp password
+  let tempPassword = null;
+  // Try to find an unused PasswordResetToken for this user
+  const latestToken = await prisma.passwordResetToken.findFirst({
+    where: { userId: user.id, used: false },
+    orderBy: { expiresAt: 'desc' },
+  });
+  if (latestToken && latestToken.tempPassword) {
+    tempPassword = latestToken.tempPassword;
+  } else {
+    // Generate new temp password
+    tempPassword = crypto.randomBytes(8).toString('hex');
+  }
+  // Create PasswordResetToken for onboarding
+  const resetToken = crypto.randomBytes(32).toString('hex');
+  const expiresAt = new Date(Date.now() + 1000 * 60 * 60); // 1 hour
+  await prisma.passwordResetToken.create({
+    data: {
+      userId: user.id,
+      token: resetToken,
+      tempPassword,
+      expiresAt,
+    },
+  });
+  // Return token for frontend redirect
+  return NextResponse.json({
+    message: 'Email verified successfully',
+    resetToken,
+  });
 }

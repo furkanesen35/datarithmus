@@ -2,7 +2,10 @@
 export async function PATCH(req: NextRequest) {
   const { id, status } = await req.json();
   if (!id || !status) {
-    return NextResponse.json({ error: 'Missing id or status.' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Missing id or status.' },
+      { status: 400 },
+    );
   }
   try {
     await prisma.enrollmentApplication.update({
@@ -11,7 +14,10 @@ export async function PATCH(req: NextRequest) {
     });
     return NextResponse.json({ message: 'Status updated.' });
   } catch {
-    return NextResponse.json({ error: 'Failed to update status.' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Failed to update status.' },
+      { status: 500 },
+    );
   }
 }
 import { NextRequest, NextResponse } from 'next/server';
@@ -24,7 +30,10 @@ const prisma = new PrismaClient();
 export async function POST(req: NextRequest) {
   const { name, email, course, message } = await req.json();
   if (!name || !email || !course) {
-    return NextResponse.json({ error: 'Missing required fields.' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Missing required fields.' },
+      { status: 400 },
+    );
   }
   try {
     await prisma.enrollmentApplication.create({
@@ -32,14 +41,15 @@ export async function POST(req: NextRequest) {
     });
 
     // Send Google Meet invitation email
-    const googleMeetLink = process.env.GOOGLE_MEET_LINK || 'https://meet.google.com/aga-zrqj-skt';
+    const googleMeetLink =
+      process.env.GOOGLE_MEET_LINK || 'https://meet.google.com/aga-zrqj-skt';
     const meetingDate = 'September 30, 2025';
     const meetingTime = '09:00-10:00 PM';
-    
+
     try {
       await sendMail({
         to: email,
-        subject: "Datarithmus Application - Online Meeting Invitation",
+        subject: 'Datarithmus Application - Online Meeting Invitation',
         html: `
           <div style="font-family: Arial, sans-serif; color: #222; background: #f9f9f9; padding: 24px; border-radius: 8px; max-width: 480px; margin: auto;">
             <h2 style="color: #2563eb;">Application Received</h2>
@@ -60,7 +70,10 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ message: 'Application submitted.' });
   } catch {
-    return NextResponse.json({ error: 'Failed to submit application.' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Failed to submit application.' },
+      { status: 500 },
+    );
   }
 }
 
@@ -72,6 +85,9 @@ export async function GET() {
     });
     return NextResponse.json(applications);
   } catch {
-    return NextResponse.json({ error: 'Failed to fetch applications.' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Failed to fetch applications.' },
+      { status: 500 },
+    );
   }
 }

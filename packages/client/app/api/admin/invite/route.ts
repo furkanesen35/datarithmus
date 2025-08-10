@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
       mustChangePassword: true,
     },
   });
-  
+
   try {
     await sendMail({
       to: email,

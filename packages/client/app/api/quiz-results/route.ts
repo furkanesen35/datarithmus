@@ -6,7 +6,10 @@ export async function POST(req: Request) {
   try {
     const { studentId, quizId, answers } = await req.json();
     if (!studentId || !quizId || !answers) {
-      return NextResponse.json({ error: 'Missing required fields.' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Missing required fields.' },
+        { status: 400 },
+      );
     }
 
     // Fetch quiz and questions
@@ -28,7 +31,7 @@ export async function POST(req: Request) {
     });
 
     // Save QuizResults
-  const result = await prisma.quizResults.create({
+    const result = await prisma.quizResults.create({
       data: {
         studentId,
         quizId,
@@ -53,7 +56,7 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: 'Missing quizId.' }, { status: 400 });
   }
   try {
-  const results = await prisma.quizResults.findMany({
+    const results = await prisma.quizResults.findMany({
       where: { quizId },
       include: { student: true, quiz: true },
     });

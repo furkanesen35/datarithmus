@@ -10,8 +10,11 @@ import CertificationsTab from './HeaderComponents/CertificationsTab';
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState<boolean>(false);
-  const [isCoursesDropdownOpen, setIsCoursesDropdownOpen] = useState<boolean>(false);
-  const [activeTab, setActiveTab] = useState<'career' | 'expert' | 'cert'>('career');
+  const [isCoursesDropdownOpen, setIsCoursesDropdownOpen] =
+    useState<boolean>(false);
+  const [activeTab, setActiveTab] = useState<'career' | 'expert' | 'cert'>(
+    'career',
+  );
   const { auth, logout } = useAuth();
   const pathname = usePathname();
 
@@ -22,14 +25,14 @@ export default function Header() {
         setIsMenuOpen(false);
       }
     };
-    
+
     // Check immediately on mount
     checkAndCloseMobileMenu();
-    
+
     const handleResize = () => {
       checkAndCloseMobileMenu();
     };
-    
+
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
@@ -200,13 +203,22 @@ export default function Header() {
                 </div>
               )}
             </div>
-            <Link href="/skills" className="block py-2 px-4 text-white hover:bg-gray-800 border-b border-gray-700">
+            <Link
+              href="/skills"
+              className="block py-2 px-4 text-white hover:bg-gray-800 border-b border-gray-700"
+            >
               Skills
             </Link>
-            <Link href="/events" className="block py-2 px-4 text-white hover:bg-gray-800 border-b border-gray-700">
+            <Link
+              href="/events"
+              className="block py-2 px-4 text-white hover:bg-gray-800 border-b border-gray-700"
+            >
               Events
             </Link>
-            <Link href="/about" className="block py-2 px-4 text-white hover:bg-gray-800 border-b border-gray-700">
+            <Link
+              href="/about"
+              className="block py-2 px-4 text-white hover:bg-gray-800 border-b border-gray-700"
+            >
               About Us
             </Link>
             {/* Auth buttons for mobile */}

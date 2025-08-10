@@ -73,30 +73,30 @@ export default function DashboardPage() {
         {mobileNavOpen && (
           <div className="fixed top-[56px] left-0 w-full bg-[#e5e5e5] z-40 p-4 border-b border-gray-300 md:hidden animate-fade-in">
             <ul className="space-y-2">
-            <li>
-              <button
-                className={`w-full text-left p-2 rounded ${
-                  activeSection === 'quizzes'
-                    ? 'bg-blue-500 text-white'
-                    : 'hover:bg-gray-200'
-                }`}
-                onClick={() => setActiveSection('quizzes')}
-              >
-                Quizzes
-              </button>
-            </li>
-            <li>
-              <button
-                className={`w-full text-left p-2 rounded ${
-                  activeSection === 'resources'
-                    ? 'bg-blue-500 text-white'
-                    : 'hover:bg-gray-200'
-                }`}
-                onClick={() => setActiveSection('resources')}
-              >
-                Resources
-              </button>
-            </li>
+              <li>
+                <button
+                  className={`w-full text-left p-2 rounded ${
+                    activeSection === 'quizzes'
+                      ? 'bg-blue-500 text-white'
+                      : 'hover:bg-gray-200'
+                  }`}
+                  onClick={() => setActiveSection('quizzes')}
+                >
+                  Quizzes
+                </button>
+              </li>
+              <li>
+                <button
+                  className={`w-full text-left p-2 rounded ${
+                    activeSection === 'resources'
+                      ? 'bg-blue-500 text-white'
+                      : 'hover:bg-gray-200'
+                  }`}
+                  onClick={() => setActiveSection('resources')}
+                >
+                  Resources
+                </button>
+              </li>
               <li>
                 <button
                   className={`w-full text-left p-2 rounded ${
@@ -296,7 +296,9 @@ export default function DashboardPage() {
         </div>
         {/* Main Content (adapts to available space) */}
         <div className="flex-1 p-4 sm:p-8 min-w-0">
-          {activeSection === 'overview' && <Overview email={auth.user?.email} />}
+          {activeSection === 'overview' && (
+            <Overview email={auth.user?.email} />
+          )}
           {activeSection === 'announcements' && <Announcements />}
           {activeSection === 'homework' && <Homework />}
           {activeSection === 'resources' && <Resources />}

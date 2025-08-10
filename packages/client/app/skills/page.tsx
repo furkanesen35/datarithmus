@@ -141,12 +141,15 @@ const coursesData = [
 ];
 
 export default function Skills() {
-  const [selectedSkill, setSelectedSkill] = useState<string | null>(null);
+  const [selectedSkills, setSelectedSkills] = useState<string[]>([]);
 
-  // Find courses that include the selected skill
-  const relevantCourses = selectedSkill
-    ? coursesData.filter((course) => course.skills.includes(selectedSkill))
-    : [];
+  // Find courses that include all selected skills (AND logic)
+  const relevantCourses =
+    selectedSkills.length > 0
+      ? coursesData.filter((course) =>
+          selectedSkills.every((skill) => course.skills.includes(skill)),
+        )
+      : [];
 
   return (
     <div className="min-h-screen bg-[#301934] w-full flex flex-col items-center py-12 px-4">
@@ -163,31 +166,45 @@ export default function Skills() {
       >
         Return to Home
       </Link>
-      <div className="flex flex-row justify-center items-center w-full max-w-5xl">
+      <div className="flex flex-col justify-center items-start w-full max-w-5xl">
         {/* Skill buttons */}
         <div
-          className={`flex flex-wrap justify-center items-center gap-3 transition-all duration-500 ${selectedSkill ? 'w-1/3 justify-start' : 'w-full justify-center'}`}
+          className="flex flex-wrap justify-center items-center gap-3 transition-all duration-500 w-full"
           style={{ minHeight: '120px' }}
         >
-          {skillsData.map((skill) => (
-            <button
-              key={skill}
-              className={`px-4 py-2 rounded-full text-sm font-semibold shadow transition-all duration-300 ${selectedSkill === skill ? 'bg-blue-600 text-white scale-110' : 'bg-[#e4ed94] text-[#301934] hover:bg-blue-200 hover:text-blue-900'}`}
-              onClick={() => setSelectedSkill(skill)}
-            >
-              {skill}
-            </button>
-          ))}
+          {skillsData.map((skill) => {
+            const isSelected = selectedSkills.includes(skill);
+            return (
+              <button
+                key={skill}
+                className={`px-4 py-2 rounded-full text-sm font-semibold shadow transition-all duration-300 ${isSelected ? 'bg-blue-600 text-white scale-110' : 'bg-[#e4ed94] text-[#301934] hover:bg-blue-200 hover:text-blue-900'}`}
+                onClick={() => {
+                  if (isSelected) {
+                    setSelectedSkills(
+                      selectedSkills.filter((s) => s !== skill),
+                    );
+                  } else {
+                    setSelectedSkills([...selectedSkills, skill]);
+                  }
+                }}
+              >
+                {skill}
+              </button>
+            );
+          })}
         </div>
         {/* Relevant courses as cards */}
-        {selectedSkill && (
-          <div className="flex flex-col gap-6 w-2/3 items-start pl-8">
+        {selectedSkills.length > 0 && (
+          <div className="flex flex-col gap-6 w-full items-start mt-8">
             <h2 className="text-2xl font-bold text-[#e4ed94] mb-4">
               Courses with{' '}
-              <span className="text-blue-300">{selectedSkill}</span>:
+              <span className="text-blue-300">{selectedSkills.join(', ')}</span>
+              :
             </h2>
             {relevantCourses.length === 0 ? (
-              <p className="text-[#e4ed94]">No courses found for this skill.</p>
+              <p className="text-[#e4ed94]">
+                No courses found for these skills.
+              </p>
             ) : (
               relevantCourses.map((course) => (
                 <a
@@ -206,10 +223,10 @@ export default function Skills() {
         )}
       </div>
       {/* Reset button */}
-      {selectedSkill && (
+      {selectedSkills.length > 0 && (
         <button
           className="mt-8 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-all duration-300"
-          onClick={() => setSelectedSkill(null)}
+          onClick={() => setSelectedSkills([])}
         >
           Reset
         </button>

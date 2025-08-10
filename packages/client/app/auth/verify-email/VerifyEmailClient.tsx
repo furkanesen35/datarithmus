@@ -46,7 +46,9 @@ export default function VerifyEmailClient() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-[#301934] px-4">
       <div className="bg-[#e4ed94] rounded-xl shadow-lg p-8 flex flex-col items-center text-[#1c2229] border-2 border-blue-500 max-w-md w-full">
-        <h2 className="text-2xl font-bold mb-4 text-[#301934]">Email Verification</h2>
+        <h2 className="text-2xl font-bold mb-4 text-[#301934]">
+          Email Verification
+        </h2>
         <p className="mb-4 text-center text-[#301934]/80">{message}</p>
         {loading && <div className="text-blue-500">Verifying...</div>}
       </div>

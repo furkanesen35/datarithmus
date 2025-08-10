@@ -235,7 +235,9 @@ export default function AdminPage() {
             onClick={() => toggleSection('applications')}
             className="w-full flex justify-between items-center p-4 bg-white rounded-lg shadow-md hover:bg-blue-50 transition-colors"
           >
-            <span className="text-lg font-semibold">Manage Pending Applications</span>
+            <span className="text-lg font-semibold">
+              Manage Pending Applications
+            </span>
             <span className="text-xl">
               {activeSection === 'applications' ? '−' : '+'}
             </span>

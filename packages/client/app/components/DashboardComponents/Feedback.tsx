@@ -28,7 +28,9 @@ interface FeedbackResponse {
 export default function Feedback() {
   const [forms, setForms] = useState<FeedbackForm[]>([]);
   const [selectedForm, setSelectedForm] = useState<FeedbackForm | null>(null);
-  const [responses, setResponses] = useState<{ [questionId: number]: FeedbackResponse }>({});
+  const [responses, setResponses] = useState<{
+    [questionId: number]: FeedbackResponse;
+  }>({});
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
@@ -60,28 +62,35 @@ export default function Feedback() {
     setSelectedForm(form);
     setMessage(null);
     setError(null);
-    
+
     // Pre-populate with existing responses if form is completed
     const responseMap: { [questionId: number]: FeedbackResponse } = {};
-    form.userResponses.forEach(response => {
+    form.userResponses.forEach((response) => {
       responseMap[response.questionId] = {
         questionId: response.questionId,
         rating: response.rating,
-        comment: response.comment
+        comment: response.comment,
       };
     });
     setResponses(responseMap);
   }
 
-  function updateResponse(questionId: number, field: 'rating' | 'comment', value: number | string) {
-    setResponses(prev => ({
+  function updateResponse(
+    questionId: number,
+    field: 'rating' | 'comment',
+    value: number | string,
+  ) {
+    setResponses((prev) => ({
       ...prev,
       [questionId]: {
         ...prev[questionId],
         questionId,
         [field]: value,
-        rating: field === 'rating' ? value as number : prev[questionId]?.rating || 5
-      }
+        rating:
+          field === 'rating'
+            ? (value as number)
+            : prev[questionId]?.rating || 5,
+      },
     }));
   }
 
@@ -95,7 +104,7 @@ export default function Feedback() {
 
     try {
       // Validate all questions have ratings
-      const responseArray = selectedForm.questions.map(question => {
+      const responseArray = selectedForm.questions.map((question) => {
         const response = responses[question.id];
         if (!response || response.rating === undefined) {
           throw new Error(`Please provide a rating for: ${question.question}`);
@@ -108,21 +117,20 @@ export default function Feedback() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           formId: selectedForm.id,
-          responses: responseArray
-        })
+          responses: responseArray,
+        }),
       });
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Failed to submit feedback');
 
       setMessage('Feedback submitted successfully!');
-      
+
       // Refresh forms to update completion status
       await fetchAvailableForms();
-      
+
       // Update selected form completion status
-      setSelectedForm(prev => prev ? { ...prev, isCompleted: true } : null);
-      
+      setSelectedForm((prev) => (prev ? { ...prev, isCompleted: true } : null));
     } catch (err: unknown) {
       if (err instanceof Error) {
         setError(err.message || 'Failed to submit feedback');
@@ -134,10 +142,16 @@ export default function Feedback() {
     }
   }
 
-  function StarRating({ rating, onRatingChange }: { rating: number; onRatingChange: (rating: number) => void }) {
+  function StarRating({
+    rating,
+    onRatingChange,
+  }: {
+    rating: number;
+    onRatingChange: (rating: number) => void;
+  }) {
     return (
       <div className="flex gap-1">
-        {[1, 2, 3, 4, 5].map(star => (
+        {[1, 2, 3, 4, 5].map((star) => (
           <button
             key={star}
             type="button"
@@ -164,19 +178,19 @@ export default function Feedback() {
     return (
       <div className="max-w-4xl mx-auto p-6 bg-white rounded shadow">
         <h2 className="text-2xl font-bold mb-6">Feedback Forms</h2>
-        
+
         {forms.length === 0 ? (
           <div className="text-center text-gray-500">
             No feedback forms available at the moment.
           </div>
         ) : (
           <div className="space-y-4">
-            {forms.map(form => (
+            {forms.map((form) => (
               <div
                 key={form.id}
                 className={`p-4 border rounded-lg cursor-pointer transition-colors ${
-                  form.isCompleted 
-                    ? 'bg-green-50 border-green-200 hover:bg-green-100' 
+                  form.isCompleted
+                    ? 'bg-green-50 border-green-200 hover:bg-green-100'
                     : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
                 }`}
                 onClick={() => selectForm(form)}
@@ -185,7 +199,8 @@ export default function Feedback() {
                   <div>
                     <h3 className="text-lg font-semibold">{form.title}</h3>
                     <p className="text-sm text-gray-600">
-                      {form.questions.length} question{form.questions.length !== 1 ? 's' : ''}
+                      {form.questions.length} question
+                      {form.questions.length !== 1 ? 's' : ''}
                     </p>
                   </div>
                   <div className="flex items-center gap-2">
@@ -203,7 +218,7 @@ export default function Feedback() {
             ))}
           </div>
         )}
-        
+
         {error && <div className="text-red-600 mt-4">{error}</div>}
       </div>
     );
@@ -234,14 +249,16 @@ export default function Feedback() {
                 {index + 1}. {question.question}
               </h3>
             </div>
-            
+
             <div className="mb-4">
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Rating (1-5 stars)
               </label>
               <StarRating
                 rating={responses[question.id]?.rating || 5}
-                onRatingChange={(rating) => updateResponse(question.id, 'rating', rating)}
+                onRatingChange={(rating) =>
+                  updateResponse(question.id, 'rating', rating)
+                }
               />
             </div>
 
@@ -251,7 +268,9 @@ export default function Feedback() {
               </label>
               <textarea
                 value={responses[question.id]?.comment || ''}
-                onChange={(e) => updateResponse(question.id, 'comment', e.target.value)}
+                onChange={(e) =>
+                  updateResponse(question.id, 'comment', e.target.value)
+                }
                 className="w-full p-3 border rounded-md"
                 rows={3}
                 placeholder="Share any additional thoughts..."
@@ -266,7 +285,11 @@ export default function Feedback() {
             className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50"
             disabled={submitting}
           >
-            {submitting ? 'Submitting...' : selectedForm.isCompleted ? 'Update Feedback' : 'Submit Feedback'}
+            {submitting
+              ? 'Submitting...'
+              : selectedForm.isCompleted
+                ? 'Update Feedback'
+                : 'Submit Feedback'}
           </button>
         </div>
 

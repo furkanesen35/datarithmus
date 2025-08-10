@@ -26,11 +26,16 @@ const ExpertCoursesTab = () => (
     <div className="flex flex-wrap justify-center gap-6">
       {expertCourses.map((course) => {
         let link = '';
-        if (course.title === 'Machine Learning Engineer') link = '/courses/machine-learning-engineer';
+        if (course.title === 'Machine Learning Engineer')
+          link = '/courses/machine-learning-engineer';
         if (course.title === 'LLM Engineer') link = '/courses/llm-engineer';
         if (course.title === 'Dataops') link = '/courses/dataops';
         return (
-          <Link href={link} key={course.title} className="bg-white rounded-lg shadow-md p-3 flex flex-col items-center w-[260px] h-[220px] cursor-pointer hover:shadow-lg transition">
+          <Link
+            href={link}
+            key={course.title}
+            className="bg-white rounded-lg shadow-md p-3 flex flex-col items-center w-[260px] h-[220px] cursor-pointer hover:shadow-lg transition"
+          >
             <Image
               src={course.image}
               alt={course.title}
@@ -42,7 +47,9 @@ const ExpertCoursesTab = () => (
             <h3 className="text-lg font-semibold mb-1 text-black">
               {course.title}
             </h3>
-            <p className="text-sm text-black text-center">{course.description}</p>
+            <p className="text-sm text-black text-center">
+              {course.description}
+            </p>
           </Link>
         );
       })}

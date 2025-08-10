@@ -8,16 +8,16 @@ export async function GET() {
   const discussions = await prisma.discussion.findMany({
     include: {
       author: {
-        select: { username: true, email: true }
+        select: { username: true, email: true },
       },
       comments: {
         include: {
           author: {
-            select: { username: true, email: true }
-          }
+            select: { username: true, email: true },
+          },
         },
-        orderBy: { createdAt: 'asc' }
-      }
+        orderBy: { createdAt: 'asc' },
+      },
     },
     orderBy: { createdAt: 'desc' },
   });
@@ -31,12 +31,17 @@ export async function POST(req: NextRequest) {
   }
 
   const discussion = await prisma.discussion.create({
-    data: { title, content, authorId: parseInt(authorId), pinned: pinned || false },
+    data: {
+      title,
+      content,
+      authorId: parseInt(authorId),
+      pinned: pinned || false,
+    },
     include: {
       author: {
-        select: { username: true, email: true }
-      }
-    }
+        select: { username: true, email: true },
+      },
+    },
   });
 
   return NextResponse.json(
@@ -52,7 +57,12 @@ export async function PUT(req: NextRequest) {
   }
 
   // Only update author if authorId is provided and valid
-  const updateData: { title: string; content: string; pinned: boolean; authorId?: number } = { title, content, pinned };
+  const updateData: {
+    title: string;
+    content: string;
+    pinned: boolean;
+    authorId?: number;
+  } = { title, content, pinned };
   if (authorId && !isNaN(parseInt(authorId))) {
     updateData.authorId = parseInt(authorId);
   }

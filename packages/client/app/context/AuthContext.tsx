@@ -38,7 +38,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           const data = await res.json();
           setAuth({
             isLoggedIn: true,
-            user: { id: data.id, email: data.email, isSuperuser: data.isSuperuser },
+            user: {
+              id: data.id,
+              email: data.email,
+              isSuperuser: data.isSuperuser,
+            },
           });
         } else {
           setAuth({ isLoggedIn: false, user: null });
@@ -53,8 +57,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = (email: string, isSuperuser: boolean) => {
-  // For manual login, set id to -1 (should be replaced with real id after auth)
-  setAuth({ isLoggedIn: true, user: { id: -1, email, isSuperuser } });
+    // For manual login, set id to -1 (should be replaced with real id after auth)
+    setAuth({ isLoggedIn: true, user: { id: -1, email, isSuperuser } });
   };
 
   const logout = () => {

@@ -122,7 +122,9 @@ export default function QuizManager() {
     <div className="mb-8">
       <h2 className="text-xl font-semibold mb-4">Create Quiz</h2>
       {titleError && (
-        <div className="mb-2 p-2 bg-red-100 text-red-700 rounded">{titleError}</div>
+        <div className="mb-2 p-2 bg-red-100 text-red-700 rounded">
+          {titleError}
+        </div>
       )}
       <div className="mb-4">
         <label htmlFor="quiz-title" className="block text-sm font-medium mb-1">

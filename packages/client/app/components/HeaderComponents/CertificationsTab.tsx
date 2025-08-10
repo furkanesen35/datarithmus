@@ -24,7 +24,11 @@ const CertificationsTab = () => (
         if (cert.title === 'Power BI PL-300') link = '/courses/power-bi-pl-300';
         if (cert.title === 'Fabric Engineer') link = '/courses/fabric-engineer';
         return (
-          <Link href={link} key={cert.title} className="bg-white rounded-lg shadow-md p-3 flex flex-col items-center w-[260px] h-[220px] cursor-pointer hover:shadow-lg transition">
+          <Link
+            href={link}
+            key={cert.title}
+            className="bg-white rounded-lg shadow-md p-3 flex flex-col items-center w-[260px] h-[220px] cursor-pointer hover:shadow-lg transition"
+          >
             <Image
               src={cert.image}
               alt={cert.title}

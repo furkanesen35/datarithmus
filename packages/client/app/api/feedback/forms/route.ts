@@ -11,7 +11,9 @@ interface JwtPayload {
   userId: number;
 }
 
-async function requireSuperuser(req: NextRequest): Promise<NextResponse | null> {
+async function requireSuperuser(
+  req: NextRequest,
+): Promise<NextResponse | null> {
   const token = req.cookies.get('token')?.value;
   if (!token) {
     return NextResponse.json({ error: 'No token provided' }, { status: 401 });
@@ -43,13 +45,13 @@ export async function GET(req: NextRequest) {
       questions: {
         include: {
           _count: {
-            select: { responses: true }
-          }
-        }
+            select: { responses: true },
+          },
+        },
       },
       _count: {
-        select: { responses: true }
-      }
+        select: { responses: true },
+      },
     },
     orderBy: { createdAt: 'desc' },
   });
@@ -62,20 +64,28 @@ export async function POST(req: NextRequest) {
   if (authCheck) return authCheck;
 
   const { title, questions } = await req.json();
-  if (!title || !questions || !Array.isArray(questions) || questions.length === 0) {
-    return NextResponse.json({ error: 'Title and questions array required' }, { status: 400 });
+  if (
+    !title ||
+    !questions ||
+    !Array.isArray(questions) ||
+    questions.length === 0
+  ) {
+    return NextResponse.json(
+      { error: 'Title and questions array required' },
+      { status: 400 },
+    );
   }
 
   const form = await prisma.feedbackForm.create({
     data: {
       title,
       questions: {
-        create: questions.map((q: string) => ({ question: q }))
-      }
+        create: questions.map((q: string) => ({ question: q })),
+      },
     },
     include: {
-      questions: true
-    }
+      questions: true,
+    },
   });
 
   return NextResponse.json(
@@ -97,22 +107,25 @@ export async function DELETE(req: NextRequest) {
   try {
     // Delete all responses first
     await prisma.feedbackResponse.deleteMany({
-      where: { formId: Number(id) }
+      where: { formId: Number(id) },
     });
 
     // Delete all questions
     await prisma.feedbackQuestion.deleteMany({
-      where: { formId: Number(id) }
+      where: { formId: Number(id) },
     });
 
     // Delete the form
     await prisma.feedbackForm.delete({
-      where: { id: Number(id) }
+      where: { id: Number(id) },
     });
 
     return NextResponse.json({ message: 'Feedback form deleted' });
   } catch (error) {
     console.error('Error deleting feedback form:', error);
-    return NextResponse.json({ error: 'Failed to delete feedback form' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Failed to delete feedback form' },
+      { status: 500 },
+    );
   }
 }

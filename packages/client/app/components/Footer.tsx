@@ -8,8 +8,12 @@ const Footer = () => (
         <span className="block text-sm mt-1">Empowering your data career</span>
       </div>
       <div className="flex gap-6 text-sm">
-        <a href="/about" className="hover:text-[#FBBF24] transition">About Us</a>
-        <a href="/contact" className="hover:text-[#FBBF24] transition">Contact</a>
+        <a href="/about" className="hover:text-[#FBBF24] transition">
+          About Us
+        </a>
+        <a href="/contact" className="hover:text-[#FBBF24] transition">
+          Contact
+        </a>
       </div>
       <div className="mt-4 md:mt-0 text-center md:text-right text-xs">
         &copy; {new Date().getFullYear()} Datarithmus. All rights reserved.

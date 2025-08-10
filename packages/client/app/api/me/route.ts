@@ -17,7 +17,10 @@ export async function GET(req: NextRequest) {
     // Fetch user id from database
     const { PrismaClient } = await import('@prisma/client');
     const prisma = new PrismaClient();
-    const user = await prisma.user.findUnique({ where: { email: decoded.email }, select: { id: true, email: true, isSuperuser: true } });
+    const user = await prisma.user.findUnique({
+      where: { email: decoded.email },
+      select: { id: true, email: true, isSuperuser: true },
+    });
     if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }

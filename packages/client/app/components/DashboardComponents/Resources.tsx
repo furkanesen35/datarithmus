@@ -53,16 +53,27 @@ export default function Resources() {
                 <span className="text-xs text-gray-500">{r.category}</span>
               </div>
               {r.fileName && r.filePath && (
-                <a href={r.filePath} className="text-blue-500 hover:underline" download>
+                <a
+                  href={r.filePath}
+                  className="text-blue-500 hover:underline"
+                  download
+                >
                   Download: {r.fileName}
                 </a>
               )}
               {r.link && (
-                <a href={r.link} className="text-blue-500 hover:underline" target="_blank" rel="noopener noreferrer">
+                <a
+                  href={r.link}
+                  className="text-blue-500 hover:underline"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
                   Open Resource
                 </a>
               )}
-              <div className="text-xs text-gray-400">Added: {new Date(r.createdAt).toLocaleString()}</div>
+              <div className="text-xs text-gray-400">
+                Added: {new Date(r.createdAt).toLocaleString()}
+              </div>
             </li>
           ))}
         </ul>

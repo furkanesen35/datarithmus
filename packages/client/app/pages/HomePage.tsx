@@ -12,7 +12,7 @@ export default function HomePage() {
       <FirstContainer />
       <SecondContainer />
       <ThirdContainer />
-      <Footer/>
+      <Footer />
     </div>
   );
 }

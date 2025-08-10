@@ -28,7 +28,10 @@ export async function POST(req: NextRequest) {
       const crypto = await import('crypto');
       const resetToken = crypto.randomBytes(32).toString('hex');
       const expiresAt = new Date(Date.now() + 1000 * 60 * 60); // 1 hour expiry
-      console.log('User must change password, creating reset token:', resetToken);
+      console.log(
+        'User must change password, creating reset token:',
+        resetToken,
+      );
       await prisma.passwordResetToken.create({
         data: {
           userId: user.id,
@@ -38,7 +41,10 @@ export async function POST(req: NextRequest) {
       });
       console.log('Reset token created successfully');
       return NextResponse.json(
-        { error: 'Password change required', redirect: `/auth/reset-password?token=${resetToken}` },
+        {
+          error: 'Password change required',
+          redirect: `/auth/reset-password?token=${resetToken}`,
+        },
         { status: 403 },
       );
     }

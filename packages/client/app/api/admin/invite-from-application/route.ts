@@ -9,15 +9,33 @@ const prisma = new PrismaClient();
 // POST /api/admin/invite-from-application { id }
 export async function POST(req: NextRequest) {
   const { id } = await req.json();
-  if (!id) return NextResponse.json({ error: 'Missing application id.' }, { status: 400 });
+  if (!id)
+    return NextResponse.json(
+      { error: 'Missing application id.' },
+      { status: 400 },
+    );
 
   const app = await prisma.enrollmentApplication.findUnique({ where: { id } });
-  if (!app) return NextResponse.json({ error: 'Application not found.' }, { status: 404 });
-  if (app.status !== 'pending') return NextResponse.json({ error: 'Application not pending.' }, { status: 400 });
+  if (!app)
+    return NextResponse.json(
+      { error: 'Application not found.' },
+      { status: 404 },
+    );
+  if (app.status !== 'pending')
+    return NextResponse.json(
+      { error: 'Application not pending.' },
+      { status: 400 },
+    );
 
   // Check if user already exists
-  const existing = await prisma.user.findUnique({ where: { email: app.email } });
-  if (existing) return NextResponse.json({ error: 'User already exists.' }, { status: 400 });
+  const existing = await prisma.user.findUnique({
+    where: { email: app.email },
+  });
+  if (existing)
+    return NextResponse.json(
+      { error: 'User already exists.' },
+      { status: 400 },
+    );
 
   // Create user (active, no verification needed since they were met face-to-face)
   const password = crypto.randomBytes(12).toString('hex');
@@ -56,6 +74,9 @@ export async function POST(req: NextRequest) {
     });
     return NextResponse.json({ message: 'Invitation sent!' });
   } catch {
-    return NextResponse.json({ error: 'Could not send invitation email.' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Could not send invitation email.' },
+      { status: 500 },
+    );
   }
 }

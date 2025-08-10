@@ -11,7 +11,9 @@ interface JwtPayload {
   userId: number;
 }
 
-async function requireAuth(req: NextRequest): Promise<{ user: JwtPayload } | NextResponse> {
+async function requireAuth(
+  req: NextRequest,
+): Promise<{ user: JwtPayload } | NextResponse> {
   const token = req.cookies.get('token')?.value;
   if (!token) {
     return NextResponse.json({ error: 'No token provided' }, { status: 401 });
@@ -34,7 +36,7 @@ export async function GET(req: NextRequest) {
 
   // Get user from database
   const user = await prisma.user.findUnique({
-    where: { email: authResult.user.email }
+    where: { email: authResult.user.email },
   });
 
   if (!user) {
@@ -47,18 +49,18 @@ export async function GET(req: NextRequest) {
       responses: {
         where: { studentId: user.id },
         include: {
-          question: true
-        }
-      }
+          question: true,
+        },
+      },
     },
-    orderBy: { createdAt: 'desc' }
+    orderBy: { createdAt: 'desc' },
   });
 
   // Add completion status to each form
-  const formsWithStatus = forms.map(form => ({
+  const formsWithStatus = forms.map((form) => ({
     ...form,
     isCompleted: form.responses.length === form.questions.length,
-    userResponses: form.responses
+    userResponses: form.responses,
   }));
 
   return NextResponse.json(formsWithStatus);

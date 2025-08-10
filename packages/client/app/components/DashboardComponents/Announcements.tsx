@@ -55,13 +55,20 @@ export default function Announcements() {
       ) : (
         <ul className="space-y-4">
           {sorted.map((a) => (
-            <li key={a.id} className={`p-4 rounded shadow ${a.pinned ? 'bg-yellow-100 border-l-4 border-yellow-500' : 'bg-white'}`}>
+            <li
+              key={a.id}
+              className={`p-4 rounded shadow ${a.pinned ? 'bg-yellow-100 border-l-4 border-yellow-500' : 'bg-white'}`}
+            >
               <div className="flex justify-between items-center mb-2">
                 <span className="font-semibold text-lg">{a.title}</span>
-                {a.pinned && <span className="text-yellow-600 font-bold">Pinned</span>}
+                {a.pinned && (
+                  <span className="text-yellow-600 font-bold">Pinned</span>
+                )}
               </div>
               <div className="mb-2">{a.content}</div>
-              <div className="text-xs text-gray-500">{new Date(a.createdAt).toLocaleString()}</div>
+              <div className="text-xs text-gray-500">
+                {new Date(a.createdAt).toLocaleString()}
+              </div>
             </li>
           ))}
         </ul>

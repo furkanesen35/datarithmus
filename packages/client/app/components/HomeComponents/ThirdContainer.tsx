@@ -146,58 +146,58 @@ function ThirdContainer() {
   ];
 
   return (
-  <div className="w-full py-8 bg-[#301934] px-4">
-    <h1 className="text-[#F7FAFC] p-[5px] font-bold text-2xl text-center mb-4">
-      Our Programs
-    </h1>
-  <div className="max-w-7xl mx-auto">
-      <div className="flex flex-col md:flex-row gap-6 justify-center items-stretch mb-8">
-        {pillars.map((pillar) => (
-          <div
-            key={pillar.title}
-            className="flex-1 bg-[#2D3748] border border-[#4A5568] rounded-lg shadow-md p-6 flex flex-col min-w-[220px]"
-          >
-            <h2 className="text-[#FBBF24] text-xl font-bold mb-3 text-center">
-              {pillar.title}
-            </h2>
-            <div className="flex flex-col gap-4">
-              {pillar.items.map((course) => (
-                <div
-                  key={course.name}
-                  className="mb-8 flex flex-col items-center"
-                >
-                  <Image
-                    src={course.image}
-                    alt={course.name}
-                    width={280}
-                    height={60}
-                    className="mb-2 rounded-lg object-cover"
-                    style={{
-                      width: '280px',
-                      height: '60px',
-                      objectFit: 'cover',
-                    }}
-                  />
-                  <h3 className="text-[#F7FAFC] text-base font-semibold mb-1 text-center">
-                    {course.name}
-                  </h3>
-                  <div className="text-[#CBD5E1] text-sm pl-4 text-left">
-                    {course.info.map((info, idx) =>
-                      info ? (
-                        <div key={idx}>{info}</div>
-                      ) : (
-                        <div key={idx}>&nbsp;</div>
-                      ),
-                    )}
+    <div className="w-full py-8 bg-[#301934] px-4">
+      <h1 className="text-[#F7FAFC] p-[5px] font-bold text-2xl text-center mb-4">
+        Our Programs
+      </h1>
+      <div className="max-w-7xl mx-auto">
+        <div className="flex flex-col md:flex-row gap-6 justify-center items-stretch mb-8">
+          {pillars.map((pillar) => (
+            <div
+              key={pillar.title}
+              className="flex-1 bg-[#2D3748] border border-[#4A5568] rounded-lg shadow-md p-6 flex flex-col min-w-[220px]"
+            >
+              <h2 className="text-[#FBBF24] text-xl font-bold mb-3 text-center">
+                {pillar.title}
+              </h2>
+              <div className="flex flex-col gap-4">
+                {pillar.items.map((course) => (
+                  <div
+                    key={course.name}
+                    className="mb-8 flex flex-col items-center"
+                  >
+                    <Image
+                      src={course.image}
+                      alt={course.name}
+                      width={280}
+                      height={60}
+                      className="mb-2 rounded-lg object-cover"
+                      style={{
+                        width: '280px',
+                        height: '60px',
+                        objectFit: 'cover',
+                      }}
+                    />
+                    <h3 className="text-[#F7FAFC] text-base font-semibold mb-1 text-center">
+                      {course.name}
+                    </h3>
+                    <div className="text-[#CBD5E1] text-sm pl-4 text-left">
+                      {course.info.map((info, idx) =>
+                        info ? (
+                          <div key={idx}>{info}</div>
+                        ) : (
+                          <div key={idx}>&nbsp;</div>
+                        ),
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     </div>
-  </div>
   );
 }
 

@@ -15,7 +15,10 @@ interface ApplicationManagerProps {
   onError: (err: string) => void;
 }
 
-export default function ApplicationManager({ onMessage, onError }: ApplicationManagerProps) {
+export default function ApplicationManager({
+  onMessage,
+  onError,
+}: ApplicationManagerProps) {
   const [applications, setApplications] = useState<Application[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -59,20 +62,25 @@ export default function ApplicationManager({ onMessage, onError }: ApplicationMa
           <tbody>
             {loading ? (
               <tr>
-                <td colSpan={6} className="text-center py-4">Loading...</td>
+                <td colSpan={6} className="text-center py-4">
+                  Loading...
+                </td>
               </tr>
             ) : applications.length === 0 ? (
               <tr>
-                <td colSpan={6} className="text-center py-4">No applications found.</td>
+                <td colSpan={6} className="text-center py-4">
+                  No applications found.
+                </td>
               </tr>
             ) : (
-              applications.map(app => (
+              applications.map((app) => (
                 <tr key={app.id}>
                   <td className="border px-2 py-1">{app.name}</td>
                   <td className="border px-2 py-1">{app.email}</td>
                   <td className="border px-2 py-1">{app.course}</td>
                   <td className="border px-2 py-1">{app.message || '-'}</td>
-                  <td className="border px-2 py-1">{app.status}
+                  <td className="border px-2 py-1">
+                    {app.status}
                     {app.status === 'pending' && (
                       <div className="flex gap-2 mt-2">
                         <button
@@ -80,17 +88,26 @@ export default function ApplicationManager({ onMessage, onError }: ApplicationMa
                           onClick={async () => {
                             setLoading(true);
                             try {
-                              const res = await fetch('/api/admin/invite-from-application', {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ id: app.id }),
-                              });
+                              const res = await fetch(
+                                '/api/admin/invite-from-application',
+                                {
+                                  method: 'POST',
+                                  headers: {
+                                    'Content-Type': 'application/json',
+                                  },
+                                  body: JSON.stringify({ id: app.id }),
+                                },
+                              );
                               const data = await res.json();
                               if (res.ok) {
-                                onMessage('Invitation sent and application approved');
+                                onMessage(
+                                  'Invitation sent and application approved',
+                                );
                                 await fetchApplications();
                               } else {
-                                onError(data.error || 'Failed to send invitation');
+                                onError(
+                                  data.error || 'Failed to send invitation',
+                                );
                               }
                             } catch {
                               onError('Failed to send invitation');
@@ -99,7 +116,9 @@ export default function ApplicationManager({ onMessage, onError }: ApplicationMa
                             }
                           }}
                           disabled={loading}
-                        >Approve & Invite</button>
+                        >
+                          Approve & Invite
+                        </button>
                         <button
                           className="px-2 py-1 bg-red-500 text-white rounded hover:bg-red-600 text-sm"
                           onClick={async () => {
@@ -108,7 +127,10 @@ export default function ApplicationManager({ onMessage, onError }: ApplicationMa
                               const res = await fetch('/api/enroll', {
                                 method: 'PATCH',
                                 headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ id: app.id, status: 'rejected' }),
+                                body: JSON.stringify({
+                                  id: app.id,
+                                  status: 'rejected',
+                                }),
                               });
                               if (res.ok) {
                                 onMessage('Application rejected');
@@ -123,11 +145,15 @@ export default function ApplicationManager({ onMessage, onError }: ApplicationMa
                             }
                           }}
                           disabled={loading}
-                        >Reject</button>
+                        >
+                          Reject
+                        </button>
                       </div>
                     )}
                   </td>
-                  <td className="border px-2 py-1">{new Date(app.createdAt).toLocaleString()}</td>
+                  <td className="border px-2 py-1">
+                    {new Date(app.createdAt).toLocaleString()}
+                  </td>
                 </tr>
               ))
             )}

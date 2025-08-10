@@ -38,7 +38,7 @@ export default function DiscussionManager({
 
   useEffect(() => {
     fetchDiscussions();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function fetchDiscussions() {
@@ -47,7 +47,9 @@ export default function DiscussionManager({
       if (!res.ok) throw new Error('Failed to fetch discussions');
       setDiscussions(await res.json());
     } catch (err: unknown) {
-      onError(err instanceof Error ? err.message : 'Failed to fetch discussions');
+      onError(
+        err instanceof Error ? err.message : 'Failed to fetch discussions',
+      );
     } finally {
       setLoading(false);
     }
@@ -60,14 +62,16 @@ export default function DiscussionManager({
       const res = await fetch('/api/discussion', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id })
+        body: JSON.stringify({ id }),
       });
 
       if (!res.ok) throw new Error('Failed to delete discussion');
       onMessage('Discussion deleted successfully');
       fetchDiscussions();
     } catch (err: unknown) {
-      onError(err instanceof Error ? err.message : 'Failed to delete discussion');
+      onError(
+        err instanceof Error ? err.message : 'Failed to delete discussion',
+      );
     }
   }
 
@@ -80,15 +84,19 @@ export default function DiscussionManager({
           id: discussion.id,
           title: discussion.title,
           content: discussion.content,
-          pinned: !discussion.pinned
-        })
+          pinned: !discussion.pinned,
+        }),
       });
 
       if (!res.ok) throw new Error('Failed to update discussion');
-      onMessage(`Discussion ${discussion.pinned ? 'unpinned' : 'pinned'} successfully`);
+      onMessage(
+        `Discussion ${discussion.pinned ? 'unpinned' : 'pinned'} successfully`,
+      );
       fetchDiscussions();
     } catch (err: unknown) {
-      onError(err instanceof Error ? err.message : 'Failed to update discussion');
+      onError(
+        err instanceof Error ? err.message : 'Failed to update discussion',
+      );
     }
   }
 
@@ -99,7 +107,7 @@ export default function DiscussionManager({
       const res = await fetch('/api/comments', {
         method: 'DELETE',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id: commentId })
+        body: JSON.stringify({ id: commentId }),
       });
 
       if (!res.ok) throw new Error('Failed to delete comment');
@@ -115,28 +123,36 @@ export default function DiscussionManager({
   return (
     <div className="mb-8">
       <h2 className="text-xl font-bold mb-4">Discussion Management</h2>
-      
+
       {discussions.length === 0 ? (
         <div>No discussions yet.</div>
       ) : (
         <div className="space-y-6">
-          {discussions.map(d => (
-            <div key={d.id} className={`p-4 rounded shadow border ${d.pinned ? 'bg-yellow-50 border-yellow-300' : 'bg-white border-gray-200'}`}>
+          {discussions.map((d) => (
+            <div
+              key={d.id}
+              className={`p-4 rounded shadow border ${d.pinned ? 'bg-yellow-50 border-yellow-300' : 'bg-white border-gray-200'}`}
+            >
               <div className="flex justify-between items-start mb-2">
                 <div className="flex-1">
                   <div className="font-semibold text-lg">{d.title}</div>
                   <div className="text-gray-700 mb-2">{d.content}</div>
                   <div className="text-xs text-gray-500">
-                    By {d.author.username} ({d.author.email}) • {new Date(d.createdAt).toLocaleString()}
-                    {d.pinned && <span className="text-yellow-700 font-bold ml-2">📌 Pinned</span>}
+                    By {d.author.username} ({d.author.email}) •{' '}
+                    {new Date(d.createdAt).toLocaleString()}
+                    {d.pinned && (
+                      <span className="text-yellow-700 font-bold ml-2">
+                        📌 Pinned
+                      </span>
+                    )}
                   </div>
                 </div>
                 <div className="flex gap-2 ml-4">
                   <button
                     onClick={() => togglePin(d)}
                     className={`px-3 py-1 text-sm rounded ${
-                      d.pinned 
-                        ? 'bg-yellow-500 text-white hover:bg-yellow-600' 
+                      d.pinned
+                        ? 'bg-yellow-500 text-white hover:bg-yellow-600'
                         : 'bg-gray-500 text-white hover:bg-gray-600'
                     }`}
                   >
@@ -153,14 +169,20 @@ export default function DiscussionManager({
 
               {/* Comments section */}
               <div className="border-t pt-4 mt-4">
-                <h4 className="font-semibold text-sm mb-2">Comments ({d.comments.length})</h4>
-                
-                {d.comments.map(comment => (
-                  <div key={comment.id} className="bg-gray-50 p-3 rounded mb-2 flex justify-between items-start">
+                <h4 className="font-semibold text-sm mb-2">
+                  Comments ({d.comments.length})
+                </h4>
+
+                {d.comments.map((comment) => (
+                  <div
+                    key={comment.id}
+                    className="bg-gray-50 p-3 rounded mb-2 flex justify-between items-start"
+                  >
                     <div className="flex-1">
                       <div className="text-sm">{comment.content}</div>
                       <div className="text-xs text-gray-500 mt-1">
-                        By {comment.author.username} ({comment.author.email}) • {new Date(comment.createdAt).toLocaleString()}
+                        By {comment.author.username} ({comment.author.email}) •{' '}
+                        {new Date(comment.createdAt).toLocaleString()}
                       </div>
                     </div>
                     <button
@@ -173,7 +195,9 @@ export default function DiscussionManager({
                 ))}
 
                 {d.comments.length === 0 && (
-                  <div className="text-gray-500 text-sm italic">No comments yet.</div>
+                  <div className="text-gray-500 text-sm italic">
+                    No comments yet.
+                  </div>
                 )}
               </div>
             </div>

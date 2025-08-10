@@ -11,7 +11,9 @@ interface JwtPayload {
   userId: number;
 }
 
-async function requireAuth(req: NextRequest): Promise<{ user: JwtPayload } | NextResponse> {
+async function requireAuth(
+  req: NextRequest,
+): Promise<{ user: JwtPayload } | NextResponse> {
   const token = req.cookies.get('token')?.value;
   if (!token) {
     return NextResponse.json({ error: 'No token provided' }, { status: 401 });
@@ -27,10 +29,12 @@ async function requireAuth(req: NextRequest): Promise<{ user: JwtPayload } | Nex
   }
 }
 
-async function requireSuperuser(req: NextRequest): Promise<NextResponse | null> {
+async function requireSuperuser(
+  req: NextRequest,
+): Promise<NextResponse | null> {
   const authResult = await requireAuth(req);
   if (authResult instanceof NextResponse) return authResult;
-  
+
   if (!authResult.user.isSuperuser) {
     return NextResponse.json(
       { error: 'Superuser access required' },
@@ -58,13 +62,13 @@ export async function GET(req: NextRequest) {
             responses: {
               include: {
                 student: {
-                  select: { username: true, email: true }
-                }
-              }
-            }
-          }
-        }
-      }
+                  select: { username: true, email: true },
+                },
+              },
+            },
+          },
+        },
+      },
     });
     return NextResponse.json(form);
   }
@@ -76,12 +80,12 @@ export async function GET(req: NextRequest) {
           responses: {
             include: {
               student: {
-                select: { username: true, email: true }
-              }
-            }
-          }
-        }
-      }
+                select: { username: true, email: true },
+              },
+            },
+          },
+        },
+      },
     },
     orderBy: { createdAt: 'desc' },
   });
@@ -95,19 +99,22 @@ export async function POST(req: NextRequest) {
 
   const { title, questions } = await req.json();
   if (!title || !questions || !Array.isArray(questions)) {
-    return NextResponse.json({ error: 'Title and questions array required' }, { status: 400 });
+    return NextResponse.json(
+      { error: 'Title and questions array required' },
+      { status: 400 },
+    );
   }
 
   const form = await prisma.feedbackForm.create({
     data: {
       title,
       questions: {
-        create: questions.map((q: string) => ({ question: q }))
-      }
+        create: questions.map((q: string) => ({ question: q })),
+      },
     },
     include: {
-      questions: true
-    }
+      questions: true,
+    },
   });
 
   return NextResponse.json(

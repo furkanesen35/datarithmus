@@ -181,64 +181,68 @@ export default function FeedbackManager({
         </div>
 
         <div className="space-y-6">
-            {selectedForm.questions.map((question, questionIndex) => {
-              const responses = question.responses ?? [];
-              return (
-                <div
-                  key={question.id}
-                  className="bg-white p-6 border border-gray-300 rounded-lg"
-                >
-                  <div className="flex justify-between items-start mb-4">
-                    <h3 className="text-lg font-medium">
-                      {questionIndex + 1}. {question.question}
-                    </h3>
-                    <div className="text-right">
-                      <div className="text-sm text-gray-600">
-                        {responses.length} response{responses.length !== 1 ? 's' : ''}
+          {selectedForm.questions.map((question, questionIndex) => {
+            const responses = question.responses ?? [];
+            return (
+              <div
+                key={question.id}
+                className="bg-white p-6 border border-gray-300 rounded-lg"
+              >
+                <div className="flex justify-between items-start mb-4">
+                  <h3 className="text-lg font-medium">
+                    {questionIndex + 1}. {question.question}
+                  </h3>
+                  <div className="text-right">
+                    <div className="text-sm text-gray-600">
+                      {responses.length} response
+                      {responses.length !== 1 ? 's' : ''}
+                    </div>
+                    {responses.length > 0 && (
+                      <div className="text-lg font-semibold text-blue-600">
+                        ★ {calculateAverageRating(responses)}/5
                       </div>
-                      {responses.length > 0 && (
-                        <div className="text-lg font-semibold text-blue-600">
-                          ★ {calculateAverageRating(responses)}/5
-                        </div>
-                      )}
-                    </div>
+                    )}
                   </div>
-
-                  {responses.length === 0 ? (
-                    <p className="text-gray-500 italic">No responses yet</p>
-                  ) : (
-                    <div className="space-y-3">
-                      {responses.map((response) => (
-                        <div
-                          key={response.id}
-                          className="p-3 bg-gray-50 rounded border"
-                        >
-                          <div className="flex justify-between items-start mb-2">
-                            <div className="text-sm font-medium text-gray-700">
-                              {response.student.username} ({response.student.email})
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <span className="text-yellow-500">
-                                {'★'.repeat(response.rating)}
-                              </span>
-                              <span className="text-gray-400">
-                                {'☆'.repeat(5 - response.rating)}
-                              </span>
-                              <span className="ml-1 text-sm">
-                                ({response.rating}/5)
-                              </span>
-                            </div>
-                          </div>
-                          {response.comment && (
-                            <p className="text-sm text-gray-600 mt-2">&quot;{response.comment}&quot;</p>
-                          )}
-                        </div>
-                      ))}
-                    </div>
-                  )}
                 </div>
-              );
-            })}
+
+                {responses.length === 0 ? (
+                  <p className="text-gray-500 italic">No responses yet</p>
+                ) : (
+                  <div className="space-y-3">
+                    {responses.map((response) => (
+                      <div
+                        key={response.id}
+                        className="p-3 bg-gray-50 rounded border"
+                      >
+                        <div className="flex justify-between items-start mb-2">
+                          <div className="text-sm font-medium text-gray-700">
+                            {response.student.username} (
+                            {response.student.email})
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <span className="text-yellow-500">
+                              {'★'.repeat(response.rating)}
+                            </span>
+                            <span className="text-gray-400">
+                              {'☆'.repeat(5 - response.rating)}
+                            </span>
+                            <span className="ml-1 text-sm">
+                              ({response.rating}/5)
+                            </span>
+                          </div>
+                        </div>
+                        {response.comment && (
+                          <p className="text-sm text-gray-600 mt-2">
+                            &quot;{response.comment}&quot;
+                          </p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
 
         <div className="mt-6 pt-4 border-t">

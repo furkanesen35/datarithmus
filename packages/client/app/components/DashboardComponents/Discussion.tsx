@@ -31,7 +31,10 @@ export default function Discussion() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showNewDiscussion, setShowNewDiscussion] = useState(false);
-  const [newDiscussion, setNewDiscussion] = useState({ title: '', content: '' });
+  const [newDiscussion, setNewDiscussion] = useState({
+    title: '',
+    content: '',
+  });
   const [newComments, setNewComments] = useState<Record<number, string>>({});
 
   useEffect(() => {
@@ -44,7 +47,9 @@ export default function Discussion() {
       if (!res.ok) throw new Error('Failed to fetch discussions');
       setDiscussions(await res.json());
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Failed to fetch discussions');
+      setError(
+        err instanceof Error ? err.message : 'Failed to fetch discussions',
+      );
     } finally {
       setLoading(false);
     }
@@ -52,7 +57,8 @@ export default function Discussion() {
 
   async function createDiscussion(e: React.FormEvent) {
     e.preventDefault();
-    if (!newDiscussion.title || !newDiscussion.content || !auth.user?.id) return;
+    if (!newDiscussion.title || !newDiscussion.content || !auth.user?.id)
+      return;
 
     try {
       const res = await fetch('/api/discussion', {
@@ -61,17 +67,19 @@ export default function Discussion() {
         body: JSON.stringify({
           title: newDiscussion.title,
           content: newDiscussion.content,
-          authorId: auth.user.id
-        })
+          authorId: auth.user.id,
+        }),
       });
 
       if (!res.ok) throw new Error('Failed to create discussion');
-      
+
       setNewDiscussion({ title: '', content: '' });
       setShowNewDiscussion(false);
       fetchDiscussions();
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Failed to create discussion');
+      setError(
+        err instanceof Error ? err.message : 'Failed to create discussion',
+      );
     }
   }
 
@@ -86,13 +94,13 @@ export default function Discussion() {
         body: JSON.stringify({
           content: commentContent,
           authorId: auth.user.id,
-          discussionId
-        })
+          discussionId,
+        }),
       });
 
       if (!res.ok) throw new Error('Failed to add comment');
-      
-      setNewComments(prev => ({ ...prev, [discussionId]: '' }));
+
+      setNewComments((prev) => ({ ...prev, [discussionId]: '' }));
       fetchDiscussions();
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to add comment');
@@ -122,14 +130,21 @@ export default function Discussion() {
               type="text"
               placeholder="Discussion title"
               value={newDiscussion.title}
-              onChange={(e) => setNewDiscussion(prev => ({ ...prev, title: e.target.value }))}
+              onChange={(e) =>
+                setNewDiscussion((prev) => ({ ...prev, title: e.target.value }))
+              }
               className="w-full p-2 border rounded mb-2"
               required
             />
             <textarea
               placeholder="Discussion content"
               value={newDiscussion.content}
-              onChange={(e) => setNewDiscussion(prev => ({ ...prev, content: e.target.value }))}
+              onChange={(e) =>
+                setNewDiscussion((prev) => ({
+                  ...prev,
+                  content: e.target.value,
+                }))
+              }
               className="w-full p-2 border rounded mb-2 h-24"
               required
             />
@@ -156,24 +171,33 @@ export default function Discussion() {
         <div>No discussions yet.</div>
       ) : (
         <div className="space-y-6">
-          {discussions.map(d => (
-            <div key={d.id} className={`p-4 rounded shadow ${d.pinned ? 'bg-yellow-100' : 'bg-white'}`}>
+          {discussions.map((d) => (
+            <div
+              key={d.id}
+              className={`p-4 rounded shadow ${d.pinned ? 'bg-yellow-100' : 'bg-white'}`}
+            >
               <div className="font-semibold text-lg">{d.title}</div>
               <div className="text-gray-700 mb-2">{d.content}</div>
               <div className="text-xs text-gray-500 mb-4">
-                By {d.author.username} • {new Date(d.createdAt).toLocaleString()}
-                {d.pinned && <span className="text-yellow-700 font-bold ml-2">Pinned</span>}
+                By {d.author.username} •{' '}
+                {new Date(d.createdAt).toLocaleString()}
+                {d.pinned && (
+                  <span className="text-yellow-700 font-bold ml-2">Pinned</span>
+                )}
               </div>
 
               {/* Comments section */}
               <div className="border-t pt-4">
-                <h4 className="font-semibold text-sm mb-2">Comments ({d.comments.length})</h4>
-                
-                {d.comments.map(comment => (
+                <h4 className="font-semibold text-sm mb-2">
+                  Comments ({d.comments.length})
+                </h4>
+
+                {d.comments.map((comment) => (
                   <div key={comment.id} className="bg-gray-50 p-3 rounded mb-2">
                     <div className="text-sm">{comment.content}</div>
                     <div className="text-xs text-gray-500 mt-1">
-                      By {comment.author.username} • {new Date(comment.createdAt).toLocaleString()}
+                      By {comment.author.username} •{' '}
+                      {new Date(comment.createdAt).toLocaleString()}
                     </div>
                   </div>
                 ))}
@@ -185,7 +209,12 @@ export default function Discussion() {
                       type="text"
                       placeholder="Add a comment..."
                       value={newComments[d.id] || ''}
-                      onChange={(e) => setNewComments(prev => ({ ...prev, [d.id]: e.target.value }))}
+                      onChange={(e) =>
+                        setNewComments((prev) => ({
+                          ...prev,
+                          [d.id]: e.target.value,
+                        }))
+                      }
                       className="flex-1 p-2 border rounded text-sm"
                     />
                     <button

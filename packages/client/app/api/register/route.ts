@@ -1,7 +1,7 @@
 // packages/client/app/api/register/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import { sendMail } from '../../../lib/mail';
 import { getBaseUrl } from '../../utils/baseUrl';

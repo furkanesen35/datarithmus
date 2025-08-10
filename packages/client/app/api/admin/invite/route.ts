@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import { sendMail } from '../../../../lib/mail';
 import { getBaseUrl } from '../../../utils/baseUrl';
@@ -19,26 +19,22 @@ export async function POST(req: NextRequest) {
   if (existing)
     return NextResponse.json({ error: 'User already exists' }, { status: 400 });
 
-  // Generate a random password and verification token
-  const tempPassword = crypto.randomBytes(8).toString('hex');
-  const hashedPassword = await bcrypt.hash(tempPassword, 10);
-  const token = crypto.randomBytes(32).toString('hex');
-  const expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24);
+  // Generate a random initial password
+  const password = crypto.randomBytes(12).toString('hex');
+  const hashedPassword = await bcrypt.hash(password, 10);
 
-  // Create user (inactive until verified)
-  const user = await prisma.user.create({
+  // Create user (active but must change password)
+  await prisma.user.create({
     data: {
       email,
       username,
       password: hashedPassword,
       isSuperuser: false,
-      isActive: false,
+      isActive: true,
+      mustChangePassword: true,
     },
   });
-  await prisma.emailVerificationToken.create({
-    data: { userId: user.id, token, expiresAt },
-  });
-  const verifyUrl = `${getBaseUrl()}/auth/verify-email?token=${token}`;
+  
   try {
     await sendMail({
       to: email,
@@ -46,11 +42,11 @@ export async function POST(req: NextRequest) {
       html: `
         <div style="font-family: Arial, sans-serif; color: #222; background: #f9f9f9; padding: 24px; border-radius: 8px; max-width: 480px; margin: auto;">
           <h2 style="color: #2563eb;">You've been invited!</h2>
-          <p>An admin has invited you to join Datarithmus. Your temporary password is:</p>
-          <div style="font-size: 1.2em; font-weight: bold; margin: 12px 0;">${tempPassword}</div>
-          <p>Please verify your email and set your own password by clicking the button below:</p>
-          <a href="${verifyUrl}" style="display: inline-block; margin: 16px 0; padding: 12px 24px; background: #2563eb; color: #fff; border-radius: 4px; text-decoration: none; font-weight: bold;">Verify Email</a>
-          <p>If you did not expect this invitation, you can ignore this email.</p>
+          <p>An admin has created an account for you. Your initial password is:</p>
+          <div style="font-size: 1.2em; font-weight: bold; margin: 12px 0; padding: 12px; background: #e5e7eb; border-radius: 4px;">${password}</div>
+          <p>You can now log in and will be prompted to create your own password.</p>
+          <a href="${getBaseUrl()}/auth/login" style="display: inline-block; margin: 16px 0; padding: 12px 24px; background: #2563eb; color: #fff; border-radius: 4px; text-decoration: none; font-weight: bold;">Login Now</a>
+          <p>If you did not expect this invitation, please contact support.</p>
           <hr style="margin: 24px 0; border: none; border-top: 1px solid #eee;" />
           <small style="color: #888;">&copy; ${new Date().getFullYear()} Datarithmus</small>
         </div>

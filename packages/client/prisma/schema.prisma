@@ -23,6 +23,7 @@ model User {
   username                String
   isSuperuser             Boolean                  @default(false)
   isActive                Boolean                  @default(true)
+  mustChangePassword      Boolean                  @default(false)
   createdAt               DateTime                 @default(now())
   emailVerificationTokens EmailVerificationToken[]
   meetingParticipants     MeetingParticipant[]
@@ -211,7 +212,7 @@ model PasswordResetToken {
   id        Int      @id @default(autoincrement())
   userId    Int
   token     String   @unique
-  tempPassword String
+  // tempPassword removed
   expiresAt DateTime
   used      Boolean  @default(false)
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -221,7 +222,7 @@ model EmailVerificationToken {
   id        Int      @id @default(autoincrement())
   userId    Int
   token     String   @unique
-  tempPassword String?
+  // tempPassword removed
   expiresAt DateTime
   used      Boolean  @default(false)
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)

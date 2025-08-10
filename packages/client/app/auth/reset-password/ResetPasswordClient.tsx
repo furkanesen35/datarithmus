@@ -3,7 +3,6 @@ import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function ResetPasswordClient() {
-  const [tempPassword, setTempPassword] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
   const [message, setMessage] = useState('');
@@ -14,10 +13,6 @@ export default function ResetPasswordClient() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!tempPassword) {
-      setMessage('Temporary password is required.');
-      return;
-    }
     if (!password || password.length < 6) {
       setMessage('Password must be at least 6 characters.');
       return;
@@ -27,19 +22,28 @@ export default function ResetPasswordClient() {
       return;
     }
     setLoading(true);
-    const res = await fetch('/api/auth/reset-password', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token, tempPassword, password }),
-    });
-    const data = await res.json();
-    if (res.ok) {
-      setMessage('Password reset! You can now log in.');
-      setTimeout(() => router.push('/auth/login'), 1500);
-    } else {
-      setMessage(data.error || 'Failed to reset password');
+    try {
+      console.log('Sending password reset request with token:', token);
+      const res = await fetch('/api/auth/reset-password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token, password }),
+      });
+      console.log('Response status:', res.status);
+      const data = await res.json();
+      console.log('Response data:', data);
+      if (res.ok) {
+        setMessage('Password reset! You can now log in.');
+        setTimeout(() => router.push('/auth/login'), 1500);
+      } else {
+        setMessage(data.error || 'Failed to reset password');
+      }
+    } catch (error) {
+      console.error('Fetch error:', error);
+      setMessage('Network error. Please try again.');
+    } finally {
+      setLoading(false);
     }
-    setLoading(false);
   };
 
   if (!token) {
@@ -49,17 +53,8 @@ export default function ResetPasswordClient() {
   return (
     <div className="max-w-md mx-auto mt-12 p-6 bg-[#f9f9f9] rounded shadow border border-gray-200">
       <h2 className="text-2xl font-bold mb-2 text-[#301934]">Create New Password</h2>
-      <p className="mb-4 text-[#301934]/80 text-sm">Set your new password using the temporary password sent to your email.</p>
+      <p className="mb-4 text-[#301934]/80 text-sm">Set your new password below.</p>
       <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-[#301934]">Temporary Password</label>
-          <input
-            type="password"
-            value={tempPassword}
-            onChange={(e) => setTempPassword(e.target.value)}
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md text-[#301934] bg-white"
-          />
-        </div>
         <div>
           <label className="block text-sm font-medium text-[#301934]">New Password</label>
           <input

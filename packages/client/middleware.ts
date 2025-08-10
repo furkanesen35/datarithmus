@@ -15,7 +15,10 @@ export async function middleware(req: NextRequest) {
     pathname === '/api/register' ||
     pathname === '/api/auth/google' ||
     pathname === '/api/enroll' ||
-    pathname === '/api/auth/request-password-reset'
+    pathname === '/api/auth/request-password-reset' ||
+    pathname === '/api/auth/reset-password' ||
+    pathname === '/api/auth/verify-email' ||
+    pathname === '/api/auth/resend-verification'
   ) {
     return NextResponse.next();
   }

@@ -1,7 +1,7 @@
 // packages/client/app/api/login/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 
 const prisma = new PrismaClient();
@@ -20,6 +20,25 @@ export async function POST(req: NextRequest) {
     if (!user.isActive) {
       return NextResponse.json(
         { error: 'Account not verified. Please check your email.' },
+        { status: 403 },
+      );
+    }
+    if (user.mustChangePassword) {
+      // Generate password reset token
+      const crypto = await import('crypto');
+      const resetToken = crypto.randomBytes(32).toString('hex');
+      const expiresAt = new Date(Date.now() + 1000 * 60 * 60); // 1 hour expiry
+      console.log('User must change password, creating reset token:', resetToken);
+      await prisma.passwordResetToken.create({
+        data: {
+          userId: user.id,
+          token: resetToken,
+          expiresAt,
+        },
+      });
+      console.log('Reset token created successfully');
+      return NextResponse.json(
+        { error: 'Password change required', redirect: `/auth/reset-password?token=${resetToken}` },
         { status: 403 },
       );
     }

@@ -103,8 +103,8 @@ export default function Header() {
           <Link href="/skills" className="hover:text-gray-300 ml-6">
             Skills
           </Link>
-          <Link href="/events" className="hover:text-gray-300 ml-6">
-            Events
+          <Link href="/contact" className="hover:text-gray-300 ml-6">
+            Contact
           </Link>
           <Link href="/about" className="hover:text-gray-300 ml-6">
             About Us

@@ -21,9 +21,9 @@ const courses = [
 ];
 
 const CoursesTab = () => (
-  <div className="p-8">
-    <h2 className="text-2xl font-bold mb-4 text-black">Courses</h2>
-    <div className="flex flex-wrap justify-center gap-6">
+  <div className="p-8 bg-white">
+  <h2 className="text-2xl font-bold mb-4 text-black">Courses</h2>
+  <div className="flex flex-wrap justify-center gap-6">
       {courses.map((course) => {
         let link = '';
         if (course.title === 'Data Fundamentals') link = '/courses/data-fundamentals';

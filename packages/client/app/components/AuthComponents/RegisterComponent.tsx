@@ -31,7 +31,7 @@ export default function RegisterComponent() {
         setMessage(
           '✔ Registration successful! Please check your email to verify your account.',
         );
-        setTimeout(() => router.push('/auth/login'), 3500);
+        setTimeout(() => router.push('/auth/login'), 3000);
       } else {
         setError(data.error);
       }

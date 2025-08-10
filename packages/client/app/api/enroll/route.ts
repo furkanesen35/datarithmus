@@ -32,9 +32,9 @@ export async function POST(req: NextRequest) {
     });
 
     // Send Google Meet invitation email
-    const googleMeetLink = process.env.GOOGLE_MEET_LINK || 'https://meet.google.com/your-link';
-    const meetingDate = process.env.MEETING_DATE || 'TBD';
-    const meetingTime = process.env.MEETING_TIME || 'TBD';
+    const googleMeetLink = process.env.GOOGLE_MEET_LINK || 'https://meet.google.com/aga-zrqj-skt';
+    const meetingDate = 'September 30, 2025';
+    const meetingTime = '09:00-10:00 PM';
     
     try {
       await sendMail({

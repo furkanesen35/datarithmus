@@ -161,7 +161,7 @@ export default function Header() {
 
         {/* Mobile menu - updated to match desktop navigation */}
         {isMenuOpen && (
-          <div className="lg:hidden absolute top-[50px] left-0 w-full bg-black transition-opacity duration-500 z-50">
+          <div className="lg:hidden absolute top-[50px] left-0 w-full bg-black transition-opacity duration-500 z-50 overflow-y-auto max-h-[calc(100vh-50px)]">
             {/* Career Paths dropdown for mobile */}
             <div className="border-b border-gray-700">
               <button

@@ -34,7 +34,7 @@ export default function ResetPasswordClient() {
       console.log('Response data:', data);
       if (res.ok) {
         setMessage('Password reset! You can now log in.');
-        setTimeout(() => router.push('/auth/login'), 1500);
+        setTimeout(() => router.push('/auth/login'), 3000);
       } else {
         setMessage(data.error || 'Failed to reset password');
       }

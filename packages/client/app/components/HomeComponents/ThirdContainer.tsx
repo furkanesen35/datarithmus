@@ -32,16 +32,16 @@ function ThirdContainer() {
   ];
 
   return (
-    <div className="container mx-auto my-8 bg-[#1A202C]">
-      <h1 className="text-[#E2E8F0] p-[5px] font-bold text-2xl">Career Paths</h1>
-      <p className="text-[#E2E8F0] p-[5px]">
+  <div className="container mx-auto my-8 bg-[#1A202C]">
+      <h1 className="text-[#F7FAFC] p-[5px] font-bold text-2xl">Career Paths</h1>
+      <p className="text-[#CBD5E1] p-[5px]">
         The business courses train beginners in the data business.
       </p>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="flex overflow-x-auto md:grid md:grid-cols-2 lg:grid-cols-4 gap-4 pb-2 scrollbar-thin scrollbar-thumb-[#4A5568] scrollbar-track-[#1A202C]">
         {cardsData.map((card, index) => (
           <div
             key={index}
-            className="bg-[#2D3748] border border-[#4A5568] rounded-lg shadow-md overflow-hidden"
+            className="min-w-[260px] md:min-w-0 bg-[#2D3748] border border-[#4A5568] rounded-lg shadow-md overflow-hidden"
           >
             <Link href={card.link}>
               <Image
@@ -55,11 +55,11 @@ function ThirdContainer() {
               />
             </Link>
             <div className="p-4">
-              <h3 className="text-[#9F7AEA] text-xl font-semibold mb-2">
+              <h3 className="text-[#FBBF24] text-xl font-semibold mb-2">
                 {card.title}
               </h3>
-              <p className="text-[#E2E8F0] text-base mb-4">{card.description}</p>
-              <Link href={card.link} className="inline-block px-4 py-2 bg-[#38B2AC] text-[#E2E8F0] rounded hover:bg-[#9F7AEA] transition duration-300 font-semibold">Learn More</Link>
+              <p className="text-[#F7FAFC] text-base mb-4">{card.description}</p>
+              <Link href={card.link} className="inline-block px-4 py-2 bg-[#38B2AC] text-black rounded hover:bg-[#FBBF24] transition duration-300 font-semibold">Learn More</Link>
             </div>
           </div>
         ))}

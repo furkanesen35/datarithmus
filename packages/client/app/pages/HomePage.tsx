@@ -2,6 +2,7 @@
 import Header from 'app/components/Header';
 import FirstContainer from '../components/HomeComponents/FirstContainer';
 import SecondContainer from 'app/components/HomeComponents/SecondContainer';
+import ThirdContainer from 'app/components/HomeComponents/ThirdContainer';
 
 export default function HomePage() {
   return (
@@ -9,7 +10,7 @@ export default function HomePage() {
       <Header />
       <FirstContainer />
       <SecondContainer />
-      {/* <ThirdContainer /> */}
+      <ThirdContainer />
     </div>
   );
 }

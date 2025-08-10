@@ -30,10 +30,10 @@ export default function LoginComponent() {
       if (response.ok) {
         login(data.email, data.isSuperuser);
         setMessage('✔ Login successful! Redirecting to dashboard...');
-        setTimeout(() => router.push('/dashboard'), 3500); // Increased to 5 seconds
+        setTimeout(() => router.push('/dashboard'), 3000); // Increased to 3 seconds
       } else if (data.redirect) {
         setError(data.error);
-        setTimeout(() => router.push(data.redirect), 1500);
+        setTimeout(() => router.push(data.redirect), 3000);
       } else {
         setError(data.error);
       }

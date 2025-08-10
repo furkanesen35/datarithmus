@@ -52,11 +52,17 @@ export default function ResetPasswordClient() {
 
   return (
     <div className="max-w-md mx-auto mt-12 p-6 bg-[#f9f9f9] rounded shadow border border-gray-200">
-      <h2 className="text-2xl font-bold mb-2 text-[#301934]">Create New Password</h2>
-      <p className="mb-4 text-[#301934]/80 text-sm">Set your new password below.</p>
+      <h2 className="text-2xl font-bold mb-2 text-[#301934]">
+        Create New Password
+      </h2>
+      <p className="mb-4 text-[#301934]/80 text-sm">
+        Set your new password below.
+      </p>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
-          <label className="block text-sm font-medium text-[#301934]">New Password</label>
+          <label className="block text-sm font-medium text-[#301934]">
+            New Password
+          </label>
           <input
             type="password"
             value={password}
@@ -65,7 +71,9 @@ export default function ResetPasswordClient() {
           />
         </div>
         <div>
-          <label className="block text-sm font-medium text-[#301934]">Confirm Password</label>
+          <label className="block text-sm font-medium text-[#301934]">
+            Confirm Password
+          </label>
           <input
             type="password"
             value={confirm}
@@ -80,7 +88,11 @@ export default function ResetPasswordClient() {
         >
           {loading ? 'Creating...' : 'Create Password'}
         </button>
-        {message && <div className="text-center text-sm mt-2 text-[#301934]">{message}</div>}
+        {message && (
+          <div className="text-center text-sm mt-2 text-[#301934]">
+            {message}
+          </div>
+        )}
       </form>
     </div>
   );

@@ -1,4 +1,5 @@
 import '../../globals.css';
+import Link from 'next/link';
 
 export default function Dataops() {
 	return (
@@ -17,7 +18,10 @@ export default function Dataops() {
 					<li>Soft Skills & Communication ~ 8 hours</li>
 				</ul>
 			</div>
-			<a href="/enroll" className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-all duration-300">Enroll Now</a>
+					<div className="flex gap-4">
+						<Link href="/enroll" className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-all duration-300">Enroll Now</Link>
+						<Link href="/" className="px-4 py-2 bg-gray-200 text-[#301934] rounded hover:bg-gray-300 transition-all duration-300 font-semibold">Return to Home</Link>
+					</div>
 		</div>
 	);
 }

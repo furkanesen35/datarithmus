@@ -32,8 +32,10 @@ function ThirdContainer() {
   ];
 
   return (
-  <div className="container mx-auto my-8 bg-[#1A202C]">
-      <h1 className="text-[#F7FAFC] p-[5px] font-bold text-2xl">Career Paths</h1>
+    <div className="container mx-auto my-8 bg-[#1A202C]">
+      <h1 className="text-[#F7FAFC] p-[5px] font-bold text-2xl">
+        Career Paths
+      </h1>
       <p className="text-[#CBD5E1] p-[5px]">
         The business courses train beginners in the data business.
       </p>
@@ -58,8 +60,15 @@ function ThirdContainer() {
               <h3 className="text-[#FBBF24] text-xl font-semibold mb-2">
                 {card.title}
               </h3>
-              <p className="text-[#F7FAFC] text-base mb-4">{card.description}</p>
-              <Link href={card.link} className="inline-block px-4 py-2 bg-[#38B2AC] text-black rounded hover:bg-[#FBBF24] transition duration-300 font-semibold">Learn More</Link>
+              <p className="text-[#F7FAFC] text-base mb-4">
+                {card.description}
+              </p>
+              <Link
+                href={card.link}
+                className="inline-block px-4 py-2 bg-[#38B2AC] text-black rounded hover:bg-[#FBBF24] transition duration-300 font-semibold"
+              >
+                Learn More
+              </Link>
             </div>
           </div>
         ))}

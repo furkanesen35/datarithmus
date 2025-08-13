@@ -23,6 +23,7 @@
   "dependencies": {
     "bcrypt": "^6.0.0",
     "jose": "^5.10.0",
-    "multer": "^2.0.1"
+    "multer": "^2.0.1",
+    "xlsx": "^0.18.5"
   }
 }

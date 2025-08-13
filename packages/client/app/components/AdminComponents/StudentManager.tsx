@@ -1,6 +1,7 @@
 // packages/client/app/components/AdminComponents/StudentManager.tsx
 'use client';
 import { useEffect, useState } from 'react';
+import { exportStudentsToXLSX, Student as ExportStudent } from './exportStudentsToXLSX';
 
 interface Student {
   id: number;
@@ -176,6 +177,13 @@ export default function StudentManager({
             className="block w-full px-3 py-2 border border-gray-300 rounded-md text-black"
           />
         </div>
+        <button
+          className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+          onClick={() => exportStudentsToXLSX(filtered as ExportStudent[])}
+          disabled={filtered.length === 0}
+        >
+          Export to Excel
+        </button>
       </div>
       <div className="overflow-x-auto">
         <table className="min-w-full border border-gray-300">

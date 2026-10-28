@@ -1,6 +1,5 @@
 'use client';
 import Link from 'next/link';
-import '../globals.css';
 import { useState } from 'react';
 
 const skillsData = [

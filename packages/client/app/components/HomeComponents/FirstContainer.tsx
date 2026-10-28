@@ -1,6 +1,4 @@
 // packages/client/app/components/HomeComponents/FirstContainer.tsx
-import '../../globals.css';
-
 function FirstContainer() {
   return (
     <div className="flex flex-col w-full justify-center items-center h-[400px] bg-[#1A202C] text-[#E2E8F0]">

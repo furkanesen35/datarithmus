@@ -21,7 +21,7 @@ export default function LoginComponent() {
 
     try {
       setError(null);
-      const response = await authFetch('/api/login', {
+      const response = await authFetch('/api/auth/login', {
         method: 'POST',
         body: JSON.stringify({ email, password }),
       });

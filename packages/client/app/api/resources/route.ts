@@ -3,14 +3,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import path from 'path';
 import fs from 'fs/promises';
-import jwt from 'jsonwebtoken';
+import { verifyToken } from '../../../lib/auth';
 
 const prisma = new PrismaClient();
-
-interface JwtPayload {
-  email: string;
-  isSuperuser: boolean;
-}
 
 async function requireSuperuser(
   req: NextRequest,
@@ -20,10 +15,7 @@ async function requireSuperuser(
     return NextResponse.json({ error: 'No token provided' }, { status: 401 });
   }
   try {
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET || 'fallback-secret',
-    ) as JwtPayload;
+    const decoded = await verifyToken(token);
     if (!decoded.isSuperuser) {
       return NextResponse.json(
         { error: 'Superuser access required' },

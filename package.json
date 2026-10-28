@@ -21,7 +21,6 @@
     "packages/client"
   ],
   "dependencies": {
-    "jose": "^5.10.0",
     "multer": "^2.0.1"
   },
   "allowScripts": {

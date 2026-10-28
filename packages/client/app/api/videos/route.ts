@@ -1,7 +1,7 @@
-// packages/client/app/api/students/route.ts
+
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
-import { jwtVerify } from 'jose';
+import { verifyToken } from '../../../lib/auth';
 
 const prisma = new PrismaClient();
 
@@ -11,8 +11,7 @@ async function requireSuperuserJWT(req: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
   }
   try {
-    const secret = new TextEncoder().encode(process.env.JWT_SECRET!);
-    const { payload } = await jwtVerify(token, secret);
+    const payload = await verifyToken(token);
     if (!payload.isSuperuser) {
       return NextResponse.json(
         { error: 'Superuser access required' },

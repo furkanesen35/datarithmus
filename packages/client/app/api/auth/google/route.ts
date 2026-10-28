@@ -1,8 +1,8 @@
 // packages/client/app/api/auth/google/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
-import jwt from 'jsonwebtoken';
 import { OAuth2Client } from 'google-auth-library';
+import { signToken } from '../../../../lib/auth';
 
 const prisma = new PrismaClient();
 const googleClient = new OAuth2Client(process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID);
@@ -43,11 +43,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const jwtToken = jwt.sign(
-      { email: user.email, isSuperuser: user.isSuperuser },
-      process.env.JWT_SECRET!,
-      { expiresIn: '1h' },
-    );
+    const jwtToken = await signToken({
+      email: user.email,
+      isSuperuser: user.isSuperuser,
+    });
 
     const response = NextResponse.json({
       email: user.email,

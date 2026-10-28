@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import jwt from 'jsonwebtoken';
+import { verifyToken } from '../../../lib/auth';
 
 export async function GET(req: NextRequest) {
   const token = req.cookies.get('token')?.value;
@@ -7,13 +7,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
   }
   try {
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET || 'fallback-secret',
-    ) as {
-      email: string;
-      isSuperuser: boolean;
-    };
+    const decoded = await verifyToken(token);
     // Fetch user id from database
     const { PrismaClient } = await import('@prisma/client');
     const prisma = new PrismaClient();

@@ -1,15 +1,9 @@
 // packages/client/app/api/feedback/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
-import jwt from 'jsonwebtoken';
+import { verifyToken, type JwtPayload } from '../../../lib/auth';
 
 const prisma = new PrismaClient();
-
-interface JwtPayload {
-  email: string;
-  isSuperuser: boolean;
-  userId: number;
-}
 
 async function requireAuth(
   req: NextRequest,
@@ -19,10 +13,7 @@ async function requireAuth(
     return NextResponse.json({ error: 'No token provided' }, { status: 401 });
   }
   try {
-    const decoded = jwt.verify(
-      token,
-      process.env.JWT_SECRET || 'fallback-secret',
-    ) as JwtPayload;
+    const decoded = await verifyToken(token);
     return { user: decoded };
   } catch {
     return NextResponse.json({ error: 'Invalid token' }, { status: 401 });

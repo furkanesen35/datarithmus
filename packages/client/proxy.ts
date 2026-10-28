@@ -1,6 +1,6 @@
 // packages/client/proxy.ts
 import { NextRequest, NextResponse } from 'next/server';
-import { jwtVerify } from 'jose';
+import { verifyToken } from './lib/auth';
 
 export async function proxy(req: NextRequest) {
   const token =
@@ -11,7 +11,7 @@ export async function proxy(req: NextRequest) {
   // Allow unauthenticated access to public routes
   if (
     pathname.startsWith('/auth') ||
-    pathname === '/api/login' ||
+    pathname === '/api/auth/login' ||
     pathname === '/api/register' ||
     pathname === '/api/auth/google' ||
     pathname === '/api/enroll' ||
@@ -28,9 +28,7 @@ export async function proxy(req: NextRequest) {
   }
 
   try {
-    // jose requires the secret as a Uint8Array
-    const secret = new TextEncoder().encode(process.env.JWT_SECRET!);
-    const { payload } = await jwtVerify(token, secret);
+    const payload = await verifyToken(token);
     // Redirect non-superusers from admin routes
     if (pathname.startsWith('/admin') && !payload.isSuperuser) {
       return NextResponse.redirect(new URL('/dashboard', req.url));

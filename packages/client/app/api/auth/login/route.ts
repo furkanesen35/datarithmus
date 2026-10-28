@@ -1,8 +1,8 @@
-// packages/client/app/api/login/route.ts
+// packages/client/app/api/auth/login/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
+import { signToken } from '../../../../lib/auth';
 
 const prisma = new PrismaClient();
 
@@ -49,11 +49,10 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const token = jwt.sign(
-      { email: user.email, isSuperuser: user.isSuperuser },
-      process.env.JWT_SECRET!,
-      { expiresIn: '1h' },
-    );
+    const token = await signToken({
+      email: user.email,
+      isSuperuser: user.isSuperuser,
+    });
 
     const response = NextResponse.json({
       email: user.email,

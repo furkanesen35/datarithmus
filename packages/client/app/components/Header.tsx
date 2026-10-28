@@ -18,16 +18,13 @@ export default function Header() {
   const { auth, logout } = useAuth();
   const pathname = usePathname();
 
-  // Force close mobile menu on desktop (component mount and resize)
+  // Keep the mobile menu closed when resizing to desktop.
   useEffect(() => {
     const checkAndCloseMobileMenu = () => {
       if (window.innerWidth >= 1024) {
         setIsMenuOpen(false);
       }
     };
-
-    // Check immediately on mount
-    checkAndCloseMobileMenu();
 
     const handleResize = () => {
       checkAndCloseMobileMenu();
@@ -40,6 +37,7 @@ export default function Header() {
   // Close mobile menu on route change and ensure it's closed if on desktop
   useEffect(() => {
     if (window.innerWidth >= 1024) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setIsMenuOpen(false);
     }
   }, [pathname]);

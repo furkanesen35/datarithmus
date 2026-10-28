@@ -1,6 +1,6 @@
 // packages/client/app/components/AdminComponents/QuizManager.tsx
 'use client';
-import { useState, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 interface Quiz {
   id: number;
@@ -26,23 +26,24 @@ export default function QuizManager() {
   const [newCorrectAnswer, setNewCorrectAnswer] = useState(1); // 1-based
 
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [quizTitle, setQuizTitle] = useState('');
   const [titleError, setTitleError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchQuizzes();
-  }, []);
-
-  const fetchQuizzes = async () => {
-    setLoading(true);
+  const fetchQuizzes = useCallback(async () => {
     const res = await fetch('/api/quizzes', { credentials: 'include' });
     if (res.ok) {
       const data = await res.json();
       setQuizzes(data);
     }
     setLoading(false);
-  };
+  }, []);
+
+  useEffect(() => {
+    // The effect intentionally starts an asynchronous data fetch.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void fetchQuizzes();
+  }, [fetchQuizzes]);
 
   const handleAddOption = () => {
     setNewOptions([...newOptions, '']);

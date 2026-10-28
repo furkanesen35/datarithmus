@@ -1,6 +1,6 @@
 // packages/client/app/components/AdminComponents/AnnouncementManager.tsx
 'use client';
-import { useState, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 interface Announcement {
   id: number;
@@ -18,11 +18,7 @@ export default function AnnouncementsManager() {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchAnnouncements();
-  }, []);
-
-  const fetchAnnouncements = async () => {
+  const fetchAnnouncements = useCallback(async () => {
     try {
       const res = await fetch('/api/announcements', { credentials: 'include' });
       if (!res.ok) {
@@ -37,7 +33,13 @@ export default function AnnouncementsManager() {
         setError('Failed to fetch announcements');
       }
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    // The effect intentionally starts an asynchronous data fetch.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void fetchAnnouncements();
+  }, [fetchAnnouncements]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

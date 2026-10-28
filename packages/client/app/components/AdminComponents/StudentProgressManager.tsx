@@ -1,6 +1,6 @@
 // packages/client/app/components/AdminComponents/StudentProgressManager.tsx
 'use client';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 interface Student {
   id: number;
@@ -33,12 +33,7 @@ export default function StudentProgressManager() {
   }>({});
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  async function fetchData() {
-    setLoading(true);
+  const fetchData = useCallback(async () => {
     const res = await fetch('/api/student-progress', {
       credentials: 'include',
     });
@@ -49,7 +44,13 @@ export default function StudentProgressManager() {
       setResults(data.results);
     }
     setLoading(false);
-  }
+  }, []);
+
+  useEffect(() => {
+    // The effect intentionally starts an asynchronous data fetch.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void fetchData();
+  }, [fetchData]);
 
   return (
     <div className="mb-8">

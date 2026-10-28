@@ -46,7 +46,7 @@ function Schedule() {
     left: number;
   }>({ top: 0, left: 0 });
   const [users, setUsers] = useState<User[]>([]);
-  const [usersLoading, setUsersLoading] = useState(false);
+  const [usersLoading, setUsersLoading] = useState(true);
   const [usersError, setUsersError] = useState<string | null>(null);
   const [selectedUser, setSelectedUser] = useState('');
   const [showEventDetails, setShowEventDetails] = useState(false);
@@ -193,7 +193,6 @@ function Schedule() {
   };
 
   useEffect(() => {
-    setLoading(true);
     fetch('/api/schedule')
       .then((res) => res.json())
       .then((data) => {
@@ -208,7 +207,6 @@ function Schedule() {
   }, []);
 
   useEffect(() => {
-    setUsersLoading(true);
     fetch('/api/users')
       .then((res) => res.json())
       .then((data) => {

@@ -1,6 +1,6 @@
 // packages/client/app/components/AdminComponents/ResourceManager.tsx
 'use client';
-import { useState, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 interface Resource {
   id: number;
@@ -27,17 +27,11 @@ export default function ResourceManager({
   const [resourceLink, setResourceLink] = useState('');
   const [resources, setResources] = useState<Resource[]>([]);
   const [editingId, setEditingId] = useState<number | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const categories = ['Cheat Sheet', 'Tutorial', 'Article', 'Code Sample'];
 
-  useEffect(() => {
-    fetchResources();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const fetchResources = async () => {
-    setLoading(true);
+  const fetchResources = useCallback(async () => {
     try {
       const res = await fetch('/api/resources', { credentials: 'include' });
       if (!res.ok) throw new Error('Failed to fetch resources');
@@ -51,7 +45,13 @@ export default function ResourceManager({
     } finally {
       setLoading(false);
     }
-  };
+  }, [onError]);
+
+  useEffect(() => {
+    // The effect intentionally starts an asynchronous data fetch.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void fetchResources();
+  }, [fetchResources]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

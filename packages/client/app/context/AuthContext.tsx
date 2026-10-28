@@ -7,6 +7,7 @@ import {
   useEffect,
   ReactNode,
 } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface AuthState {
   isLoggedIn: boolean;
@@ -23,6 +24,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  const router = useRouter();
   const [auth, setAuth] = useState<AuthState>({
     isLoggedIn: false,
     user: null,
@@ -66,7 +68,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Call /api/auth/logout to clear cookies, then redirect
     fetch('/api/auth/logout', { method: 'POST', credentials: 'include' }).then(
       () => {
-        window.location.href = '/auth/login';
+        router.push('/auth/login');
       },
     );
   };

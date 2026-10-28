@@ -40,10 +40,9 @@ export default function FeedbackManager({
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [newFormTitle, setNewFormTitle] = useState('');
   const [newFormQuestions, setNewFormQuestions] = useState<string[]>(['']);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const fetchForms = React.useCallback(async () => {
-    setLoading(true);
     try {
       const res = await fetch('/api/feedback/forms', {
         credentials: 'include',
@@ -63,6 +62,8 @@ export default function FeedbackManager({
   }, [onError]);
 
   useEffect(() => {
+    // The effect intentionally starts an asynchronous data fetch.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchForms();
   }, [fetchForms]);
 

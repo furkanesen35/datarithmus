@@ -1,6 +1,6 @@
 // packages/client/app/components/AdminComponents/HomeworkManager.tsx
 'use client';
-import { useState, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 interface Homework {
   id: number;
@@ -27,15 +27,9 @@ export default function HomeworkManager({
   const [homeworkFile, setHomeworkFile] = useState<File | null>(null);
   const [homeworks, setHomeworks] = useState<Homework[]>([]);
   const [editingId, setEditingId] = useState<number | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchHomeworks();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const fetchHomeworks = async () => {
-    setLoading(true);
+  const fetchHomeworks = useCallback(async () => {
     try {
       const res = await fetch('/api/homework', { credentials: 'include' });
       if (!res.ok) throw new Error('Failed to fetch homework');
@@ -49,7 +43,13 @@ export default function HomeworkManager({
     } finally {
       setLoading(false);
     }
-  };
+  }, [onError]);
+
+  useEffect(() => {
+    // The effect intentionally starts an asynchronous data fetch.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void fetchHomeworks();
+  }, [fetchHomeworks]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

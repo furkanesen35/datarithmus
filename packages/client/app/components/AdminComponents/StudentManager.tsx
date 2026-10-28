@@ -1,6 +1,6 @@
 // packages/client/app/components/AdminComponents/StudentManager.tsx
 'use client';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { exportStudentsToXLSX, Student as ExportStudent } from './exportStudentsToXLSX';
 
 interface Student {
@@ -22,18 +22,12 @@ export default function StudentManager({
 }: StudentManagerProps) {
   const [students, setStudents] = useState<Student[]>([]);
   const [search, setSearch] = useState('');
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
   const [inviteEmail, setInviteEmail] = useState('');
   const [inviteUsername, setInviteUsername] = useState('');
   const [inviteLoading, setInviteLoading] = useState(false);
 
-  useEffect(() => {
-    fetchStudents();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const fetchStudents = async () => {
-    setLoading(true);
+  const fetchStudents = useCallback(async () => {
     try {
       const res = await fetch('/api/students', { credentials: 'include' });
       if (!res.ok) throw new Error('Failed to fetch students');
@@ -47,7 +41,13 @@ export default function StudentManager({
     } finally {
       setLoading(false);
     }
-  };
+  }, [onError]);
+
+  useEffect(() => {
+    // The effect intentionally starts an asynchronous data fetch.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void fetchStudents();
+  }, [fetchStudents]);
 
   const handleToggleStatus = async (id: number, isActive: boolean) => {
     setLoading(true);

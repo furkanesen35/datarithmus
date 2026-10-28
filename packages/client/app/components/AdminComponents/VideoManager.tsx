@@ -1,6 +1,6 @@
 // packages/client/app/components/AdminComponents/VideoManager.tsx
 'use client';
-import { useState, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 interface Video {
   id: number;
@@ -17,18 +17,20 @@ export default function VideoManager() {
   const [videos, setVideos] = useState<Video[]>([]);
   const [editingId, setEditingId] = useState<number | null>(null);
 
-  useEffect(() => {
-    fetchVideos();
-  }, []);
-
-  const fetchVideos = async () => {
+  const fetchVideos = useCallback(async () => {
     const res = await fetch('/api/videos', {
       credentials: 'include', // Send cookies for authentication
     });
     if (res.ok) {
       setVideos(await res.json());
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    // The effect intentionally starts an asynchronous data fetch.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void fetchVideos();
+  }, [fetchVideos]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

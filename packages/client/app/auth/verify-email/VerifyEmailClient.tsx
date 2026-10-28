@@ -3,16 +3,16 @@ import { useState, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function VerifyEmailClient() {
-  const [message, setMessage] = useState('Verifying...');
-  const [loading, setLoading] = useState(true);
   const router = useRouter();
   const params = useSearchParams();
   const token = params.get('token');
+  const [message, setMessage] = useState(
+    token ? 'Verifying...' : 'Invalid or missing token.',
+  );
+  const [loading, setLoading] = useState(Boolean(token));
 
   useEffect(() => {
     if (!token) {
-      setMessage('Invalid or missing token.');
-      setLoading(false);
       return;
     }
     fetch('/api/auth/verify-email', {

@@ -21,8 +21,13 @@
     "packages/client"
   ],
   "dependencies": {
-    "bcrypt": "^6.0.0",
     "jose": "^5.10.0",
     "multer": "^2.0.1"
+  },
+  "allowScripts": {
+    "@prisma/client@6.10.1": true,
+    "@prisma/engines@6.8.2": true,
+    "prisma@6.8.2": true,
+    "unrs-resolver@1.7.2": true
   }
 }

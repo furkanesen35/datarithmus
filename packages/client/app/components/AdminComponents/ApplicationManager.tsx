@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 interface Application {
   id: number;
@@ -20,15 +20,9 @@ export default function ApplicationManager({
   onError,
 }: ApplicationManagerProps) {
   const [applications, setApplications] = useState<Application[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchApplications();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const fetchApplications = async () => {
-    setLoading(true);
+  const fetchApplications = useCallback(async () => {
     try {
       const res = await fetch('/api/enroll');
       if (!res.ok) throw new Error('Failed to fetch applications');
@@ -42,7 +36,13 @@ export default function ApplicationManager({
     } finally {
       setLoading(false);
     }
-  };
+  }, [onError]);
+
+  useEffect(() => {
+    // The effect intentionally starts an asynchronous data fetch.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void fetchApplications();
+  }, [fetchApplications]);
 
   return (
     <div>

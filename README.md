@@ -2,6 +2,22 @@ This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-
 
 ## Getting Started
 
+### Environment Setup
+
+Copy the client environment template to a local environment file:
+
+```powershell
+Copy-Item packages\client\.env.example packages\client\.env.local
+```
+
+Set the PostgreSQL connection string and any Google OAuth or SMTP credentials you use. Replace `JWT_SECRET` with a generated random value; for example:
+
+```powershell
+node -e "console.log(require('node:crypto').randomBytes(32).toString('hex'))"
+```
+
+The `.env.local` file is ignored by Git. Do not commit real credentials.
+
 First, run the development server:
 
 ```bash

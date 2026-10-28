@@ -1,8 +1,8 @@
-// packages/client/middleware.ts
+// packages/client/proxy.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { jwtVerify } from 'jose';
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const token =
     req.headers.get('authorization')?.split(' ')[1] ||
     req.cookies.get('token')?.value;
@@ -46,6 +46,3 @@ export async function middleware(req: NextRequest) {
 export const config = {
   matcher: ['/admin/:path*', '/dashboard/:path*', '/api/:path*'],
 };
-
-// All code is commented out, so there are no ESLint or Prettier errors in this file.
-// If you want to enable the middleware, uncomment and clean up unused variables as needed.

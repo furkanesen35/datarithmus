@@ -1,25 +1,17 @@
-// # packages/client/eslint.config.mjs
-import { dirname } from 'path';
-import { fileURLToPath } from 'url';
-import { FlatCompat } from '@eslint/eslintrc';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-const compat = new FlatCompat({
-  baseDirectory: __dirname,
-});
+import nextVitals from 'eslint-config-next/core-web-vitals';
+import nextTs from 'eslint-config-next/typescript';
 
 const eslintConfig = [
-  // Add ignores for build output, typegen files, and common patterns
+  ...nextVitals,
+  ...nextTs,
   {
     ignores: [
-      '.next',
-      '**/types/',
-      'node_modules/',
-      'dist/',
-      'build/',
-      'coverage/',
+      '.next/**',
+      '**/types/**',
+      'node_modules/**',
+      'dist/**',
+      'build/**',
+      'coverage/**',
       '*.config.js',
       '*.config.mjs',
       '*.config.cjs',
@@ -30,7 +22,6 @@ const eslintConfig = [
       '**/__mocks__/**',
     ],
   },
-  ...compat.extends('next/core-web-vitals', 'next/typescript'),
 ];
 
 export default eslintConfig;

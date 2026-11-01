@@ -4,13 +4,41 @@ import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
 import { sendMail } from '../../../../lib/mail';
 import { getBaseUrl } from '../../../utils/baseUrl';
+import { isPasswordValid } from '../../../../lib/passwordPolicy';
+import { isEmailValid } from '../../../../lib/formValidation';
 
 const prisma = new PrismaClient();
 
 export async function POST(req: NextRequest) {
   try {
-    const { username, email, password } = await req.json();
-    const existingUser = await prisma.user.findUnique({ where: { email } });
+    const body: {
+      username?: unknown;
+      email?: unknown;
+      password?: unknown;
+    } = await req.json();
+    const { username, email, password } = body;
+    if (
+      typeof username !== 'string' ||
+      !username.trim() ||
+      typeof email !== 'string' ||
+      !isEmailValid(email) ||
+      typeof password !== 'string' ||
+      !isPasswordValid(password)
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            'Username, email, and a password meeting all password requirements are required.',
+        },
+        { status: 400 },
+      );
+    }
+
+    const normalizedEmail = email.trim();
+    const normalizedUsername = username.trim();
+    const existingUser = await prisma.user.findUnique({
+      where: { email: normalizedEmail },
+    });
 
     if (existingUser) {
       return NextResponse.json(
@@ -25,9 +53,9 @@ export async function POST(req: NextRequest) {
 
     let user;
     try {
-      const verifyUrl = `${getBaseUrl()}/auth/verify-email?token=${token}`;
+      const verifyUrl = `${getBaseUrl()}/auth/verify-email#token=${token}`;
       await sendMail({
-        to: email,
+        to: normalizedEmail,
         subject: 'Verify your email',
         html: `
           <div style="font-family: Arial, sans-serif; color: #222; background: #f9f9f9; padding: 24px; border-radius: 8px; max-width: 480px; margin: auto;">
@@ -42,8 +70,8 @@ export async function POST(req: NextRequest) {
       });
       user = await prisma.user.create({
         data: {
-          email,
-          username,
+          email: normalizedEmail,
+          username: normalizedUsername,
           password: hashedPassword,
           isSuperuser: false,
         },

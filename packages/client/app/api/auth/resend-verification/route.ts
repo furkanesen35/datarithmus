@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
   await prisma.emailVerificationToken.create({
     data: { userId: user.id, token, expiresAt },
   });
-  const verifyUrl = `${getBaseUrl()}/auth/verify-email?token=${token}`;
+  const verifyUrl = `${getBaseUrl()}/auth/verify-email#token=${token}`;
   try {
     await sendMail({
       to: user.email,

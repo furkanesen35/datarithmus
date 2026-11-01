@@ -3,15 +3,17 @@
 import React, { FormEvent, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
-import { GoogleOAuthProvider, GoogleLogin } from '@react-oauth/google';
+import { GoogleLogin } from '@react-oauth/google';
 import { authFetch } from '../../../lib/fetch';
 import Link from 'next/link';
+import PasswordVisibilityToggle from '../PasswordVisibilityToggle';
 
 export default function LoginComponent() {
   const { login } = useAuth();
   const router = useRouter();
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -73,8 +75,15 @@ export default function LoginComponent() {
   };
 
   return (
-    <GoogleOAuthProvider clientId={process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID!}>
-      <div>
+    <div>
+        <div className="mb-6">
+          <Link
+            href="/"
+            className="text-sm text-blue-600 hover:underline focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+          >
+            ← Back to main page
+          </Link>
+        </div>
         {message && (
           <div className="mb-4 p-4 bg-green-100 text-green-700 rounded-md text-center flex items-center justify-center">
             <span>{message}</span>
@@ -108,13 +117,19 @@ export default function LoginComponent() {
             >
               Password
             </label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              required
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-black"
-            />
+            <div className="relative mt-1">
+              <input
+                type={showPassword ? 'text' : 'password'}
+                id="password"
+                name="password"
+                required
+                className="block w-full px-3 py-2 pr-10 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 text-black"
+              />
+              <PasswordVisibilityToggle
+                visible={showPassword}
+                onToggle={() => setShowPassword((visible) => !visible)}
+              />
+            </div>
           </div>
           <div className="mt-4 flex justify-center">
             <GoogleLogin
@@ -124,6 +139,7 @@ export default function LoginComponent() {
               logo_alignment="center"
               size="large"
               shape="circle"
+              width={300}
             />
           </div>
           <button
@@ -144,7 +160,6 @@ export default function LoginComponent() {
             Don’t have an account? Register
           </Link>
         </div>
-      </div>
-    </GoogleOAuthProvider>
+    </div>
   );
 }

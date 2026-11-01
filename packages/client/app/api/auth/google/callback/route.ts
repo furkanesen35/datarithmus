@@ -3,7 +3,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { exchangeCodeForTokens } from '../../../../../lib/googleMeet';
 
 export async function GET(request: NextRequest) {
-  console.log('Google OAuth callback hit:', request.url);
   const { searchParams } = new URL(request.url);
   const code = searchParams.get('code');
   const error = searchParams.get('error');
@@ -26,11 +25,8 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    console.log('Exchanging code for tokens:', code);
     const tokens = await exchangeCodeForTokens(code);
-    console.log('Tokens received from Google:', tokens);
 
-    // Store tokens securely (you might want to encrypt these)
     const response = NextResponse.redirect(
       new URL('/dashboard?auth_success=true', request.url),
     );
@@ -44,7 +40,6 @@ export async function GET(request: NextRequest) {
         : 3600,
       sameSite: 'lax',
     });
-    console.log('Set google_access_token cookie:', tokens.access_token);
 
     // Store refresh token if available
     if (tokens.refresh_token) {
@@ -54,7 +49,6 @@ export async function GET(request: NextRequest) {
         maxAge: 30 * 24 * 60 * 60, // 30 days
         sameSite: 'lax',
       });
-      console.log('Set google_refresh_token cookie:', tokens.refresh_token);
     }
 
     return response;

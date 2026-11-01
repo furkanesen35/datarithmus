@@ -132,14 +132,14 @@ export default function StudentManager({
     }
   };
 
-  const handleAdminPasswordReset = async (email: string) => {
+  const handleAdminPasswordReset = async (id: number) => {
     setLoading(true);
     try {
-      const res = await fetch('/api/auth/request-password-reset', {
+      const res = await fetch('/api/admin/students/request-password-reset', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ id }),
       });
       const data = await res.json();
       if (res.ok) {
@@ -242,7 +242,7 @@ export default function StudentManager({
                       Delete
                     </button>
                     <button
-                      onClick={() => handleAdminPasswordReset(stu.email)}
+                      onClick={() => handleAdminPasswordReset(stu.id)}
                       className="text-blue-500 hover:underline text-sm mr-2"
                     >
                       Send Password Reset

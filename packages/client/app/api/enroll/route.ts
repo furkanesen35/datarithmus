@@ -1,13 +1,44 @@
-// PATCH /api/enroll - update application status
-export async function PATCH(req: NextRequest) {
-  const { id, status } = await req.json();
-  if (!id || !status) {
-    return NextResponse.json(
-      { error: 'Missing id or status.' },
-      { status: 400 },
-    );
+import { NextRequest, NextResponse } from 'next/server';
+import { PrismaClient } from '@prisma/client';
+import { sendMail } from '../../../lib/mail';
+import { verifyToken } from '../../../lib/auth';
+
+const prisma = new PrismaClient();
+
+async function requireSuperuser(req: NextRequest): Promise<NextResponse | null> {
+  const token = req.cookies.get('token')?.value;
+  if (!token) {
+    return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
   }
+
   try {
+    const user = await verifyToken(token);
+    if (!user.isSuperuser) {
+      return NextResponse.json(
+        { error: 'Superuser access required' },
+        { status: 403 },
+      );
+    }
+    return null;
+  } catch {
+    return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
+  }
+}
+
+// PATCH /api/enroll - update application status (admin only)
+export async function PATCH(req: NextRequest) {
+  const authError = await requireSuperuser(req);
+  if (authError) return authError;
+
+  try {
+    const { id, status } = await req.json();
+    if (!id || !status) {
+      return NextResponse.json(
+        { error: 'Missing id or status.' },
+        { status: 400 },
+      );
+    }
+
     await prisma.enrollmentApplication.update({
       where: { id },
       data: { status },
@@ -20,11 +51,6 @@ export async function PATCH(req: NextRequest) {
     );
   }
 }
-import { NextRequest, NextResponse } from 'next/server';
-import { PrismaClient } from '@prisma/client';
-import { sendMail } from '../../../lib/mail';
-
-const prisma = new PrismaClient();
 
 // POST /api/enroll - create new application
 export async function POST(req: NextRequest) {
@@ -78,7 +104,10 @@ export async function POST(req: NextRequest) {
 }
 
 // GET /api/enroll - get all applications (admin only)
-export async function GET() {
+export async function GET(req: NextRequest) {
+  const authError = await requireSuperuser(req);
+  if (authError) return authError;
+
   try {
     const applications = await prisma.enrollmentApplication.findMany({
       orderBy: { createdAt: 'desc' },

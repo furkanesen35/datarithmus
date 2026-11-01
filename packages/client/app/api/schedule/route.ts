@@ -2,10 +2,37 @@ import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { generateGoogleMeetLink } from '../../../lib/googleMeet';
 import { sendMail } from '../../../lib/mail';
+import { verifyToken } from '../../../lib/auth';
 
 const prisma = new PrismaClient();
 
-export async function GET() {
+async function authorizeRequest(
+  req: NextRequest,
+  superuserOnly = false,
+): Promise<NextResponse | null> {
+  const token = req.cookies.get('token')?.value;
+  if (!token) {
+    return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+  }
+
+  try {
+    const user = await verifyToken(token);
+    if (superuserOnly && !user.isSuperuser) {
+      return NextResponse.json(
+        { error: 'Superuser access required' },
+        { status: 403 },
+      );
+    }
+    return null;
+  } catch {
+    return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
+  }
+}
+
+export async function GET(req: NextRequest) {
+  const authError = await authorizeRequest(req);
+  if (authError) return authError;
+
   try {
     const schedules = await prisma.schedule.findMany({
       orderBy: { createdAt: 'desc' },
@@ -20,6 +47,9 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
+  const authError = await authorizeRequest(req, true);
+  if (authError) return authError;
+
   try {
     const { title, start, end, description, participants } = await req.json();
     if (!title || !start || !end) {
@@ -100,6 +130,9 @@ export async function POST(req: NextRequest) {
 }
 
 export async function PUT(req: NextRequest) {
+  const authError = await authorizeRequest(req, true);
+  if (authError) return authError;
+
   try {
     const body = await req.json();
     console.log('PUT /api/schedule body:', body);
@@ -197,6 +230,9 @@ export async function PUT(req: NextRequest) {
 }
 
 export async function DELETE(req: NextRequest) {
+  const authError = await authorizeRequest(req, true);
+  if (authError) return authError;
+
   try {
     let id: string | undefined;
     // Try to get id from query param first

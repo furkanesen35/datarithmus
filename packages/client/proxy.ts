@@ -12,7 +12,7 @@ export async function proxy(req: NextRequest) {
   if (
     pathname.startsWith('/auth') ||
     pathname === '/api/auth/login' ||
-    pathname === '/api/register' ||
+    pathname === '/api/auth/register' ||
     pathname === '/api/auth/google' ||
     pathname === '/api/enroll' ||
     pathname === '/api/auth/request-password-reset' ||

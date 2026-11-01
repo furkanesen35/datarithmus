@@ -21,7 +21,7 @@ export default function RegisterComponent() {
 
     try {
       setError(null);
-      const response = await fetch('/api/register', {
+      const response = await fetch('/api/auth/register', {
         method: 'POST',
         body: JSON.stringify({ username, email, password }),
       });

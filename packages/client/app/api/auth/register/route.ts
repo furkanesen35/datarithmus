@@ -1,10 +1,9 @@
-// packages/client/app/api/register/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import crypto from 'crypto';
-import { sendMail } from '../../../lib/mail';
-import { getBaseUrl } from '../../utils/baseUrl';
+import { sendMail } from '../../../../lib/mail';
+import { getBaseUrl } from '../../../utils/baseUrl';
 
 const prisma = new PrismaClient();
 
@@ -21,13 +20,11 @@ export async function POST(req: NextRequest) {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
-    // Generate email verification token first
     const token = crypto.randomBytes(32).toString('hex');
-    const expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24); // 24 hours
+    const expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24);
 
     let user;
     try {
-      // Try to send the email before creating the user
       const verifyUrl = `${getBaseUrl()}/auth/verify-email?token=${token}`;
       await sendMail({
         to: email,
@@ -43,7 +40,6 @@ export async function POST(req: NextRequest) {
           </div>
         `,
       });
-      // Only create the user and token if email send succeeds
       user = await prisma.user.create({
         data: {
           email,
@@ -68,8 +64,6 @@ export async function POST(req: NextRequest) {
         'Registration successful! Please check your email to verify your account.',
     });
   } catch {
-    // Log the error for debugging
-    // If error is an object, try to get a message
     return NextResponse.json({ error: 'Unknown error' }, { status: 500 });
   }
 }

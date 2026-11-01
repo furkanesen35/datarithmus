@@ -6,7 +6,7 @@ interface Application {
   email: string;
   course: string;
   message?: string;
-  status: string;
+  status: 'pending' | 'approved' | 'rejected';
   createdAt: string;
 }
 

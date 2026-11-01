@@ -4,6 +4,12 @@ import { sendMail } from '../../../lib/mail';
 import { verifyToken } from '../../../lib/auth';
 
 const prisma = new PrismaClient();
+const enrollmentStatuses = ['pending', 'approved', 'rejected'] as const;
+type EnrollmentStatus = (typeof enrollmentStatuses)[number];
+
+function isEnrollmentStatus(status: unknown): status is EnrollmentStatus {
+  return enrollmentStatuses.some((validStatus) => validStatus === status);
+}
 
 async function requireSuperuser(req: NextRequest): Promise<NextResponse | null> {
   const token = req.cookies.get('token')?.value;
@@ -31,10 +37,16 @@ export async function PATCH(req: NextRequest) {
   if (authError) return authError;
 
   try {
-    const { id, status } = await req.json();
-    if (!id || !status) {
+    const body: { id?: unknown; status?: unknown } = await req.json();
+    const { id, status } = body;
+    if (
+      typeof id !== 'number' ||
+      !Number.isInteger(id) ||
+      id <= 0 ||
+      !isEnrollmentStatus(status)
+    ) {
       return NextResponse.json(
-        { error: 'Missing id or status.' },
+        { error: 'A valid id and enrollment status are required.' },
         { status: 400 },
       );
     }

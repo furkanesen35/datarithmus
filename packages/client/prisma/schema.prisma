@@ -1,12 +1,19 @@
 model EnrollmentApplication {
-  id        Int      @id @default(autoincrement())
+  id        Int                         @id @default(autoincrement())
   name      String
   email     String
   course    String
   message   String?
-  status    String   @default("pending")
-  createdAt DateTime @default(now())
+  status    EnrollmentApplicationStatus @default(pending)
+  createdAt DateTime                    @default(now())
 }
+
+enum EnrollmentApplicationStatus {
+  pending
+  approved
+  rejected
+}
+
 generator client {
   provider = "prisma-client-js"
 }
@@ -30,8 +37,8 @@ model User {
   passwordResetTokens     PasswordResetToken[]
   questionResults         QuestionResult[]
   quizResults             QuizResults[]
-  discussions             Discussion[] @relation("UserDiscussions")
-  comments                Comment[]    @relation("UserComments")
+  discussions             Discussion[]             @relation("UserDiscussions")
+  comments                Comment[]                @relation("UserComments")
   feedbackResponses       FeedbackResponse[]
 }
 
@@ -44,24 +51,24 @@ model Video {
 }
 
 model Quiz {
-  id          Int            @id @default(autoincrement())
-  title       String
-  createdAt   DateTime       @default(now())
-  questions   QuizQuestion[]
+  id              Int              @id @default(autoincrement())
+  title           String
+  createdAt       DateTime         @default(now())
+  questions       QuizQuestion[]
   questionResults QuestionResult[]
-  quizResults QuizResults[]
-  passingScore Int @default(50)
+  quizResults     QuizResults[]
+  passingScore    Int              @default(50)
 }
 
 model QuizQuestion {
-  id            Int          @id @default(autoincrement())
-  question      String
-  options       String
-  correctAnswer Int
-  quizId        Int
-  createdAt     DateTime     @default(now())
-  quiz          Quiz         @relation(fields: [quizId], references: [id])
-  questionResults   QuestionResult[]
+  id              Int              @id @default(autoincrement())
+  question        String
+  options         String
+  correctAnswer   Int
+  quizId          Int
+  createdAt       DateTime         @default(now())
+  quiz            Quiz             @relation(fields: [quizId], references: [id])
+  questionResults QuestionResult[]
 }
 
 model Announcement {
@@ -123,64 +130,64 @@ model StudentProgress {
 }
 
 model Discussion {
-  id        Int      @id @default(autoincrement())
+  id        Int       @id @default(autoincrement())
   title     String
   content   String
   authorId  Int
-  author    User     @relation("UserDiscussions", fields: [authorId], references: [id])
-  pinned    Boolean  @default(false)
-  createdAt DateTime @default(now())
+  author    User      @relation("UserDiscussions", fields: [authorId], references: [id])
+  pinned    Boolean   @default(false)
+  createdAt DateTime  @default(now())
   comments  Comment[]
 }
 
 model Comment {
-  id          Int        @id @default(autoincrement())
-  content     String
-  authorId    Int
-  author      User       @relation("UserComments", fields: [authorId], references: [id])
+  id           Int        @id @default(autoincrement())
+  content      String
+  authorId     Int
+  author       User       @relation("UserComments", fields: [authorId], references: [id])
   discussionId Int
-  discussion  Discussion @relation(fields: [discussionId], references: [id])
-  createdAt   DateTime   @default(now())
+  discussion   Discussion @relation(fields: [discussionId], references: [id])
+  createdAt    DateTime   @default(now())
 }
 
 model FeedbackForm {
-  id        Int      @id @default(autoincrement())
+  id        Int                @id @default(autoincrement())
   title     String
-  createdAt DateTime @default(now())
+  createdAt DateTime           @default(now())
   questions FeedbackQuestion[]
   responses FeedbackResponse[]
 }
 
 model FeedbackQuestion {
-  id        Int      @id @default(autoincrement())
+  id        Int                @id @default(autoincrement())
   formId    Int
-  form      FeedbackForm @relation(fields: [formId], references: [id])
+  form      FeedbackForm       @relation(fields: [formId], references: [id])
   question  String
-  createdAt DateTime @default(now())
+  createdAt DateTime           @default(now())
   responses FeedbackResponse[]
 }
 
 model FeedbackResponse {
-  id          Int      @id @default(autoincrement())
-  questionId  Int
-  question    FeedbackQuestion @relation(fields: [questionId], references: [id])
-  studentId   Int
-  student     User     @relation(fields: [studentId], references: [id])
-  formId      Int
-  form        FeedbackForm @relation(fields: [formId], references: [id])
-  rating      Int
-  comment     String?
-  createdAt   DateTime @default(now())
-  
+  id         Int              @id @default(autoincrement())
+  questionId Int
+  question   FeedbackQuestion @relation(fields: [questionId], references: [id])
+  studentId  Int
+  student    User             @relation(fields: [studentId], references: [id])
+  formId     Int
+  form       FeedbackForm     @relation(fields: [formId], references: [id])
+  rating     Int
+  comment    String?
+  createdAt  DateTime         @default(now())
+
   @@unique([questionId, studentId])
 }
 
 model Student {
-  id          Int          @id @default(autoincrement())
-  email       String       @unique
-  name        String
-  isActive    Boolean      @default(true)
-  createdAt   DateTime     @default(now())
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  name      String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
 }
 
 model QuestionResult {
@@ -200,11 +207,12 @@ model QuizResults {
   id          Int      @id @default(autoincrement())
   studentId   Int
   quizId      Int
-  answers     Json     // Stores all answers for the quiz
+  answers     Json // Stores all answers for the quiz
   score       Int
   submittedAt DateTime @default(now())
   student     User     @relation(fields: [studentId], references: [id])
   quiz        Quiz     @relation(fields: [quizId], references: [id])
+
   @@unique([studentId, quizId]) // One result per student per quiz
 }
 

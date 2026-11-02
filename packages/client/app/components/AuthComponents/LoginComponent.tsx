@@ -70,7 +70,9 @@ export default function LoginComponent() {
         setError(data.error);
       }
     } catch {
-      setError('Google login failed. Please try again.');
+      setError(
+        'Could not contact the sign-in service. Check your connection and try again.',
+      );
     }
   };
 

@@ -91,7 +91,9 @@ export default function RegisterComponent() {
         setError(data.error);
       }
     } catch {
-      setError('Google registration failed. Please try again.');
+      setError(
+        'Could not contact the sign-in service. Check your connection and try again.',
+      );
     }
   };
 

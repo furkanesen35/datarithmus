@@ -51,7 +51,21 @@ export async function POST(req: NextRequest) {
     const token = crypto.randomBytes(32).toString('hex');
     const expiresAt = new Date(Date.now() + 1000 * 60 * 60 * 24);
 
-    let user;
+    // Save the account first so an email outage never blocks registration.
+    // A nested create writes the user and token atomically in one query.
+    // The account stays inactive until the email link is used.
+    await prisma.user.create({
+      data: {
+        email: normalizedEmail,
+        username: normalizedUsername,
+        password: hashedPassword,
+        isSuperuser: false,
+        isActive: false,
+        emailVerified: false,
+        emailVerificationTokens: { create: { token, expiresAt } },
+      },
+    });
+
     try {
       const verifyUrl = `${getBaseUrl()}/auth/verify-email#token=${token}`;
       await sendMail({
@@ -68,26 +82,17 @@ export async function POST(req: NextRequest) {
           </div>
         `,
       });
-      user = await prisma.user.create({
-        data: {
-          email: normalizedEmail,
-          username: normalizedUsername,
-          password: hashedPassword,
-          isSuperuser: false,
-        },
-      });
-      await prisma.emailVerificationToken.create({
-        data: { userId: user.id, token, expiresAt },
-      });
     } catch (mailError) {
       console.error('Email send error:', mailError);
-      return NextResponse.json(
-        { error: 'Registration failed: could not send verification email.' },
-        { status: 500 },
-      );
+      return NextResponse.json({
+        emailSent: false,
+        message:
+          'Your account was created, but we could not send the verification email. Please request a new verification email.',
+      });
     }
 
     return NextResponse.json({
+      emailSent: true,
       message:
         'Registration successful! Please check your email to verify your account.',
     });

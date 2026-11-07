@@ -16,7 +16,7 @@ interface AuthState {
 
 interface AuthContextType {
   auth: AuthState;
-  login: (email: string, isSuperuser: boolean) => void;
+  login: (id: number, email: string, isSuperuser: boolean) => void;
   logout: () => void;
   isAuthLoading: boolean;
 }
@@ -58,9 +58,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     checkAuth();
   }, []);
 
-  const login = (email: string, isSuperuser: boolean) => {
-    // For manual login, set id to -1 (should be replaced with real id after auth)
-    setAuth({ isLoggedIn: true, user: { id: -1, email, isSuperuser } });
+  const login = (id: number, email: string, isSuperuser: boolean) => {
+    setAuth({ isLoggedIn: true, user: { id, email, isSuperuser } });
   };
 
   const logout = () => {

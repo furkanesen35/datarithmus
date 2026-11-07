@@ -16,6 +16,7 @@ export default function AdminAppointments() {
   const { auth } = useAuth();
   const [requests, setRequests] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchRequests() {
@@ -30,14 +31,23 @@ export default function AdminAppointments() {
   }, [auth.user?.email]);
 
   async function handleAction(id: number, status: 'approved' | 'rejected') {
-    await fetch(`/api/appointment-request/${id}`, {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ status }),
-    });
-    setRequests((reqs) =>
-      reqs.map((r) => (r.id === id ? { ...r, status } : r)),
-    );
+    try {
+      setError(null);
+      const response = await fetch(`/api/appointment-request/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status }),
+      });
+      if (!response.ok) {
+        setError('Failed to update appointment request.');
+        return;
+      }
+      setRequests((reqs) =>
+        reqs.map((r) => (r.id === id ? { ...r, status } : r)),
+      );
+    } catch {
+      setError('Could not contact the appointment service.');
+    }
   }
 
   if (loading) return <div>Loading appointment requests...</div>;
@@ -45,6 +55,7 @@ export default function AdminAppointments() {
   return (
     <div className="mb-6">
       <h3 className="text-lg font-bold mb-2">Pending Appointment Requests</h3>
+      {error && <div className="mb-2 text-red-600">{error}</div>}
       {requests.filter((r) => r.status === 'pending').length === 0 && (
         <div>No pending requests.</div>
       )}

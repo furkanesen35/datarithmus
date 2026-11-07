@@ -52,7 +52,13 @@ export default function RegisterComponent() {
       });
 
       const data = await response.json();
-      if (response.ok) {
+      if (response.ok && data.emailSent === false) {
+        // Account exists but the email failed; the error text below shows the resend button.
+        setMessage(null);
+        setError(
+          'Your account was created, but we could not send the verification email.',
+        );
+      } else if (response.ok) {
         setMessage(
           '✔ Registration successful! Please check your email to verify your account.',
         );
@@ -81,7 +87,7 @@ export default function RegisterComponent() {
 
       const data = await response.json();
       if (response.ok) {
-        login(data.email, data.isSuperuser);
+        login(data.id, data.email, data.isSuperuser);
         setMessage('✔ Google registration successful, redirecting...');
         setTimeout(
           () => router.push(data.isSuperuser ? '/admin' : '/dashboard'),

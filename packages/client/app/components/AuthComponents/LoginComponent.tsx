@@ -30,7 +30,7 @@ export default function LoginComponent() {
 
       const data = await response.json();
       if (response.ok) {
-        login(data.email, data.isSuperuser);
+        login(data.id, data.email, data.isSuperuser);
         setMessage('✔ Login successful! Redirecting to dashboard...');
         setTimeout(() => router.push('/dashboard'), 3000); // Increased to 3 seconds
       } else if (data.redirect) {
@@ -60,7 +60,7 @@ export default function LoginComponent() {
 
       const data = await response.json();
       if (response.ok) {
-        login(data.email, data.isSuperuser);
+        login(data.id, data.email, data.isSuperuser);
         setMessage('✔ Google login successful, redirecting...');
         setTimeout(
           () => router.push(data.isSuperuser ? '/admin' : '/dashboard'),

@@ -30,6 +30,9 @@ model User {
   username                String
   isSuperuser             Boolean                  @default(false)
   isActive                Boolean                  @default(true)
+  // Separate from isActive so an admin deactivation can't be undone by email verification.
+  // Only self-registration sets this to false.
+  emailVerified           Boolean                  @default(true)
   mustChangePassword      Boolean                  @default(false)
   createdAt               DateTime                 @default(now())
   emailVerificationTokens EmailVerificationToken[]

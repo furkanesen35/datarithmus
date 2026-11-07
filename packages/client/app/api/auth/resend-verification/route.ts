@@ -14,7 +14,8 @@ export async function POST(req: NextRequest) {
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user)
     return NextResponse.json({ error: 'User not found' }, { status: 404 });
-  if (user.isActive)
+  // Check emailVerified, not isActive: a deactivated account must not be able to re-verify.
+  if (user.emailVerified)
     return NextResponse.json(
       { error: 'User already verified' },
       { status: 400 },

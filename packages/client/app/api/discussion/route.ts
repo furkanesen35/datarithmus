@@ -1,6 +1,8 @@
 // packages/client/app/api/discussion/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
+import { getCurrentUser } from '../../../lib/currentUser';
+import { readJsonObject } from '../../../lib/requestBody';
 
 const prisma = new PrismaClient();
 
@@ -25,17 +27,31 @@ export async function GET() {
 }
 
 export async function POST(req: NextRequest) {
-  const { title, content, authorId, pinned } = await req.json();
-  if (!title || !content || !authorId) {
+  const user = await getCurrentUser(req);
+  if (!user) {
+    return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+  }
+
+  const body = await readJsonObject<{ title?: unknown; content?: unknown }>(req);
+  if (!body) {
+    return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
+  }
+  const { title, content } = body;
+  if (
+    typeof title !== 'string' ||
+    !title.trim() ||
+    typeof content !== 'string' ||
+    !content.trim()
+  ) {
     return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
   }
 
   const discussion = await prisma.discussion.create({
     data: {
-      title,
-      content,
-      authorId: parseInt(authorId),
-      pinned: pinned || false,
+      title: title.trim(),
+      content: content.trim(),
+      authorId: user.id,
+      pinned: false,
     },
     include: {
       author: {
@@ -51,38 +67,81 @@ export async function POST(req: NextRequest) {
 }
 
 export async function PUT(req: NextRequest) {
-  const { id, title, content, pinned, authorId } = await req.json();
-  if (!id || !title || !content) {
+  const user = await getCurrentUser(req);
+  if (!user) {
+    return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+  }
+  if (!user.isSuperuser) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
+
+  const body = await readJsonObject<{
+    id?: unknown;
+    title?: unknown;
+    content?: unknown;
+    pinned?: unknown;
+  }>(req);
+  if (!body) {
+    return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
+  }
+  const { id, title, content, pinned } = body;
+  if (
+    typeof id !== 'number' ||
+    !Number.isSafeInteger(id) ||
+    id <= 0 ||
+    typeof title !== 'string' ||
+    !title.trim() ||
+    typeof content !== 'string' ||
+    !content.trim() ||
+    typeof pinned !== 'boolean'
+  ) {
     return NextResponse.json({ error: 'Missing fields' }, { status: 400 });
   }
 
-  // Only update author if authorId is provided and valid
-  const updateData: {
-    title: string;
-    content: string;
-    pinned: boolean;
-    authorId?: number;
-  } = { title, content, pinned };
-  if (authorId && !isNaN(parseInt(authorId))) {
-    updateData.authorId = parseInt(authorId);
+  const existing = await prisma.discussion.findUnique({
+    where: { id },
+    select: { id: true },
+  });
+  if (!existing) {
+    return NextResponse.json({ error: 'Discussion not found' }, { status: 404 });
   }
 
   const discussion = await prisma.discussion.update({
-    where: { id: Number(id) },
-    data: updateData,
+    where: { id },
+    data: { title: title.trim(), content: content.trim(), pinned },
   });
 
   return NextResponse.json({ message: 'Discussion updated', discussion });
 }
 
 export async function DELETE(req: NextRequest) {
-  const { id } = await req.json();
-  if (!id) {
-    return NextResponse.json({ error: 'ID required' }, { status: 400 });
+  const user = await getCurrentUser(req);
+  if (!user) {
+    return NextResponse.json({ error: 'Not authenticated' }, { status: 401 });
+  }
+  if (!user.isSuperuser) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
+
+  const body = await readJsonObject<{ id?: unknown }>(req);
+  if (!body) {
+    return NextResponse.json({ error: 'Invalid request body' }, { status: 400 });
+  }
+  const { id } = body;
+  if (typeof id !== 'number' || !Number.isSafeInteger(id) || id <= 0) {
+    return NextResponse.json({ error: 'Invalid discussion ID' }, { status: 400 });
+  }
+
+  const existing = await prisma.discussion.findUnique({
+    where: { id },
+    select: { id: true },
+  });
+  if (!existing) {
+    return NextResponse.json({ error: 'Discussion not found' }, { status: 404 });
   }
 
   // Delete all comments for this discussion first
-  await prisma.comment.deleteMany({ where: { discussionId: Number(id) } });
-  await prisma.discussion.delete({ where: { id: Number(id) } });
+  await prisma.comment.deleteMany({ where: { discussionId: id } });
+  await prisma.discussion.delete({ where: { id } });
   return NextResponse.json({ message: 'Discussion deleted' });
 }

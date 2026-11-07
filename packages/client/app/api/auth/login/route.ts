@@ -19,7 +19,11 @@ export async function POST(req: NextRequest) {
     }
     if (!user.isActive) {
       return NextResponse.json(
-        { error: 'Account not verified. Please check your email.' },
+        {
+          error: user.emailVerified
+            ? 'This account has been deactivated. Please contact an administrator.'
+            : 'Account not verified. Please check your email.',
+        },
         { status: 403 },
       );
     }
@@ -50,6 +54,7 @@ export async function POST(req: NextRequest) {
     });
 
     const response = NextResponse.json({
+      id: user.id,
       email: user.email,
       isSuperuser: user.isSuperuser,
     });
